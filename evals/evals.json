@@ -1,0 +1,28 @@
+{
+  "skill_name": "chutes-ai",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I want to use open-source AI models but I don't have a Chutes account yet. Can you set me up from scratch and give me an API key I can start using right away?",
+      "expected_output": "Should walk through account registration via API or web, warn about fingerprint sensitivity, offer to create a credential backup file, then create an API key and present it clearly. Should mention recovery options.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "What DeepSeek models are available on Chutes and how much do they cost? I need something that supports tool calling for my agent framework.",
+      "expected_output": "Should query or reference the models list, filter for DeepSeek models, show pricing, and specifically check the supported_features field for 'tools' support. Should present a clear recommendation.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I have a Chutes API key already (cpk_abc123). Show me how to call a model from Python and also check how much balance I have left.",
+      "expected_output": "Should show Python code using OpenAI SDK pointed at llm.chutes.ai/v1, and show how to check balance via GET /users/me. Should use the provided key in examples.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "I'm building a chatbot and need it to be fast and reliable. Can you set up model routing on Chutes so if one model is slow or down, it automatically fails over? I want the lowest latency possible and I care about privacy so TEE models only.",
+      "expected_output": "Should explain model routing strategies (default, default:latency, default:throughput), recommend using default:latency for a chatbot, filter available TEE models by TTFT, build a routing pool of 3-4 fast TEE models, and provide working code examples using either inline routing strings or the default alias."
+    }
+  ]
+}

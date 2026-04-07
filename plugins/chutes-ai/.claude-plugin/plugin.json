@@ -1,0 +1,24 @@
+{
+  "name": "chutes-ai",
+  "description": "Access decentralized open-source AI inference via Chutes.ai. Register accounts, manage API keys, discover models, make inference calls, set up model routing, and manage billing — all through Claude.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Vincent Bontempo",
+    "email": "bontempo.vincent@gmail.com"
+  },
+  "homepage": "https://chutes.ai",
+  "license": "MIT",
+  "keywords": [
+    "chutes",
+    "ai",
+    "inference",
+    "open-source",
+    "decentralized",
+    "deepseek",
+    "llama",
+    "qwen",
+    "bittensor",
+    "tee",
+    "model-routing"
+  ]
+}
