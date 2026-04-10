@@ -15,6 +15,25 @@ Open-source AI models are powerful but hosting them is expensive and complex. Ch
 
 ---
 
+## Session Initialization
+
+When this skill is first invoked in a session, check for stored credentials before doing anything else:
+
+```bash
+python <skill-scripts-dir>/manage_credentials.py check
+```
+
+- If credentials exist for a profile → retrieve the API key silently for use in API calls:
+  ```bash
+  python <skill-scripts-dir>/manage_credentials.py get --field api_key
+  ```
+- If no credentials exist → proceed with account creation (Step 1) and save credentials immediately after.
+- **NEVER paste raw credential values into conversation text.** Use them only in API call headers.
+
+Replace `<skill-scripts-dir>` with the actual path to the `scripts/` directory where `manage_credentials.py` is installed.
+
+---
+
 ## Quick Orientation
 
 There are two base URLs to remember:
@@ -96,6 +115,86 @@ DELETE https://api.chutes.ai/api_keys/{api_key_id}
 ### Extracting user_id from an API key
 
 The `user_id` is embedded in the key itself. For a key formatted as `cpk_<key_id>.<user_id_hex>.<secret>`, insert hyphens into the middle segment at positions 8-4-4-4-12 to get the UUID. Alternatively, just call `GET https://api.chutes.ai/users/me` — it returns everything including user_id.
+
+---
+
+## Step 2b: Credential Store
+
+After creating an account and API key, **immediately save credentials** to the secure credential store. This stores secrets in the OS keychain (macOS Keychain or Linux Secret Service) — not in plaintext files. Credentials persist across sessions and projects.
+
+### Save credentials after registration
+
+```bash
+python <skill-scripts-dir>/manage_credentials.py set-profile \
+  --username <username> \
+  --user-id <user_id> \
+  --fingerprint <fingerprint> \
+  --api-key <api_key>
+```
+
+This stores secret fields (api_key, fingerprint) in the OS keychain and non-secret metadata (username, user_id) in `~/.chutes/config` with `chmod 600`.
+
+### Read credentials in a new session
+
+```bash
+# Get a specific field (raw value, safe for shell substitution)
+python <skill-scripts-dir>/manage_credentials.py get --field api_key
+
+# Get all fields as JSON
+python <skill-scripts-dir>/manage_credentials.py get
+```
+
+### Multiple profiles
+
+Use `--profile` to manage separate credential sets (e.g., personal vs. production):
+
+```bash
+# Save to a named profile
+python <skill-scripts-dir>/manage_credentials.py set-profile --profile production --api-key cpk_prod...
+
+# Read from a named profile
+python <skill-scripts-dir>/manage_credentials.py get --profile production --field api_key
+
+# List all profiles
+python <skill-scripts-dir>/manage_credentials.py list-profiles
+```
+
+### Save OAuth app credentials
+
+When creating OAuth apps ("Sign in with Chutes"), store the client credentials:
+
+```bash
+python <skill-scripts-dir>/manage_credentials.py set-profile \
+  --profile oauth.my-app \
+  --client-id <cid_...> \
+  --client-secret <csc_...>
+```
+
+### Environment variable overrides (for CI/CD)
+
+Environment variables always take precedence over stored credentials:
+- `CHUTES_API_KEY` → api_key
+- `CHUTES_FINGERPRINT` → fingerprint
+- `CHUTES_CLIENT_ID` → client_id
+- `CHUTES_CLIENT_SECRET` → client_secret
+- `CHUTES_PROFILE` → profile name
+
+### Check credential status
+
+```bash
+python <skill-scripts-dir>/manage_credentials.py check
+```
+
+Returns a JSON status object showing which backend is active, which profiles exist, and whether file permissions are secure — without revealing any secrets.
+
+### Security model
+
+- **Secrets** (api_key, fingerprint, client_secret, client_id) are stored in the OS keychain, not in files
+- **macOS**: Uses Keychain Access — secrets are encrypted at rest and require explicit app authorization
+- **Linux**: Uses freedesktop Secret Service (GNOME Keyring / KDE Wallet) if available, otherwise falls back to AES-256-GCM encrypted file
+- **Non-secret metadata** (username, user_id) stored in `~/.chutes/config` with `chmod 600`
+- **Process safety**: Secrets are piped via stdin, never passed as CLI arguments (prevents `ps aux` exposure)
+- `~/.chutes/` directory has a `.gitignore` containing `*` as an extra guard against accidental commits
 
 ---
 
@@ -423,9 +522,10 @@ Full SDK docs at `https://chutes.ai/docs`. Templates available for vLLM, SGLang,
 When helping a user set up Chutes, always:
 
 1. **Warn about the fingerprint** — it's shown once, ever. Losing it without a linked wallet means losing access.
-2. **Offer to save credentials locally** — create a `chutes-credentials.txt` or similar with the fingerprint, username, user_id, and API key(s). Remind the user to store this somewhere safe and NOT commit it to git.
+2. **Save credentials to the secure store** — run `manage_credentials.py set-profile` immediately after registration to store secrets in the OS keychain. Do NOT save credentials to plaintext files.
 3. **Explain the API key** — also shown once (the `secret_key` field). If lost, delete the old key and create a new one.
 4. **Mention fingerprint recovery** — if they link a Bittensor wallet (hotkey), they can reset the fingerprint at `https://chutes.ai/auth/reset` or via `POST https://api.chutes.ai/users/change_fingerprint`.
+5. **Never echo secrets in conversation** — use `manage_credentials.py get --field api_key` to retrieve credentials programmatically; never paste raw values into the chat.
 
 ---
 

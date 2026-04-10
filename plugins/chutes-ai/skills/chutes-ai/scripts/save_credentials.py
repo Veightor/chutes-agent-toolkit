@@ -1,14 +1,31 @@
 #!/usr/bin/env python3
 """
-Save Chutes.ai credentials to a local backup file.
-Usage: python save_credentials.py --username NAME --fingerprint FP --user-id UID [--api-key KEY] [--output PATH]
+DEPRECATED: Use manage_credentials.py instead for secure, keychain-backed credential storage.
+
+    python manage_credentials.py set-profile --username NAME --fingerprint FP --user-id UID --api-key KEY
+
+This script saves credentials to a PLAINTEXT file, which is insecure.
+manage_credentials.py stores secrets in the OS keychain (macOS Keychain / Linux Secret Service).
+
+This script is kept for backward compatibility only.
+
+Original usage: python save_credentials.py --username NAME --fingerprint FP --user-id UID [--api-key KEY] [--output PATH]
 """
 import argparse
 import os
+import sys
 from datetime import datetime
 
 
 def main():
+    import warnings
+    warnings.warn(
+        "save_credentials.py is deprecated. Use manage_credentials.py for secure keychain-backed storage.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    print("WARNING: This script saves credentials in PLAINTEXT. Use manage_credentials.py instead.", file=sys.stderr)
+
     parser = argparse.ArgumentParser(description="Save Chutes.ai credentials to a backup file")
     parser.add_argument("--username", required=True, help="Chutes.ai username")
     parser.add_argument("--fingerprint", required=True, help="32-character fingerprint")
