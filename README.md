@@ -60,12 +60,93 @@ Chutes also publishes standard machine-readable interfaces for tool-based framew
 
 - **Create accounts** — register on Chutes.ai with proper credential handling and backup
 - **Manage API keys** — create, list, and delete `cpk_` prefixed keys
+- **Secure credential store** — save keys to the OS keychain and read them back in future sessions
 - **Discover models** — browse 40+ models with real-time pricing, TTFT, and TPS data
 - **Make inference calls** — OpenAI-compatible API (Python, Node, cURL, any SDK)
 - **Model routing** — failover, latency-optimized, or throughput-optimized multi-model pools
 - **Billing** — top up via crypto ($TAO/Bittensor) or Stripe (25+ payment methods)
 - **Usage tracking** — quotas, invocation stats, per-model costs
 - **TEE models** — hardware-isolated inference via Intel TDX for privacy-sensitive workloads
+
+## Secure Credential Store
+
+This toolkit includes `manage_credentials.py` — a secure credential manager that stores API keys, fingerprints, and OAuth secrets in the **OS keychain** rather than plaintext files. Credentials persist across sessions and projects, so once saved, agents can read them back automatically in future conversations.
+
+### Security model
+
+| Data | Storage | Protection |
+|------|---------|------------|
+| `api_key` (`cpk_...`) | OS keychain | Encrypted at rest, per-app access control |
+| `fingerprint` (32-char master credential) | OS keychain | Encrypted at rest, per-app access control |
+| `client_id` / `client_secret` (OAuth apps) | OS keychain | Encrypted at rest, per-app access control |
+| `username`, `user_id` (non-secret metadata) | `~/.chutes/config` | `chmod 600`, directory `chmod 700` |
+
+**Backend auto-detection:**
+- **macOS** → Keychain Access (via `security` command)
+- **Linux** → freedesktop Secret Service (GNOME Keyring / KDE Wallet, via `secret-tool`)
+- **Fallback** → AES-256-GCM encrypted file with key derived from machine identity (PBKDF2-SHA256, 600k iterations)
+
+**What this protects against:**
+- Other users on the same machine reading secrets
+- Malware with user-level file access (keychain requires explicit app authorization)
+- Disk image / backup theft (keychain entries are not in standard backups)
+- Accidental git commits (`~/.chutes/.gitignore` contains `*` as a guard)
+- `ps aux` exposure — secrets are never passed as command-line arguments to child processes
+
+### CLI reference
+
+```bash
+# Save a full credential profile
+python manage_credentials.py set-profile \
+  --username alice \
+  --user-id 550e8400-e29b-41d4-a716-446655440000 \
+  --fingerprint <32-char-fingerprint> \
+  --api-key cpk_...
+
+# Read a specific field (raw value, safe for shell substitution)
+python manage_credentials.py get --field api_key
+
+# Read all fields as JSON
+python manage_credentials.py get
+
+# Update a single field
+python manage_credentials.py set --field api_key --value cpk_new...
+
+# Manage multiple profiles (default, production, research, etc.)
+python manage_credentials.py set-profile --profile production --api-key cpk_prod...
+python manage_credentials.py get --profile production --field api_key
+python manage_credentials.py list-profiles
+
+# Save OAuth app credentials
+python manage_credentials.py set-profile \
+  --profile oauth.my-app \
+  --client-id cid_... \
+  --client-secret csc_...
+
+# Status check (shows backend, profiles, permissions — no secrets)
+python manage_credentials.py check
+
+# Delete a profile from both config and the keychain
+python manage_credentials.py delete --profile production
+```
+
+### Environment variable overrides
+
+For CI/CD and headless environments, env vars always take precedence over the stored keychain values:
+
+| Variable | Field |
+|----------|-------|
+| `CHUTES_API_KEY` | `api_key` |
+| `CHUTES_FINGERPRINT` | `fingerprint` |
+| `CHUTES_CLIENT_ID` | `client_id` |
+| `CHUTES_CLIENT_SECRET` | `client_secret` |
+| `CHUTES_PROFILE` | active profile name |
+
+### Agent usage pattern
+
+When the Chutes skill is invoked in a new session, it first runs `manage_credentials.py check` to see if credentials already exist. If so, it reads the API key silently for use in API calls — never pasting raw secrets into the conversation. If not, it walks the user through account creation and saves credentials immediately after.
+
+> **Note on the deprecated `save_credentials.py`**: The original `save_credentials.py` script wrote credentials to a plaintext backup file. It is now deprecated and emits a warning — use `manage_credentials.py` for all new credential storage.
 
 ## Repo Structure
 
@@ -84,7 +165,8 @@ chutes-agent-toolkit/
 │               │   ├── api-reference.md
 │               │   └── known-models.md
 │               └── scripts/
-│                   └── save_credentials.py
+│                   ├── manage_credentials.py  # Secure credential manager (keychain-backed)
+│                   └── save_credentials.py    # DEPRECATED — use manage_credentials.py
 ├── other-agents/
 │   ├── system-prompt/
 │   │   └── chutes-agent-prompt.md    # Paste into any agent's system prompt
