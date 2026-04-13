@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# Python cache / test artifacts
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# Hermes local planning artifacts
+.hermes/

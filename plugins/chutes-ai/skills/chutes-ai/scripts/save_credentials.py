@@ -25,6 +25,7 @@ def main():
         stacklevel=2,
     )
     print("WARNING: This script saves credentials in PLAINTEXT. Use manage_credentials.py instead.", file=sys.stderr)
+    print("Legacy use only: prefer keychain-backed storage via manage_credentials.py.", file=sys.stderr)
 
     parser = argparse.ArgumentParser(description="Save Chutes.ai credentials to a backup file")
     parser.add_argument("--username", required=True, help="Chutes.ai username")

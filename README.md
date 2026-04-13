@@ -4,6 +4,8 @@ Give any AI agent access to [Chutes.ai](https://chutes.ai) — decentralized ser
 
 This repo is both a **Claude plugin marketplace** and a **multi-agent toolkit**. Install it in one command for Claude, or grab the system prompt for any other agent.
 
+It is also the staging ground for a Hermes integration path: first via named custom-provider docs and skills, then via a future first-class Chutes provider implementation in a Hermes fork/PR.
+
 ## Install for Claude (Code / Cowork)
 
 ### Option 1: Plugin Marketplace (recommended)
@@ -35,6 +37,12 @@ cp -r plugins/chutes-ai/skills/chutes-ai ~/.claude/skills/chutes-ai
 ### Any LLM Agent (GPT, Gemini, Llama, etc.)
 
 Copy the contents of [`other-agents/system-prompt/chutes-agent-prompt.md`](other-agents/system-prompt/chutes-agent-prompt.md) into your agent's system prompt. It's a single self-contained file with all the API details, code examples, and instructions.
+
+### Hermes
+
+Hermes works with Chutes today via named custom-provider configuration. See:
+- [`other-agents/hermes/README.md`](other-agents/hermes/README.md)
+- [`other-agents/hermes/config-examples/`](other-agents/hermes/config-examples/)
 
 ### LangChain / LiteLLM / Vercel AI SDK / AutoGPT
 
@@ -152,32 +160,46 @@ When the Chutes skill is invoked in a new session, it first runs `manage_credent
 
 ```
 chutes-agent-toolkit/
-├── .claude-plugin/
-│   └── marketplace.json              # Claude plugin marketplace definition
 ├── plugins/
-│   └── chutes-ai/                    # The Claude plugin
+│   └── chutes-ai/
 │       ├── .claude-plugin/
-│       │   └── plugin.json           # Plugin manifest (name, version, metadata)
+│       │   └── plugin.json
 │       └── skills/
 │           └── chutes-ai/
-│               ├── SKILL.md          # Main skill (full 6-step workflow)
+│               ├── SKILL.md
 │               ├── references/
 │               │   ├── api-reference.md
 │               │   └── known-models.md
 │               └── scripts/
-│                   ├── manage_credentials.py  # Secure credential manager (keychain-backed)
-│                   └── save_credentials.py    # DEPRECATED — use manage_credentials.py
+│                   ├── manage_credentials.py
+│                   └── save_credentials.py
 ├── other-agents/
+│   ├── hermes/
+│   │   ├── README.md
+│   │   ├── config-examples/
+│   │   └── skills/
+│   │       └── chutes-ai/
+│   │           └── SKILL.md
 │   ├── system-prompt/
-│   │   └── chutes-agent-prompt.md    # Paste into any agent's system prompt
+│   │   └── chutes-agent-prompt.md
 │   └── openai-compatible/
-│       └── README.md                 # LangChain, LiteLLM, Vercel AI SDK, AutoGPT
-├── docs/                             # Shared reference docs
+│       └── README.md
+├── docs/
 │   ├── api-reference.md
 │   ├── known-models.md
-│   └── llms.txt
+│   ├── roadmap.md
+│   ├── hermes-integration-spec.md
+│   ├── credential-store.md
+│   ├── save-credentials-deprecation.md
+│   └── llms-txt-review.md
 ├── evals/
-│   └── evals.json                    # Test cases
+│   ├── evals.json
+│   └── README.md
+├── scripts/
+│   └── run_evals.py
+├── tests/
+│   ├── test_manage_credentials.py
+│   └── test_run_evals.py
 ├── LICENSE
 └── README.md
 ```
@@ -195,6 +217,19 @@ chutes-agent-toolkit/
 ## Contributing
 
 PRs welcome! The shared docs live in `docs/` — update there and changes benefit all platforms. The Claude skill lives in `plugins/chutes-ai/skills/chutes-ai/SKILL.md`.
+
+Eval tooling:
+- `evals/evals.json`
+- `evals/README.md`
+- `scripts/run_evals.py`
+
+Useful planning docs in this repo:
+- `docs/roadmap.md`
+- `docs/pre-hermes-phase2-checklist.md`
+- `docs/hermes-integration-spec.md`
+- `docs/llms-txt-review.md`
+- `docs/credential-store.md`
+- `docs/save-credentials-deprecation.md`
 
 ## License
 

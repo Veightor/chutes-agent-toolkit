@@ -356,6 +356,8 @@ def cmd_set_profile(args):
     if cp.has_section(profile):
         existing_backend = cp.get(profile, "backend", fallback=backend)
         existing_secrets = read_secrets(existing_backend, profile) or {}
+    else:
+        existing_secrets = read_secrets(backend, profile) or {}
 
     # Build secret fields from args
     secret_updates = {}
@@ -513,6 +515,16 @@ def cmd_check(args):
         dir_mode = oct(stat.S_IMODE(CHUTES_DIR.stat().st_mode))
         result["dir_permissions"] = dir_mode
         result["dir_secure"] = dir_mode == "0o700"
+
+    result["gitignore_exists"] = GITIGNORE_FILE.exists()
+    if GITIGNORE_FILE.exists():
+        result["gitignore_secure"] = GITIGNORE_FILE.read_text() == "*\n"
+
+    result["encrypted_file_exists"] = ENCRYPTED_FILE.exists()
+    if ENCRYPTED_FILE.exists():
+        encrypted_mode = oct(stat.S_IMODE(ENCRYPTED_FILE.stat().st_mode))
+        result["encrypted_file_permissions"] = encrypted_mode
+        result["encrypted_file_secure"] = encrypted_mode == "0o600"
 
     # Check for env overrides
     active_env = {

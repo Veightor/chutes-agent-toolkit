@@ -3,26 +3,81 @@
   "evals": [
     {
       "id": 1,
+      "category": "account-bootstrap",
       "prompt": "I want to use open-source AI models but I don't have a Chutes account yet. Can you set me up from scratch and give me an API key I can start using right away?",
       "expected_output": "Should walk through account registration via API or web, warn about fingerprint sensitivity, offer to create a credential backup file, then create an API key and present it clearly. Should mention recovery options.",
       "files": []
     },
     {
       "id": 2,
+      "category": "model-discovery",
       "prompt": "What DeepSeek models are available on Chutes and how much do they cost? I need something that supports tool calling for my agent framework.",
-      "expected_output": "Should query or reference the models list, filter for DeepSeek models, show pricing, and specifically check the supported_features field for 'tools' support. Should present a clear recommendation.",
+      "expected_output": "Should query or reference the live models list, filter for DeepSeek models, show pricing, and specifically check the supported_features field for 'tools' support. Should present a clear recommendation and prefer https://llm.chutes.ai/v1/models as source of truth for current metadata.",
       "files": []
     },
     {
       "id": 3,
+      "category": "inference-usage",
       "prompt": "I have a Chutes API key already (cpk_abc123). Show me how to call a model from Python and also check how much balance I have left.",
       "expected_output": "Should show Python code using OpenAI SDK pointed at llm.chutes.ai/v1, and show how to check balance via GET /users/me. Should use the provided key in examples.",
       "files": []
     },
     {
       "id": 4,
+      "category": "routing",
       "prompt": "I'm building a chatbot and need it to be fast and reliable. Can you set up model routing on Chutes so if one model is slow or down, it automatically fails over? I want the lowest latency possible and I care about privacy so TEE models only.",
-      "expected_output": "Should explain model routing strategies (default, default:latency, default:throughput), recommend using default:latency for a chatbot, filter available TEE models by TTFT, build a routing pool of 3-4 fast TEE models, and provide working code examples using either inline routing strings or the default alias."
+      "expected_output": "Should explain model routing strategies (default, default:latency, default:throughput), recommend using default:latency for a chatbot, filter available TEE models by TTFT, build a routing pool of 3-4 fast TEE models, and provide working code examples using either inline routing strings or the default alias.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "category": "privacy-tee",
+      "prompt": "I need hardware-isolated inference for sensitive prompts. How do I identify which Chutes models are actually TEE-backed, and how should I verify that?",
+      "expected_output": "Should state that confidential_compute=true from https://llm.chutes.ai/v1/models is the canonical indicator, not the -TEE suffix alone. Should mention attestation evidence endpoints and explain how to use live model metadata as the source of truth.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "category": "billing-and-discounts",
+      "prompt": "What are my options for topping up Chutes, and how do I check whether the Harvard research discount is active on my account?",
+      "expected_output": "Should explain crypto top-ups via payment_address, mention Stripe top-up path, and show how to call GET /users/me/discounts or equivalent account endpoints to verify active discounts.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "category": "credential-storage",
+      "prompt": "I've just created a Chutes account and API key. Help me store them securely so my agent can reuse them later without dumping secrets into files or chat.",
+      "expected_output": "Should direct the user toward the secure credential manager, explain keychain/secret-service/fallback encrypted storage, and avoid recommending plaintext backups as the primary storage path.",
+      "files": [
+        "plugins/chutes-ai/skills/chutes-ai/scripts/manage_credentials.py"
+      ]
+    },
+    {
+      "id": 8,
+      "category": "hermes-setup",
+      "prompt": "I use Hermes and want Chutes available there right now, even before first-class provider support lands. How should I configure it?",
+      "expected_output": "Should explain Hermes named custom-provider setup, mention CHUTES_API_KEY, provide a config.yaml example, and distinguish the normal Chutes endpoint from the research endpoint. Should not pretend Chutes is already a built-in Hermes provider unless that is actually true in the runtime being discussed.",
+      "files": [
+        "other-agents/hermes/README.md",
+        "other-agents/hermes/config-examples/chutes-basic.yaml"
+      ]
+    },
+    {
+      "id": 9,
+      "category": "hermes-routing",
+      "prompt": "I want to use GPT as my main Hermes model but send cheaper delegated/background work to Chutes. What would that config look like?",
+      "expected_output": "Should explain a split-brain Hermes setup using Chutes as delegation and/or cheap model routing, include example config snippets, and mention that exact provider keys may depend on Hermes custom-provider naming in the installed version.",
+      "files": [
+        "other-agents/hermes/config-examples/chutes-cheap-routing.yaml",
+        "other-agents/hermes/config-examples/chutes-delegation.yaml"
+      ]
+    },
+    {
+      "id": 10,
+      "category": "research-endpoint",
+      "prompt": "When should I use the Chutes Harvard research endpoint instead of the normal endpoint?",
+      "expected_output": "Should explain the discount tradeoff clearly: same auth and API shape, but prompts/responses may be recorded for research. Should advise against using it for sensitive/private workloads without explicit consent.",
+      "files": []
     }
   ]
 }

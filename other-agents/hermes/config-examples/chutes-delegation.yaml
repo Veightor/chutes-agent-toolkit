@@ -1,0 +1,8 @@
+model:
+  default: gpt-5.4
+  provider: openai-codex
+
+delegation:
+  provider: custom:chutes
+  model: default:throughput
+  reasoning_effort: medium

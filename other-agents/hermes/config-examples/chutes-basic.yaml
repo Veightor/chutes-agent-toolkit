@@ -1,0 +1,6 @@
+custom_providers:
+  - name: Chutes
+    base_url: https://llm.chutes.ai/v1
+    key_env: CHUTES_API_KEY
+    api_mode: chat_completions
+    model: default

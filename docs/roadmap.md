@@ -1,0 +1,121 @@
+# Chutes Agent Toolkit Roadmap
+
+This repository is the source-of-truth toolkit for helping agents and agent frameworks integrate with Chutes.ai.
+
+## Mission
+
+Provide reusable Chutes integration assets that work across multiple agent environments:
+- Claude plugins and skills
+- Hermes skills and provider docs
+- generic OpenAI-compatible agent setups
+- future MCP, SDK, or framework-specific integrations
+
+The repository should remain useful even if a specific downstream integration takes time to land.
+
+## Product pillars
+
+### 1. Canonical Chutes documentation for agents
+
+This repo should contain the best agent-oriented documentation for:
+- account lifecycle
+- API keys and credential handling
+- model discovery
+- model routing
+- TEE / confidential compute
+- billing, usage, and quotas
+- framework integration patterns
+
+Important: static model snapshots are only convenience references. When live model inventory, pricing, or metadata is required, agents should use:
+
+`https://llm.chutes.ai/v1/models`
+
+as the source of truth.
+
+### 2. Secure credential tooling
+
+This repo should provide a reliable, auditable way for agents to store and retrieve Chutes credentials without leaking secrets into plaintext files, command histories, or transcripts.
+
+Near-term target:
+- harden and test `manage_credentials.py`
+- document invocation patterns for agents
+- make multi-profile workflows easy
+
+### 3. Evaluated agent workflows
+
+This repo should include scenario-driven evals that verify agents can correctly:
+- onboard users
+- manage API keys
+- recommend models
+- configure routing
+- explain TEE/privacy tradeoffs
+- integrate Chutes with popular agent stacks
+
+### 4. Hermes-ready integration assets
+
+This repo should become the staging ground for Hermes integration by providing:
+- Hermes config examples
+- Hermes-ready Chutes skill packaging
+- implementation notes for a native Hermes provider
+- test cases and docs that can be reused in a Hermes fork/PR
+
+### 5. Upstreamability
+
+Work produced here should make it easier to upstream Chutes support into Hermes and other agent projects.
+
+That means:
+- keep docs clean and reusable
+- keep examples realistic and tested
+- prefer narrow, mergeable downstream PRs over giant platform-specific dumps
+
+## Execution phases
+
+### Phase 1: Foundation
+- clean up repo docs and boundaries
+- write Hermes integration spec
+- document roadmap and ownership boundaries
+
+### Phase 2: Credential tooling
+- add tests for `manage_credentials.py`
+- improve docs and edge-case handling
+- finalize deprecation story for `save_credentials.py`
+
+### Phase 3: Shared docs and routing patterns
+- consolidate canonical docs under `docs/`
+- add routing and Hermes-specific guides
+- reduce duplication across README, Claude plugin docs, and generic-agent docs
+
+### Phase 4: Evals
+- expand `evals/evals.json`
+- add an eval runner and fixtures
+- separate live-API checks from static-doc correctness checks
+
+### Phase 5: Hermes-facing assets in this repo
+- add Hermes quickstart docs
+- add named custom provider examples
+- add a Hermes-oriented Chutes skill export/package layout
+
+### Phase 6: Hermes fork work
+- add first-class Chutes provider support in a Hermes fork
+- add docs/tests for provider resolution and setup UX
+- keep initial PR scope tight and upstreamable
+
+### Phase 7: Upstreaming and polish
+- propose upstream merge to Hermes/Nous
+- follow up with nicer routing ergonomics if needed
+
+## Non-goals right now
+
+These may happen later, but they are not the immediate focus:
+- building a full Chutes MCP server in this repo
+- replacing the Chutes official docs
+- hardcoding static model lists as authoritative data
+- tightly coupling the toolkit to only one agent platform
+
+## Definition of success
+
+This repo is successful when:
+- a new agent user can integrate Chutes quickly and correctly
+- credential handling is secure and tested
+- docs point to live sources where appropriate
+- Hermes users have a clean path today via custom provider config
+- Hermes maintainers can review a future first-class provider PR with minimal ambiguity
