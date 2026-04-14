@@ -18,14 +18,14 @@ Static lists in this repo are convenience references only.
 
 4. The first upstream Hermes PR should be narrow, mergeable, and low-risk.
 
-## Integration paths (updated 2026-04-13)
+## Integration paths (updated 2026-04-13, wave 2)
 
-As of wave 1 there are now **three** integration paths for Hermes, not two:
+There are now **four** integration paths for Hermes, and the fourth has already been delivered in a sibling repo (out of scope for this toolkit):
 
 1. **Custom provider YAML** (layer 1 — works today). See `other-agents/hermes/config-examples/`. Generated/refreshed by `plugins/chutes-ai/skills/chutes-mcp-portability/scripts/generate_agent_config.py --target hermes`.
-2. **Symmetric skill tree** (wave 1, new). `other-agents/hermes/skills/{chutes-ai,chutes-sign-in,chutes-deploy,chutes-mcp-portability}/` mirrors the Claude plugin tree so Hermes loads the same four-lane skill set. Scripts live once in the Claude plugin tree and are invoked from the repo root by either agent.
-3. **MCP server** (wave 1, new). `chutes-mcp-server` (stdio, from `plugins/chutes-ai/skills/chutes-mcp-portability/mcp-server/`) gives any MCP-aware Hermes build tool-level access to Chutes without touching the provider config. This is a second-channel integration — use it alongside the custom-provider YAML, not instead of it.
-4. **Native provider (layer 2, future)** — still the goal for the upstream Hermes PR. The wave-1 work does **not** block this; the MCP server and symmetric skills are additive.
+2. **Symmetric skill tree** (wave 1). `other-agents/hermes/skills/{chutes-ai,chutes-sign-in,chutes-deploy,chutes-mcp-portability}/` mirrors the Claude plugin tree so Hermes loads the same four-lane skill set. Scripts live once in the Claude plugin tree and are invoked from the repo root by either agent.
+3. **MCP server** (wave 1). `chutes-mcp-server` (stdio, from `plugins/chutes-ai/skills/chutes-mcp-portability/mcp-server/`) gives any MCP-aware Hermes build tool-level access to Chutes without touching the provider config. Use it alongside the custom-provider YAML, not instead of it. Wave-2 Track C.2 verified the server end-to-end with `--self-check` + 7 read tools.
+4. **Native Hermes provider** — **DELIVERED IN A SIBLING REPO.** The first-class Chutes provider PR for Hermes / Nous has already shipped from a separate repository (not this toolkit). This toolkit no longer tracks phase-6 Hermes fork work as a pending goal. See the legacy "Layer 2" section below for the original spec (retained as historical context; the implementation is elsewhere).
 
 ## Integration layers
 
@@ -56,9 +56,11 @@ Recommended environment variable:
 CHUTES_API_KEY=cpk_...
 ```
 
-### Layer 2: First-class Hermes provider target
+### Layer 2: First-class Hermes provider (historical — now delivered elsewhere)
 
-A future Hermes fork/PR should make Chutes appear in the provider picker and runtime provider logic as a built-in provider.
+> **Update 2026-04-13:** The native Hermes provider described in this section has already been delivered in a separate repository. This toolkit does not track the phase-6 fork work anymore. Everything below is retained for historical reference and to document what the native provider looks like.
+
+A Hermes fork/PR makes Chutes appear in the provider picker and runtime provider logic as a built-in provider.
 
 Expected user experience:
 - Chutes appears in `hermes model`

@@ -107,14 +107,15 @@ Deploy-side features and anything not exercised against a live Chutes account be
 - add named custom provider examples
 - add a Hermes-oriented Chutes skill export/package layout
 
-### Phase 6: Hermes fork work
-- add first-class Chutes provider support in a Hermes fork
-- add docs/tests for provider resolution and setup UX
-- keep initial PR scope tight and upstreamable
+### Phase 6: Hermes fork work — **DELIVERED (sibling repo, 2026-04-13)**
+- ~~add first-class Chutes provider support in a Hermes fork~~ ✓ shipped from a separate repository
+- ~~add docs/tests for provider resolution and setup UX~~ ✓ shipped alongside
+- ~~keep initial PR scope tight and upstreamable~~ ✓
+- this toolkit no longer tracks phase-6 work; see `docs/hermes-integration-spec.md` for historical context
 
-### Phase 7: Upstreaming and polish
-- propose upstream merge to Hermes/Nous
-- follow up with nicer routing ergonomics if needed
+### Phase 7: Upstreaming and polish — **DELIVERED (sibling repo, 2026-04-13)**
+- ~~propose upstream merge to Hermes/Nous~~ ✓ handled in the sibling repo
+- follow-up routing ergonomics remain open as a wave-3 idea
 
 ### Phase 8: Sign in with Chutes + MCP surface (wave 1, 2026-04-13)
 
