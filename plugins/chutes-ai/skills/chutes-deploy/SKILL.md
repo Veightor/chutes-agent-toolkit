@@ -7,6 +7,10 @@ description: "[BETA — permanent until verified] Deploy models on the Chutes.ai
 # chutes-deploy **[BETA — permanent until verified live runs]**
 
 > **Status: BETA (permanent).** This skill drives chute deployment, which falls under the toolkit's deploy-features policy: it is BETA until every script in it has a recorded live run against a dev Chutes account *and* the full end-to-end verification step has been executed. Time alone does not remove the label. Individual scripts graduate from BETA only with a commit that references the verification output that exercised them.
+>
+> **Wave-2 platform finding:** as of 2026-04-13, `POST /chutes/vllm` and `POST /chutes/diffusion` returned HTTP 403 `{"detail":"Easy deployment is currently disabled!"}` on the test account. The easy lanes may be gated server-side on some account classes. When this is in effect, fall back to the custom CDK lane (`build_image.py` + `deploy_custom.py`). `deploy_vllm.py` / `deploy_diffusion.py` detect the 403 and print the fall-back hint.
+>
+> **Wave-2 bug fix:** Chutes rejects branch names on the `revision` field with `{"msg":"Value error, Invalid revision specified."}`. The scripts now auto-resolve branch → commit SHA via the Hugging Face API. Pass `--revision <sha>` explicitly if you need a pinned specific commit.
 
 ## What this skill does
 

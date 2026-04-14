@@ -1,12 +1,20 @@
 ---
 name: chutes-sign-in
-status: beta
-description: "[BETA] Add Sign in with Chutes (OAuth 2.0 + OIDC + PKCE) to a user's application. Use this skill when the user wants to register a Chutes OAuth app, vendor the chutesai/Sign-in-with-Chutes Next.js package into their project, wire up sign-in routes, manage scopes, store client credentials in the OS keychain, or rotate a client secret. Triggers on: sign in with chutes, SIWC, OAuth app, /idp/apps, cid_, csc_, chutes oauth, PKCE chutes, chutes login button, useChutesSession, Next.js chutes auth, rotate oauth secret."
+description: "Add Sign in with Chutes (OAuth 2.0 + OIDC + PKCE) to a user's application. Use this skill when the user wants to register a Chutes OAuth app, vendor the chutesai/Sign-in-with-Chutes Next.js package into their project, wire up sign-in routes, manage scopes, store client credentials in the OS keychain, or rotate a client secret. Triggers on: sign in with chutes, SIWC, OAuth app, /idp/apps, cid_, csc_, chutes oauth, PKCE chutes, chutes login button, useChutesSession, Next.js chutes auth, rotate oauth secret."
 ---
 
-# chutes-sign-in **[BETA]**
+# chutes-sign-in
 
-> **Status: BETA** — this skill is BETA until a full end-to-end run (`register → vendor → verify → rotate`) has been executed against a live dev Chutes account and the output recorded. `rotate_secret.py` and `verify_siwc.py` individually stay BETA even after the rest graduates. Until then, run this skill in a scratch project and expect rough edges.
+> **Status: VERIFIED LIVE 2026-04-13** via `docs/chutes-maxi-wave-2.md` Track C.4. Full end-to-end exercised against a real Chutes account: `register_oauth_app.py` → `install_siwc.py` → `verify_siwc.py` (steps 1-3) → `rotate_secret.py` → cleanup. Real OAuth app created, real SIWC files vendored into a scratch Next.js App Router project, client secret rotated, app deleted.
+>
+> **Graduated:** `register_oauth_app.py`, `install_siwc.py`, `rotate_secret.py`, the skill itself.
+>
+> **Still BETA — `verify_siwc.py`** — steps 1-3 (files / env / keychain match) passed live but step 4 (dev server `/api/auth/chutes/session` hit) was not exercised (would require `npm install` + `npm run dev`, out of scope for automated verification). Stays BETA until step 4 is exercised end-to-end.
+>
+> **Wave-2 bug fixes that live verification caught:**
+>
+> 1. **Wrong upstream source paths.** `install_siwc.py` + `verify_siwc.py` + `references/frameworks/nextjs.md` assumed `packages/nextjs/app/api/auth/chutes/<name>/route.ts` but upstream stores them as flat files at `packages/nextjs/api/auth/chutes/<name>.ts` with a "copy me to `app/api/auth/chutes/<name>/route.ts`" comment. Installer now performs the directory + filename transform during copy.
+> 2. **`rotate_secret.py` passed `client_id` as the URL segment** on `POST /idp/apps/{X}/regenerate-secret`; API requires the `app_id` UUID. Added `app_id` to `manage_credentials.py` field whitelist, `register_oauth_app.py` now stores it on creation, `rotate_secret.py` reads it from the keychain with a clear migration error if a legacy profile lacks it.
 
 ## What this skill does
 
@@ -157,10 +165,10 @@ See `references/idp-endpoints.md` for the full list. Summary:
 
 | Script | Purpose | Status |
 |---|---|---|
-| `scripts/register_oauth_app.py` | `POST /idp/apps` + store in keychain | **[BETA]** |
-| `scripts/install_siwc.py` | Vendor upstream Next.js package + write env | **[BETA]** |
-| `scripts/verify_siwc.py` | Hit session route + introspect token | **[BETA — keeps label even after skill graduates]** |
-| `scripts/rotate_secret.py` | `POST /idp/apps/{id}/regenerate-secret` | **[BETA — keeps label even after skill graduates]** |
+| `scripts/register_oauth_app.py` | `POST /idp/apps` + store in keychain | VERIFIED (2026-04-13) |
+| `scripts/install_siwc.py` | Vendor upstream Next.js package + write env | VERIFIED (2026-04-13, with wave-2 path-transform fix) |
+| `scripts/verify_siwc.py` | Hit session route + introspect token | **[BETA]** — steps 1-3 verified; step 4 (dev server) not exercised |
+| `scripts/rotate_secret.py` | `POST /idp/apps/{id}/regenerate-secret` | VERIFIED (2026-04-13, with wave-2 app_id fix) |
 
 ## Safety rules
 

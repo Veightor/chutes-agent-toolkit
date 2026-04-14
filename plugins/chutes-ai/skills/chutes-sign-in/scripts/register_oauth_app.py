@@ -102,6 +102,10 @@ def main() -> int:
     try:
         put_secret("client_id", client_id, profile=args.profile)
         put_secret("client_secret", client_secret, profile=args.profile)
+        if app_id:
+            # app_id is the UUID used on /idp/apps/{app_id}/* routes (NOT client_id).
+            # rotate_secret.py and delete-app flows read this.
+            put_secret("app_id", app_id, profile=args.profile)
     except RuntimeError as e:
         print(f"error storing secrets: {e}", file=sys.stderr)
         print(

@@ -43,7 +43,7 @@ GITIGNORE_FILE = CHUTES_DIR / ".gitignore"
 
 SERVICE_NAME = "chutes-ai"
 
-SECRET_FIELDS = {"api_key", "fingerprint", "client_id", "client_secret"}
+SECRET_FIELDS = {"api_key", "fingerprint", "client_id", "client_secret", "app_id"}
 METADATA_FIELDS = {"username", "user_id"}
 ALL_FIELDS = SECRET_FIELDS | METADATA_FIELDS
 

@@ -1,12 +1,17 @@
 ---
 name: chutes-mcp-portability
-status: beta
-description: "[BETA] Make Chutes.ai available to any agent via MCP or drop-in OpenAI-compatible configs. Use this skill when the user wants to plug Chutes into Cursor, Cline, Aider, Claude Desktop, Hermes, or another OpenAI-compatible client. The skill installs the Chutes MCP server (stdio), writes per-agent config snippets, and runs a health check. Triggers on: MCP chutes, chutes MCP server, cursor chutes, cline chutes, aider chutes, claude desktop chutes, hermes chutes provider, openai-compatible chutes, drop-in chutes config, portable chutes, chutes for my agent."
+description: "Make Chutes.ai available to any agent via MCP or drop-in OpenAI-compatible configs. Use this skill when the user wants to plug Chutes into Cursor, Cline, Aider, Claude Desktop, Hermes, or another OpenAI-compatible client. The skill installs the Chutes MCP server (stdio), writes per-agent config snippets, and runs a health check. Triggers on: MCP chutes, chutes MCP server, cursor chutes, cline chutes, aider chutes, claude desktop chutes, hermes chutes provider, openai-compatible chutes, drop-in chutes config, portable chutes, chutes for my agent."
 ---
 
-# chutes-mcp-portability **[BETA]**
+# chutes-mcp-portability
 
-> **Status: BETA** — the skill stays BETA until a live MCP health check (`chutes_list_models` over stdio against a real `cpk_`) has been executed and the output recorded. Read-only MCP tools graduate individually after their first verified call. Write / deploy tools (`chutes_deploy_vllm`, `chutes_deploy_diffusion`, `chutes_teeify`, `chutes_set_alias`, `chutes_delete_alias`, `chutes_create_api_key`) stay BETA permanently under the deploy-features policy — their MCP tool descriptions prepend `[BETA] ` so any client displays the label.
+> **Status: VERIFIED LIVE 2026-04-13** via `docs/chutes-maxi-wave-2.md` Track C.2 + C.6. `chutes-mcp-server --self-check` passed, and 7 read tools were exercised against a real `cpk_` with non-empty responses.
+>
+> **Read tools graduated out of BETA (verified):** `chutes_list_models`, `chutes_get_quota`, `chutes_list_aliases`, `chutes_list_chutes`, `chutes_get_usage`, `chutes_get_discounts`, `chutes_list_api_keys`.
+>
+> **Read tools still BETA (not exercised this pass):** `chutes_chat_complete` (paid), `chutes_get_evidence` (needs a specific chute_id), `chutes_oauth_introspect` (needs a live OAuth token).
+>
+> **Write tools — permanent BETA** under the deploy-features policy: `chutes_deploy_vllm`, `chutes_deploy_diffusion`, `chutes_teeify`, `chutes_set_alias`, `chutes_delete_alias`, `chutes_create_api_key`. The `set`/`delete` alias pair was functionally exercised live during wave 2 (round-trip passed) but stays BETA per policy — deploy-side writes always keep the label. MCP tool descriptions prepend `[BETA] ` so clients display it.
 
 ## What this skill does
 

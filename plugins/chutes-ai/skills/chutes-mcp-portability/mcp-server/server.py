@@ -206,9 +206,10 @@ def chutes_teeify(chute_id: str) -> dict:
     return _mgmt("PUT", f"/chutes/{chute_id}/teeify", body={})
 
 
-@app.tool(description=BETA_PREFIX + "Create a stable model alias. WRITES: POST /model_aliases/.")
-def chutes_set_alias(alias: str, model: str) -> dict:
-    return _mgmt("POST", "/model_aliases/", body={"alias": alias, "model": model})
+@app.tool(description=BETA_PREFIX + "Create a stable model alias pointing at one or more chute UUIDs. WRITES: POST /model_aliases/.")
+def chutes_set_alias(alias: str, chute_ids: list[str]) -> dict:
+    """Create an alias. `chute_ids` is a list of chute UUIDs (not model names)."""
+    return _mgmt("POST", "/model_aliases/", body={"alias": alias, "chute_ids": chute_ids})
 
 
 @app.tool(description=BETA_PREFIX + "Delete a model alias. WRITES: DELETE /model_aliases/{alias}.")

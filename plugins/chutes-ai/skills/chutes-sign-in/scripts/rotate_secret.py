@@ -45,15 +45,30 @@ def main() -> int:
     if args.app_id:
         app_id = args.app_id
     else:
+        # Prefer the stored UUID (app_id). Fall back to client_id for profiles
+        # created before wave 2 — but the API rejects cid_* on this path, so
+        # emit a clear migration error if we hit that case.
         try:
-            app_id = get_secret("client_id", profile=args.profile)
-        except RuntimeError as e:
-            print(f"error: {e}", file=sys.stderr)
-            print(
-                f"hint: re-run register_oauth_app.py --profile {args.profile} first.",
-                file=sys.stderr,
-            )
-            return 1
+            app_id = get_secret("app_id", profile=args.profile)
+        except RuntimeError:
+            try:
+                legacy = get_secret("client_id", profile=args.profile)
+            except RuntimeError as e:
+                print(f"error: {e}", file=sys.stderr)
+                print(
+                    f"hint: re-run register_oauth_app.py --profile {args.profile} first.",
+                    file=sys.stderr,
+                )
+                return 1
+            if legacy.startswith("cid_"):
+                print(
+                    f"error: profile '{args.profile}' predates wave 2 and has no stored app_id UUID.\n"
+                    f"       Look up the app_id via 'GET /idp/apps' on your account, then:\n"
+                    f"       python manage_credentials.py set --profile {args.profile} --field app_id --value <uuid>",
+                    file=sys.stderr,
+                )
+                return 1
+            app_id = legacy
 
     print(f"Rotating secret for app {app_id[:8]}… (profile {args.profile})")
 

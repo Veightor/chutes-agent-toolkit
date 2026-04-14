@@ -30,12 +30,15 @@
     "diffusion"
   ],
   "betaFeatures": [
-    "chutes-sign-in",
     "chutes-deploy",
-    "chutes-mcp-portability",
     "chutes-routing",
     "chutes-usage-and-billing",
     "chutes-platform-ops",
-    "chutes-agent-registration"
+    "chutes-agent-registration",
+    "chutes-sign-in:verify_siwc.py",
+    "chutes-mcp-portability:write-tools",
+    "chutes-mcp-portability:chutes_chat_complete",
+    "chutes-mcp-portability:chutes_get_evidence",
+    "chutes-mcp-portability:chutes_oauth_introspect"
   ]
 }

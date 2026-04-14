@@ -28,10 +28,37 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import time
+import urllib.error
+import urllib.request
 
 from _common import api_key, idp_request
+
+
+SHA_RE = re.compile(r"^[0-9a-f]{7,40}$")
+
+
+def resolve_hf_revision(model: str, revision: str) -> str:
+    """Turn a branch name like 'main' into the current commit SHA on Hugging Face.
+
+    Chutes' /chutes/vllm endpoint requires a pinned commit SHA, not a branch name.
+    """
+    if SHA_RE.match(revision or ""):
+        return revision
+    url = f"https://huggingface.co/api/models/{model}"
+    try:
+        with urllib.request.urlopen(url, timeout=15) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"HF lookup failed for {model}: HTTP {e.code}") from None
+    except urllib.error.URLError as e:
+        raise RuntimeError(f"HF lookup failed for {model}: {e.reason}") from None
+    sha = data.get("sha")
+    if not sha:
+        raise RuntimeError(f"HF response for {model} has no 'sha' field")
+    return sha
 
 
 def build_body(args: argparse.Namespace) -> dict:
@@ -111,10 +138,22 @@ def poll_warmup(bearer: str, chute_id: str, timeout_seconds: int = 1200) -> dict
     raise RuntimeError(f"warmup timed out after {timeout_seconds}s")
 
 
-def create_alias(bearer: str, alias: str, model_id: str) -> None:
+def create_alias(bearer: str, alias: str, chute_id: str) -> None:
+    """Create an alias pointing at a single chute UUID.
+
+    Chutes' /model_aliases/ API takes a list of chute_ids for failover pools;
+    here we pass a single-entry list so the alias resolves to the chute we
+    just deployed. Callers that want pool failover should use alias_deploy.py
+    directly with --chute-id repeated.
+    """
     try:
-        idp_request("POST", "/model_aliases/", bearer=bearer, body={"alias": alias, "model": model_id})
-        print(f"  alias '{alias}' → {model_id}")
+        idp_request(
+            "POST",
+            "/model_aliases/",
+            bearer=bearer,
+            body={"alias": alias, "chute_ids": [chute_id]},
+        )
+        print(f"  alias '{alias}' -> [{chute_id}]")
     except RuntimeError as e:
         print(f"  alias creation failed (non-fatal): {e}", file=sys.stderr)
 
@@ -137,6 +176,16 @@ def main() -> int:
     p.add_argument("--alias", default=None, help="Create this stable alias on success")
     p.add_argument("--dry-run", action="store_true", help="Print the body and exit")
     args = p.parse_args()
+
+    # Auto-resolve branch name → commit SHA; Chutes rejects branch names.
+    try:
+        resolved = resolve_hf_revision(args.model, args.revision)
+    except RuntimeError as e:
+        print(f"error resolving revision: {e}", file=sys.stderr)
+        return 1
+    if resolved != args.revision:
+        print(f"  resolved revision {args.revision!r} -> {resolved}")
+        args.revision = resolved
 
     body = build_body(args)
 
@@ -166,7 +215,15 @@ def main() -> int:
     try:
         resp = idp_request("POST", "/chutes/vllm", bearer=bearer, body=body)
     except RuntimeError as e:
-        print(f"error: {e}", file=sys.stderr)
+        msg = str(e)
+        print(f"error: {msg}", file=sys.stderr)
+        if "Easy deployment is currently disabled" in msg:
+            print(
+                "\nhint: the platform-side easy-lane vLLM/diffusion deployment is gated.\n"
+                "      Use the custom CDK lane instead: build an image with build_image.py,\n"
+                "      then deploy it via deploy_custom.py. See references/vllm-recipe.md.",
+                file=sys.stderr,
+            )
         return 2
 
     chute_id = resp.get("chute_id") or resp.get("id")
@@ -198,7 +255,7 @@ def main() -> int:
 
     if args.alias:
         print(f"creating alias '{args.alias}'…")
-        create_alias(bearer, args.alias, model_id)
+        create_alias(bearer, args.alias, chute_id)
 
     return 0
 

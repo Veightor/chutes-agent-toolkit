@@ -2,6 +2,29 @@
 
 > Source of truth: `POST /chutes/vllm` on `api.chutes.ai`. Verify the exact field names and required keys against `https://api.chutes.ai/openapi.json` before the first live run. This doc is a starting template, not a spec.
 
+## Platform gate (read this first)
+
+**As of wave-2 live verification (2026-04-13) the easy-lane `POST /chutes/vllm` and `POST /chutes/diffusion` endpoints return HTTP 403 with `{"detail":"Easy deployment is currently disabled!"}`** on at least some account classes. When this is in effect, the easy lane cannot be used; the `chutes-deploy` skill falls back to the custom CDK lane via `build_image.py` + `deploy_custom.py`. `deploy_vllm.py` detects this exact error and prints a fall-back hint.
+
+Re-probe the endpoint if you see the gate turn off:
+
+```bash
+CHUTES_API_KEY=$(python manage_credentials.py get --field api_key)
+curl -s -w '\nHTTP %{http_code}\n' -X POST \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"probe/probe","model":"Qwen/Qwen3-0.6B","node_selector":{"gpu_count":1,"gpu_type":"a4000"}}' \
+  https://api.chutes.ai/chutes/vllm
+```
+
+A `422` (validation error) means the endpoint is live but the body is wrong. A `403` with the "Easy deployment is currently disabled" message means the gate is still on.
+
+## `revision` must be a commit SHA
+
+Chutes rejects branch names on the `revision` field with `{"msg":"Value error, Invalid revision specified."}`. You must pass a **full or short commit SHA**, not `main` / `master` / `v1`.
+
+`deploy_vllm.py` auto-resolves branch names via `GET https://huggingface.co/api/models/{repo}` and substitutes the real SHA before posting. You can override with `--revision <sha>` explicitly.
+
 ## Minimal request body
 
 ```json
@@ -27,8 +50,8 @@
 
 - **`name`** — `owner/chute-name`. Must be unique within the owner namespace. The deploy script defaults to `<your_username>/<model-slug>` if not supplied.
 - **`model`** — Hugging Face repo id (for the easy vLLM lane, this is usually enough).
-- **`revision`** — HF revision / commit sha. `main` is fine for experimentation; pin a commit for production.
-- **`node_selector`** — `gpu_count` + `gpu_type`. Allowed types: `a100_40gb`, `a100_80gb`, `h100`, `h200`, `l40s`, `mi300x`. Check `GET /nodes/supported` for the authoritative current list.
+- **`revision`** — HF commit SHA (**not** a branch name; Chutes rejects `main`). `deploy_vllm.py` auto-resolves a branch to its current SHA.
+- **`node_selector`** — `gpu_count` + `gpu_type`. `gpu_type` uses the key name from `GET /nodes/supported`, e.g. `a4000` ($0.20/hr, 16GB, cheapest), `3090` ($0.25/hr, 24GB), `l40s` ($0.85/hr, 48GB), `a100_40gb` ($1.10/hr, 40GB), `h100` ($1.79/hr, 80GB), `h200` ($2.75/hr, 140GB). Check `GET /nodes/supported` live for the authoritative list and pricing — wave-2 verification saw 27 supported types spanning $0.20/hr → $4.50/hr.
 - **`vllm_args`** — passes through to the vLLM server. Common knobs:
   - `max_model_len` — context window. Cannot exceed model's native max.
   - `gpu_memory_utilization` — 0.85–0.95 is typical.

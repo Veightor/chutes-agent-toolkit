@@ -27,15 +27,21 @@ Wave-2 stubs exist today as frontmatter-only skills so triggers don't overlap wi
 
 Anything that touches chute deployment — or anything that hasn't been exercised against a live Chutes account before the commit that introduced it — ships labeled **BETA**. A BETA label is only removed by a commit that references a recorded verification run.
 
-### Currently labeled BETA
+### Wave-2 live verification (2026-04-13) — what graduated
 
-- **`chutes-sign-in`** — until a live `register → vendor → verify → rotate` run is recorded. `rotate_secret.py` and `verify_siwc.py` stay BETA individually even after the rest graduates.
-- **`chutes-deploy`** — permanent BETA under the deploy-features policy. Every script (`build_image.py`, `deploy_vllm.py`, `deploy_diffusion.py`, `deploy_custom.py`, `teeify_chute.py`, `alias_deploy.py`) graduates only with a verified live run.
-- **`chutes-mcp-portability`** — until a live MCP health-check run (`chutes_list_models` over stdio) is recorded. MCP **write** tools (`chutes_deploy_vllm`, `chutes_deploy_diffusion`, `chutes_teeify`, `chutes_set_alias`, `chutes_delete_alias`, `chutes_create_api_key`) stay BETA permanently and prepend `[BETA] ` to their tool descriptions.
-- **Wave-2 stubs** — all four (`chutes-routing`, `chutes-usage-and-billing`, `chutes-platform-ops`, `chutes-agent-registration`) are born BETA by definition; they're stubs, not tested flows.
-- **Docs** — `docs/sign-in-with-chutes.md`, `docs/oauth-app-management.md`, `docs/model-aliases.md`, `docs/frameworks/nextjs-sign-in-with-chutes.md` all carry `Status: BETA` until their code paths are exercised.
+Exercised end-to-end against a real Chutes account during wave 2 (see `docs/chutes-maxi-wave-2.md`) and **graduated out of BETA**:
 
-Read-only / inference / credential-management content that has been exercised is **not** BETA. The `chutes-ai` hub, `manage_credentials.py`, and MCP read tools (`chutes_list_models`, `chutes_list_chutes`, `chutes_list_aliases`, `chutes_get_usage`, `chutes_get_quota`, `chutes_get_discounts`, `chutes_oauth_introspect`) all ship without the label once their verification step has been run.
+- **`chutes-sign-in`** — full `register → vendor → rotate` verified on a scratch Next.js App Router project; OAuth app created + deleted server-side. `register_oauth_app.py`, `install_siwc.py`, `rotate_secret.py` all graduated. Two real bugs were caught and fixed during verification (wrong upstream source paths; `rotate_secret.py` path segment using `client_id` instead of `app_id` UUID).
+- **`chutes-mcp-portability`** — `chutes-mcp-server --self-check` passed + 7 read tools exercised live: `chutes_list_models`, `chutes_get_quota`, `chutes_list_aliases`, `chutes_list_chutes`, `chutes_get_usage`, `chutes_get_discounts`, `chutes_list_api_keys`.
+- **`manage_credentials.py`** — credential round-trip + OAuth env alias verified live; new `app_id` field added to the schema.
+
+### Still BETA
+
+- **`chutes-deploy`** — permanent BETA under the deploy-features policy. Wave-2 live verification found that the easy-deploy lanes (`POST /chutes/vllm`, `POST /chutes/diffusion`) are currently gated server-side with HTTP 403 `{"detail":"Easy deployment is currently disabled!"}` on at least some account classes. Scripts now surface a clear fall-back hint; `--revision` branch→SHA auto-resolve is in place (wave-1 passed `main` which Chutes rejected).
+- **`chutes-sign-in:verify_siwc.py`** — steps 1-3 (files / env / keychain) verified live; step 4 (dev server `/api/auth/chutes/session` hit) not yet exercised (requires `npm install` + `npm run dev`).
+- **`chutes-mcp-portability` write tools** — `chutes_deploy_vllm`, `chutes_deploy_diffusion`, `chutes_teeify`, `chutes_set_alias`, `chutes_delete_alias`, `chutes_create_api_key` stay permanent BETA under the deploy-features policy. The alias set/delete round-trip was functionally exercised in wave 2 (and the wave-1 schema bug — `{alias, model}` → `{alias, chute_ids}` — was caught and fixed), but deploy-side writes keep the label.
+- **`chutes-mcp-portability` unexercised read tools** — `chutes_chat_complete` (paid), `chutes_get_evidence` (needs a chute_id), `chutes_oauth_introspect` (needs a live OAuth token).
+- **Wave-2 stubs** — `chutes-routing`, `chutes-usage-and-billing`, `chutes-platform-ops`, `chutes-agent-registration` — still stubs; fleshed out next in wave 2.
 
 ---
 

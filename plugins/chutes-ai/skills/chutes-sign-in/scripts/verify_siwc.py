@@ -28,6 +28,8 @@ from pathlib import Path
 
 from _common import api_key, get_secret, idp_request
 
+# Destination paths (under app_root, i.e. src/ or the project root)
+# after install_siwc.py has run its api/auth/chutes/*.ts -> app/api/auth/chutes/*/route.ts transform.
 EXPECTED_FILES = [
     "lib/chutesAuth.ts",
     "lib/serverAuth.ts",

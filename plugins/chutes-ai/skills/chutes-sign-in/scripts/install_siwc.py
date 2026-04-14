@@ -37,16 +37,21 @@ SIWC_REPO = "https://github.com/chutesai/Sign-in-with-Chutes.git"
 SIWC_PINNED_REF = "main"
 CACHE_DIR = Path.home() / ".chutes" / "cache" / "siwc"
 
-# Files relative to packages/nextjs/
-FILES_TO_VENDOR = [
-    "lib/chutesAuth.ts",
-    "lib/serverAuth.ts",
-    "hooks/useChutesSession.ts",
-    "app/api/auth/chutes/login/route.ts",
-    "app/api/auth/chutes/callback/route.ts",
-    "app/api/auth/chutes/logout/route.ts",
-    "app/api/auth/chutes/session/route.ts",
-    "components/SignInButton.tsx",
+# (source_rel_to_packages_nextjs, dest_rel_to_app_root)
+#
+# Upstream chutesai/Sign-in-with-Chutes packages the App Router route
+# handlers as flat files under packages/nextjs/api/auth/chutes/<name>.ts
+# with a "Copy this file to: src/app/api/auth/chutes/<name>/route.ts"
+# comment at the top. This installer performs that transform.
+FILES_TO_VENDOR: list[tuple[str, str]] = [
+    ("lib/chutesAuth.ts", "lib/chutesAuth.ts"),
+    ("lib/serverAuth.ts", "lib/serverAuth.ts"),
+    ("hooks/useChutesSession.ts", "hooks/useChutesSession.ts"),
+    ("api/auth/chutes/login.ts", "app/api/auth/chutes/login/route.ts"),
+    ("api/auth/chutes/callback.ts", "app/api/auth/chutes/callback/route.ts"),
+    ("api/auth/chutes/logout.ts", "app/api/auth/chutes/logout/route.ts"),
+    ("api/auth/chutes/session.ts", "app/api/auth/chutes/session/route.ts"),
+    ("components/SignInButton.tsx", "components/SignInButton.tsx"),
 ]
 
 
@@ -221,15 +226,15 @@ def main() -> int:
 
     print("\nVendoring files:")
     results = {}
-    for rel in FILES_TO_VENDOR:
-        src = siwc_root / rel
+    for src_rel, dest_rel in FILES_TO_VENDOR:
+        src = siwc_root / src_rel
         if not src.exists():
-            print(f"  WARNING: upstream file missing: {rel}")
-            results[rel] = "missing"
+            print(f"  WARNING: upstream file missing: {src_rel}")
+            results[src_rel] = "missing"
             continue
-        dst = dest_root / rel
-        results[rel] = copy_file(src, dst, force=args.force)
-        print(f"  {rel}: {results[rel]}")
+        dst = dest_root / dest_rel
+        results[src_rel] = copy_file(src, dst, force=args.force)
+        print(f"  {src_rel} -> {dest_rel}: {results[src_rel]}")
 
     print("\nWriting .env.local entries from keychain…")
     try:

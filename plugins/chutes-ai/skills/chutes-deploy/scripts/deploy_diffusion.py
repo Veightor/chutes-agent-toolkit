@@ -25,7 +25,7 @@ import sys
 from _common import api_key, idp_request
 
 # Reuse helpers by importing from deploy_vllm which also lives in this dir.
-from deploy_vllm import stream_build_logs, poll_warmup  # noqa: E402
+from deploy_vllm import stream_build_logs, poll_warmup, resolve_hf_revision  # noqa: E402
 
 
 def build_body(args: argparse.Namespace) -> dict:
@@ -69,6 +69,15 @@ def main() -> int:
     p.add_argument("--dry-run", action="store_true")
     args = p.parse_args()
 
+    try:
+        resolved = resolve_hf_revision(args.model, args.revision)
+    except RuntimeError as e:
+        print(f"error resolving revision: {e}", file=sys.stderr)
+        return 1
+    if resolved != args.revision:
+        print(f"  resolved revision {args.revision!r} -> {resolved}")
+        args.revision = resolved
+
     body = build_body(args)
 
     if args.dry_run:
@@ -97,7 +106,15 @@ def main() -> int:
     try:
         resp = idp_request("POST", "/chutes/diffusion", bearer=bearer, body=body)
     except RuntimeError as e:
-        print(f"error: {e}", file=sys.stderr)
+        msg = str(e)
+        print(f"error: {msg}", file=sys.stderr)
+        if "Easy deployment is currently disabled" in msg:
+            print(
+                "\nhint: the platform-side easy-lane diffusion deployment is gated.\n"
+                "      Use the custom CDK lane instead via build_image.py + deploy_custom.py.\n"
+                "      See references/diffusion-recipe.md.",
+                file=sys.stderr,
+            )
         return 2
 
     chute_id = resp.get("chute_id") or resp.get("id")

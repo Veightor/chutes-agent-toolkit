@@ -11,18 +11,18 @@ The `install_siwc.py` script detects which you use and places files accordingly.
 
 ## Files vendored
 
-From `chutesai/Sign-in-with-Chutes` `packages/nextjs/` at a pinned commit:
+From `chutesai/Sign-in-with-Chutes` `packages/nextjs/` at a pinned commit. Note the transform: upstream stores the route handlers as flat files with "copy me to X" comments; `install_siwc.py` applies the App Router `<name>/route.ts` directory transform during copy.
 
-| Source path | Destination |
+| Upstream source | Destination in target app |
 |---|---|
-| `lib/chutesAuth.ts` | `{src,}/lib/chutesAuth.ts` |
-| `lib/serverAuth.ts` | `{src,}/lib/serverAuth.ts` |
-| `hooks/useChutesSession.ts` | `{src,}/hooks/useChutesSession.ts` |
-| `app/api/auth/chutes/login/route.ts` | `{src,}/app/api/auth/chutes/login/route.ts` |
-| `app/api/auth/chutes/callback/route.ts` | `{src,}/app/api/auth/chutes/callback/route.ts` |
-| `app/api/auth/chutes/logout/route.ts` | `{src,}/app/api/auth/chutes/logout/route.ts` |
-| `app/api/auth/chutes/session/route.ts` | `{src,}/app/api/auth/chutes/session/route.ts` |
-| `components/SignInButton.tsx` | `{src,}/components/SignInButton.tsx` |
+| `packages/nextjs/lib/chutesAuth.ts` | `{src,}/lib/chutesAuth.ts` |
+| `packages/nextjs/lib/serverAuth.ts` | `{src,}/lib/serverAuth.ts` |
+| `packages/nextjs/hooks/useChutesSession.ts` | `{src,}/hooks/useChutesSession.ts` |
+| `packages/nextjs/api/auth/chutes/login.ts` | `{src,}/app/api/auth/chutes/login/route.ts` |
+| `packages/nextjs/api/auth/chutes/callback.ts` | `{src,}/app/api/auth/chutes/callback/route.ts` |
+| `packages/nextjs/api/auth/chutes/logout.ts` | `{src,}/app/api/auth/chutes/logout/route.ts` |
+| `packages/nextjs/api/auth/chutes/session.ts` | `{src,}/app/api/auth/chutes/session/route.ts` |
+| `packages/nextjs/components/SignInButton.tsx` | `{src,}/components/SignInButton.tsx` |
 
 If any destination file already exists, `install_siwc.py` prompts before overwriting. The original is backed up to `<name>.bak-<timestamp>`.
 

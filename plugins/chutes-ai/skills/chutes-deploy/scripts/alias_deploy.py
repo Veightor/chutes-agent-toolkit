@@ -24,7 +24,13 @@ from _common import api_key, idp_request
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--alias", required=True, help="stable handle (e.g. interactive-fast)")
-    p.add_argument("--model", required=True, help="model id the alias resolves to")
+    p.add_argument(
+        "--chute-id",
+        dest="chute_ids",
+        action="append",
+        required=True,
+        help="chute UUID the alias points at; repeat for a failover pool",
+    )
     p.add_argument(
         "--replace",
         action="store_true",
@@ -33,7 +39,7 @@ def main() -> int:
     p.add_argument("--dry-run", action="store_true")
     args = p.parse_args()
 
-    print(f"setting alias {args.alias!r} → {args.model}")
+    print(f"setting alias {args.alias!r} -> {args.chute_ids}")
     if args.dry_run:
         return 0
 
@@ -55,7 +61,7 @@ def main() -> int:
             "POST",
             "/model_aliases/",
             bearer=bearer,
-            body={"alias": args.alias, "model": args.model},
+            body={"alias": args.alias, "chute_ids": args.chute_ids},
         )
     except RuntimeError as e:
         print(f"error: {e}", file=sys.stderr)
