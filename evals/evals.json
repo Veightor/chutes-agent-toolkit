@@ -106,9 +106,44 @@
     {
       "id": 14,
       "category": "oauth-secret-rotation",
-      "status": "beta",
       "prompt": "Rotate our Chutes OAuth client secret for the 'oauth.my-app' profile without breaking production.",
-      "expected_output": "Should route to the chutes-sign-in skill (rotate_secret.py, permanent BETA). Should read the client_id from the keychain profile, POST /idp/apps/{client_id}/regenerate-secret, write the new client_secret back to the same keychain profile, and print a prominent redeploy reminder listing Vercel / Docker / bare-metal update steps. Must never auto-redeploy. Must never print the old or new secret value (only a redacted preview). If the keychain write fails after the secret rotated, must print a CRITICAL warning and exit non-zero.",
+      "expected_output": "Should route to chutes-sign-in:rotate_secret.py. Should read the app_id UUID (NOT the client_id) from the keychain profile, POST /idp/apps/{app_id}/regenerate-secret, write the new client_secret back to the same keychain profile, and print a prominent redeploy reminder listing Vercel / Docker / bare-metal update steps. Must never auto-redeploy. Must never print the old or new secret value (only a redacted preview). If the keychain write fails after the secret rotated, must print a CRITICAL warning and exit non-zero. If the profile is legacy-shaped and has no app_id, must print a clear migration hint.",
+      "files": []
+    },
+    {
+      "id": 15,
+      "category": "routing-intent-pool",
+      "prompt": "Build me a routing pool for interactive-fast and pin it as an alias. Use the smallest reasonable pool.",
+      "expected_output": "Should route to chutes-routing:build_pool.py. Should query live /v1/models, apply the interactive-fast filter (text I/O, cheapest-first), take top N (3-4), print the models with prompt/completion prices, emit an inline routing string with the :latency suffix, and (if --alias is requested) POST /model_aliases/ with {alias, chute_ids:[...]} - NOT {alias, model}. Should not pretend /v1/models has average_ttft/average_tps; client-side ranks by cost, server-side :latency ranks by TTFT.",
+      "files": []
+    },
+    {
+      "id": 16,
+      "category": "spend-summary",
+      "prompt": "What's my current Chutes spend and am I anywhere near a cap?",
+      "expected_output": "Should route to chutes-usage-and-billing:spend_summary.py + quota_guard.py. Must pull balance from /users/me, subscription caps (four_hour + monthly) from /users/me/subscription_usage, discounts from /users/me/discounts, price overrides from /users/me/price_overrides, and TAO rate from /fmv. Must clearly label these as PERSONAL data and NOT confuse them with /payments/summary/tao (which is platform-wide TAO deposits, not the user's bill). Must show ASCII progress bars against caps and warn at 70/85/95 percent.",
+      "files": []
+    },
+    {
+      "id": 17,
+      "category": "platform-ops-audit",
+      "prompt": "Audit my OAuth apps - I want to see which ones I can clean up.",
+      "expected_output": "Should route to chutes-platform-ops:list_apps.py + audit_stale_apps.py. Must paginate /idp/apps (wave-2 finding: ?mine=true and ?user_id= are IGNORED by the server, client-side filter is required), filter to user_id == my user_id, join with /idp/authorizations to compute per-app auth counts, and print a report flagging zero-authorization apps and apps aged >= 90 days. Must NOT delete anything - report only. Must exit with code 3 when stale apps are found.",
+      "files": []
+    },
+    {
+      "id": 18,
+      "category": "agent-registration-dryrun",
+      "status": "beta",
+      "prompt": "I'm building autonomous agent infrastructure and each agent should register its own Chutes account. Show me how to do a dry run of agent registration first.",
+      "expected_output": "Should route to chutes-agent-registration:register_agent.py with --dry-run (BETA). Must explain the agent-vs-human on-ramp tradeoff before proceeding, print the POST /users/agent_registration body shape {hotkey, coldkey, signature} with the signature REDACTED, and stop. Must NOT attempt a live POST. Must explicitly mention that both --yes AND --i-know-bittensor flags are required for a real registration and that real registration has on-chain implications. Must never auto-generate a signature.",
+      "files": []
+    },
+    {
+      "id": 19,
+      "category": "tee-attestation",
+      "prompt": "I'm using a confidential_compute=true chute for sensitive prompts. Verify that the attestation evidence actually looks right.",
+      "expected_output": "Should route to chutes-tee:attest_chute.py. Must GET /instances/nonce or generate a 64-hex nonce via secrets.token_hex(32), then GET /chutes/{id}/evidence?nonce=<nonce> (wave-2 finding: nonce query param is REQUIRED and must be exactly 64 hex chars), parse the TDX v4 quote header (version=4, tee_type=0x81, att_key_type=2), extract mrtd + rtmr[0..3] + report_data, parse one NVIDIA Hopper GPU certificate, and return a verdict of 'shape-valid' if crypto validation isn't available (explicitly labeled 'not run - install Intel DCAP for verified mode'). Must NOT claim 'verified' unless DCAP tooling actually ran. Must explain honest limits of TEE (see references/what-tee-does-not-protect.md).",
       "files": []
     }
   ]

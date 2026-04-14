@@ -12,14 +12,14 @@ It is also the staging ground for deeper Hermes integration: custom-provider con
 
 The toolkit is organized around four product lanes, each with one or more focused skills:
 
-| Lane | What it covers | Wave-1 skills |
+| Lane | What it covers | Skills |
 |---|---|---|
-| **Use Chutes** | Account, API keys, models, OpenAI-compatible inference, basic routing, TEE model selection. | `chutes-ai` (hub) |
-| **Build on Chutes** | "Sign in with Chutes" — OAuth 2.0 + OIDC + PKCE. Register apps, vendor the upstream Next.js package, manage scopes, rotate client secrets safely. | `chutes-sign-in` **[BETA]** |
-| **Operate on Chutes** | Model aliases, usage / quotas / discounts, token lifecycle, secret rotation. | wave-2 stubs (`chutes-routing`, `chutes-usage-and-billing`, `chutes-platform-ops`) |
-| **Run agents with Chutes** | Chutes deploy (vLLM / diffusion / teeify), MCP server + drop-in configs for Cursor / Cline / Aider / Hermes / Claude Desktop, multi-agent portability. | `chutes-deploy` **[BETA]**, `chutes-mcp-portability` **[BETA]**, wave-2 `chutes-agent-registration` stub |
+| **Use Chutes** | Account, API keys, models, OpenAI-compatible inference, basic routing, TEE model selection. | `chutes-ai` (hub), `chutes-routing`, `chutes-tee` |
+| **Build on Chutes** | "Sign in with Chutes" — OAuth 2.0 + OIDC + PKCE. Register apps, vendor the upstream Next.js package, manage scopes, rotate client secrets safely. | `chutes-sign-in` |
+| **Operate on Chutes** | Spend + quota dashboards, fleet-scale OAuth app audit, bulk secret rotation, alias governance, TEE attestation verification. | `chutes-usage-and-billing`, `chutes-platform-ops`, `chutes-tee` |
+| **Run agents with Chutes** | Chute deploy (vLLM / diffusion / teeify), MCP server + drop-in configs for Cursor / Cline / Aider / Hermes / Claude Desktop, autonomous agent registration. | `chutes-deploy` **[BETA]**, `chutes-mcp-portability`, `chutes-agent-registration` **[BETA]** |
 
-Wave-2 stubs exist today as frontmatter-only skills so triggers don't overlap with the hub; they will be fleshed out in a follow-up.
+Wave 1 shipped the core four-lane split with wave-2 skills as stubs. **Wave 2 landed all four wave-2 stubs as full live-verified skills + a new `chutes-tee` attestation skill**, and graduated most wave-1 items out of BETA after live end-to-end verification against a real Chutes account.
 
 ---
 
@@ -29,19 +29,24 @@ Anything that touches chute deployment — or anything that hasn't been exercise
 
 ### Wave-2 live verification (2026-04-13) — what graduated
 
-Exercised end-to-end against a real Chutes account during wave 2 (see `docs/chutes-maxi-wave-2.md`) and **graduated out of BETA**:
+Exercised end-to-end against a real Chutes account during wave 2 (see `~/.claude/plans/chutes-maxi-wave-2.md`) and **graduated out of BETA**. Every non-deploy skill was verified with real API calls and real data shapes.
 
-- **`chutes-sign-in`** — full `register → vendor → rotate` verified on a scratch Next.js App Router project; OAuth app created + deleted server-side. `register_oauth_app.py`, `install_siwc.py`, `rotate_secret.py` all graduated. Two real bugs were caught and fixed during verification (wrong upstream source paths; `rotate_secret.py` path segment using `client_id` instead of `app_id` UUID).
+- **`chutes-sign-in`** — full `register → vendor → rotate` cycle verified on a scratch Next.js App Router project; OAuth app created + deleted server-side. Two real wave-1 bugs caught and fixed during verification (wrong upstream source paths; `rotate_secret.py` path segment using `client_id` instead of `app_id` UUID). Only `verify_siwc.py` step 4 (dev-server hit) stays BETA.
 - **`chutes-mcp-portability`** — `chutes-mcp-server --self-check` passed + 7 read tools exercised live: `chutes_list_models`, `chutes_get_quota`, `chutes_list_aliases`, `chutes_list_chutes`, `chutes_get_usage`, `chutes_get_discounts`, `chutes_list_api_keys`.
-- **`manage_credentials.py`** — credential round-trip + OAuth env alias verified live; new `app_id` field added to the schema.
+- **`chutes-routing`** — new full skill. `build_pool.py` verified across 3 intents + alias round-trip; `audit_pool.py` verified. Caught + fixed wave-1 schema bug: `/model_aliases/` accepts `{alias, chute_ids:[uuid,...]}`, not `{alias, model}`.
+- **`chutes-usage-and-billing`** — new full skill. `spend_summary.py`, `cost_breakdown.py`, `quota_guard.py`, `download_export.py` all verified. Discovered that `/users/me/subscription_usage` is the real personal spend dashboard (4-hour + monthly caps); `/invocations/*` and `/payments*` are platform-wide aggregates; exports are CSV not JSON.
+- **`chutes-platform-ops`** — new full skill. `list_apps.py`, `audit_stale_apps.py`, `rotate_all.py --dry-run`, `alias_crud.py` all verified against 16 real OAuth apps on the test account. Found that `/idp/apps?mine=true` is ignored — client-side filter required.
+- **`chutes-tee`** — brand new skill. `fetch_evidence.py`, `verify_quote.py`, `verify_gpu_attestation.py`, `attest_chute.py` all exercised live against a real TEE chute (`Qwen/Qwen3-32B-TEE`). Parsed real TDX v4 quote (5006 bytes, 7 instances, 56 Hopper GPUs). Ships as `shape-valid` verdict; cryptographic validation is opt-in via Intel DCAP tooling.
+- **`manage_credentials.py`** — `app_id` field added; OAuth env aliases verified live.
 
 ### Still BETA
 
 - **`chutes-deploy`** — permanent BETA under the deploy-features policy. Wave-2 live verification found that the easy-deploy lanes (`POST /chutes/vllm`, `POST /chutes/diffusion`) are currently gated server-side with HTTP 403 `{"detail":"Easy deployment is currently disabled!"}` on at least some account classes. Scripts now surface a clear fall-back hint; `--revision` branch→SHA auto-resolve is in place (wave-1 passed `main` which Chutes rejected).
-- **`chutes-sign-in:verify_siwc.py`** — steps 1-3 (files / env / keychain) verified live; step 4 (dev server `/api/auth/chutes/session` hit) not yet exercised (requires `npm install` + `npm run dev`).
-- **`chutes-mcp-portability` write tools** — `chutes_deploy_vllm`, `chutes_deploy_diffusion`, `chutes_teeify`, `chutes_set_alias`, `chutes_delete_alias`, `chutes_create_api_key` stay permanent BETA under the deploy-features policy. The alias set/delete round-trip was functionally exercised in wave 2 (and the wave-1 schema bug — `{alias, model}` → `{alias, chute_ids}` — was caught and fixed), but deploy-side writes keep the label.
-- **`chutes-mcp-portability` unexercised read tools** — `chutes_chat_complete` (paid), `chutes_get_evidence` (needs a chute_id), `chutes_oauth_introspect` (needs a live OAuth token).
-- **Wave-2 stubs** — `chutes-routing`, `chutes-usage-and-billing`, `chutes-platform-ops`, `chutes-agent-registration` — still stubs; fleshed out next in wave 2.
+- **`chutes-agent-registration`** — dry-run verified. Stays BETA because creating a real Bittensor-backed agent account has on-chain implications that are the wrong shape for automated verification. Graduates on the first intentional human-initiated agent registration.
+- **`chutes-sign-in:verify_siwc.py`** — steps 1-3 (files / env / keychain) verified live; step 4 (dev server `/api/auth/chutes/session` hit) requires `npm install` + `npm run dev` which is out of scope for automated verification.
+- **`chutes-platform-ops:introspect_token.py` / `revoke_token.py`** — both need a real OAuth access token from a completed SIWC browser flow. Graduate on the first live run against a real token.
+- **`chutes-mcp-portability` write tools** — `chutes_deploy_vllm`, `chutes_deploy_diffusion`, `chutes_teeify`, `chutes_set_alias`, `chutes_delete_alias`, `chutes_create_api_key` stay permanent BETA under the deploy-features policy. `chutes_set_alias` / `chutes_delete_alias` were functionally exercised in wave 2 (and the wave-1 schema bug was fixed), but deploy-side writes keep the label.
+- **`chutes-mcp-portability` three unexercised read tools** — `chutes_chat_complete` (paid), `chutes_get_evidence` (wave-2 `chutes-tee` skill exercises the underlying endpoint but not through the MCP path), `chutes_oauth_introspect` (needs a live OAuth token).
 
 ---
 

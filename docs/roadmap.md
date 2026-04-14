@@ -117,9 +117,9 @@ Deploy-side features and anything not exercised against a live Chutes account be
 - ~~propose upstream merge to Hermes/Nous~~ ✓ handled in the sibling repo
 - follow-up routing ergonomics remain open as a wave-3 idea
 
-### Phase 8: Sign in with Chutes + MCP surface (wave 1, 2026-04-13)
+### Phase 8: Sign in with Chutes + MCP surface (wave 1, 2026-04-13) — DELIVERED
 
-Completed in wave 1 (all [BETA] until verified):
+Completed in wave 1:
 
 - `chutes-sign-in` skill — register OAuth app, vendor upstream Next.js package, verify, rotate client secret.
 - `chutes-deploy` skill — vLLM / diffusion / custom CDK deploy, teeify, rolling updates, alias pinning.
@@ -128,12 +128,39 @@ Completed in wave 1 (all [BETA] until verified):
 - Hub `chutes-ai/SKILL.md` slim-down + sibling router.
 - Wave-2 stubs scaffolded to reserve trigger territory.
 
-Wave 2 (future):
+### Phase 9: Live verification + wave-2 skill buildout (wave 2, 2026-04-13) — DELIVERED
 
-- Flesh out `chutes-routing`, `chutes-usage-and-billing`, `chutes-platform-ops`, `chutes-agent-registration`.
-- TEE attestation verification skill (`chutes-tee`) that parses TDX quotes.
+Track C — live verification against a real Chutes account (credentials from the local keychain) and BETA graduation:
+- Environment sanity, MCP self-check, credential round-trip.
+- SIWC end-to-end against a scratch Next.js project (caught + fixed 2 real wave-1 bugs: wrong upstream source paths; `rotate_secret.py` using `client_id` instead of `app_id` UUID).
+- Deploy lane attempted: platform-side gate found (HTTP 403 "Easy deployment is currently disabled!"), bugs fixed (`--revision main` → SHA auto-resolve), `chutes-deploy` stays permanent BETA per policy.
+- MCP alias round-trip: caught + fixed wave-1 schema bug (`{alias, chute_ids: []}` not `{alias, model}`).
+- 7 MCP read tools graduated out of BETA with recorded verified calls.
+
+Track A — wave-2 stubs fleshed out as full live-verified skills:
+- `chutes-routing` — intent-driven pool builder + audit with 5 recipes, alias-packs reference. Verified live.
+- `chutes-usage-and-billing` — spend dashboard + time-bucketed breakdown + quota guard + CSV export. Verified live; discovered that `/invocations/*` and `/payments*` are platform-wide aggregates (clearly labeled in the skill).
+- `chutes-platform-ops` — OAuth fleet management across the 16 real OAuth apps on the test account. `list_apps.py`, `audit_stale_apps.py`, `rotate_all.py --dry-run`, `alias_crud.py` verified live. Token introspect/revoke stay BETA pending a real OAuth token.
+- `chutes-agent-registration` — dry-run verified. Stays BETA because registering a real Bittensor-backed agent account has on-chain implications.
+
+Track B — new `chutes-tee` skill (not a stub):
+- TDX v4 quote parser, NVIDIA Hopper GPU attestation parser, shape-only verdict.
+- Verified live against a real TEE chute (`Qwen/Qwen3-32B-TEE`, 7 instances, 56 Hopper GPUs).
+- Ships `shape-valid` by default; cryptographic validation requires Intel DCAP tooling.
+
+Hermes native provider — delivered in a sibling repo; phase 6/7 marked complete.
+
+### Phase 10: wave 3 brainstorm (not yet scoped)
+
+- Graduate `chutes-sign-in:verify_siwc.py` step 4 (dev server hit) via a scripted Playwright run.
+- Graduate `chutes-platform-ops:introspect_token.py` / `revoke_token.py` via a completed live SIWC flow.
+- Graduate `chutes-mcp-portability:chutes_chat_complete` / `chutes_get_evidence` / `chutes_oauth_introspect` — the three unexercised read tools.
+- Graduate `chutes-tee` from `shape-valid` to `verified` by wiring in Intel DCAP on a Linux CI runner.
+- Automated alerting loops for `quota_guard.py` and `audit_pool.py` (promote from read-only scripts to scheduled background jobs).
+- Parquet + DuckDB pipeline for `/invocations/exports/*` (mentioned in wave-2 usage skill).
+- Cost-aware router daemon that rebalances aliases nightly based on live pricing + discounts.
+- TEE compliance mode that forces all inference through verified-attestation chutes and refuses otherwise.
 - Upstream framework adapters (Express, FastAPI) for `chutes-sign-in` when the SIWC repo ships them.
-- Hermes native provider PR (phase 6) using the wave-1 MCP server as one integration path.
 
 ## Non-goals right now
 
