@@ -78,6 +78,38 @@
       "prompt": "When should I use the Chutes Harvard research endpoint instead of the normal endpoint?",
       "expected_output": "Should explain the discount tradeoff clearly: same auth and API shape, but prompts/responses may be recorded for research. Should advise against using it for sensitive/private workloads without explicit consent.",
       "files": []
+    },
+    {
+      "id": 11,
+      "category": "sign-in-with-chutes",
+      "status": "beta",
+      "prompt": "Add Sign in with Chutes to my Next.js App Router app at ~/projects/my-app. I want the user to sign in with their Chutes account and have my server make inference calls on their behalf.",
+      "expected_output": "Should route to the chutes-sign-in skill (BETA). Should detect Next.js App Router, register an OAuth app via POST /idp/apps with scopes openid profile chutes:invoke, store client_id and client_secret in the OS keychain under a named profile via manage_credentials.py, vendor the upstream chutesai/Sign-in-with-Chutes Next.js package (lib/, hooks/, app/api/auth/chutes/, components/SignInButton.tsx) into the target, append CHUTES_OAUTH_CLIENT_ID / CHUTES_OAUTH_CLIENT_SECRET / NEXT_PUBLIC_APP_URL to .env.local, print the layout diff for the SignInButton WITHOUT auto-editing layout files, and verify via POST /idp/token/introspect once a session exists. Must never echo csc_... into the conversation. Must acknowledge BETA status.",
+      "files": []
+    },
+    {
+      "id": 12,
+      "category": "chute-deploy-vllm",
+      "status": "beta",
+      "prompt": "Deploy Qwen/Qwen3-8B as a vLLM chute on an H100 and give it a stable alias called 'interactive-fast' so my team can point at the alias instead of hardcoding the model id.",
+      "expected_output": "Should route to the chutes-deploy skill (permanent BETA). Should explicitly acknowledge that deploy consumes real paid compute, confirm before POSTing, POST /chutes/vllm with a templated body (model Qwen/Qwen3-8B, gpu_type h100, gpu_count 1), stream build logs from GET /images/{image_id}/logs, poll GET /chutes/warmup/{chute_id} until ready, then POST /model_aliases/ with {alias: interactive-fast, model: <model_id>}. Should return the base_url + model_id for inference. Must warn about BETA status.",
+      "files": []
+    },
+    {
+      "id": 13,
+      "category": "mcp-portability-cursor",
+      "status": "beta",
+      "prompt": "Make Chutes available in Cursor via MCP. I use the repo-level .cursor/mcp.json. Also run a quick health check when you're done.",
+      "expected_output": "Should route to the chutes-mcp-portability skill (BETA). Should install the chutes-mcp-server via uv tool install (from plugins/chutes-ai/skills/chutes-mcp-portability/mcp-server), run generate_agent_config.py --target cursor to write .cursor/mcp.json, ensure CHUTES_API_KEY is exported from the keychain via manage_credentials.py, and run chutes-mcp-server --self-check (which calls chutes_list_models with limit=1). Must never embed a raw cpk_ value into the config file; must use ${env:CHUTES_API_KEY}. Must acknowledge that read-only MCP tools graduate out of BETA after a verified call but write/deploy MCP tools stay BETA permanently.",
+      "files": []
+    },
+    {
+      "id": 14,
+      "category": "oauth-secret-rotation",
+      "status": "beta",
+      "prompt": "Rotate our Chutes OAuth client secret for the 'oauth.my-app' profile without breaking production.",
+      "expected_output": "Should route to the chutes-sign-in skill (rotate_secret.py, permanent BETA). Should read the client_id from the keychain profile, POST /idp/apps/{client_id}/regenerate-secret, write the new client_secret back to the same keychain profile, and print a prominent redeploy reminder listing Vercel / Docker / bare-metal update steps. Must never auto-redeploy. Must never print the old or new secret value (only a redacted preview). If the keychain write fails after the secret rotated, must print a CRITICAL warning and exit non-zero.",
+      "files": []
     }
   ]
 }

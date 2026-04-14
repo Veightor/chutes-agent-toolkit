@@ -18,6 +18,15 @@ Static lists in this repo are convenience references only.
 
 4. The first upstream Hermes PR should be narrow, mergeable, and low-risk.
 
+## Integration paths (updated 2026-04-13)
+
+As of wave 1 there are now **three** integration paths for Hermes, not two:
+
+1. **Custom provider YAML** (layer 1 — works today). See `other-agents/hermes/config-examples/`. Generated/refreshed by `plugins/chutes-ai/skills/chutes-mcp-portability/scripts/generate_agent_config.py --target hermes`.
+2. **Symmetric skill tree** (wave 1, new). `other-agents/hermes/skills/{chutes-ai,chutes-sign-in,chutes-deploy,chutes-mcp-portability}/` mirrors the Claude plugin tree so Hermes loads the same four-lane skill set. Scripts live once in the Claude plugin tree and are invoked from the repo root by either agent.
+3. **MCP server** (wave 1, new). `chutes-mcp-server` (stdio, from `plugins/chutes-ai/skills/chutes-mcp-portability/mcp-server/`) gives any MCP-aware Hermes build tool-level access to Chutes without touching the provider config. This is a second-channel integration — use it alongside the custom-provider YAML, not instead of it.
+4. **Native provider (layer 2, future)** — still the goal for the upstream Hermes PR. The wave-1 work does **not** block this; the MCP server and symmetric skills are additive.
+
 ## Integration layers
 
 ### Layer 1: Works today in Hermes via custom provider

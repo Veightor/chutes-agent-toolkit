@@ -47,6 +47,28 @@ def test_cmd_get_prefers_environment_override_for_secret_field(manage_credential
     assert captured.err == ""
 
 
+def test_cmd_get_accepts_oauth_env_alias(manage_credentials_module, monkeypatch, capsys):
+    module = manage_credentials_module
+    monkeypatch.delenv("CHUTES_CLIENT_ID", raising=False)
+    monkeypatch.setenv("CHUTES_OAUTH_CLIENT_ID", "cid_from_oauth_alias")
+
+    module.cmd_get(SimpleNamespace(profile=None, field="client_id"))
+
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "cid_from_oauth_alias"
+
+
+def test_cmd_get_legacy_env_alias_still_works(manage_credentials_module, monkeypatch, capsys):
+    module = manage_credentials_module
+    monkeypatch.delenv("CHUTES_OAUTH_CLIENT_SECRET", raising=False)
+    monkeypatch.setenv("CHUTES_CLIENT_SECRET", "csc_legacy")
+
+    module.cmd_get(SimpleNamespace(profile=None, field="client_secret"))
+
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "csc_legacy"
+
+
 def test_cmd_check_reports_gitignore_status(manage_credentials_module, capsys):
     module = manage_credentials_module
     module.ensure_chutes_dir()

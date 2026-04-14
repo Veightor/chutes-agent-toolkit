@@ -94,11 +94,26 @@ Legacy plaintext backup script:
 - `plugins/chutes-ai/skills/chutes-ai/scripts/save_credentials.py`
 - legacy use only; prefer the secure credential manager
 
+## Four product lanes — sibling skills
+
+This skill is the Hermes-facing **hub**. For deeper capabilities, hand off to sibling skills in `other-agents/hermes/skills/`:
+
+| Lane | Skill | Status |
+|---|---|---|
+| **Build on Chutes** | `chutes-sign-in` — Sign in with Chutes (OAuth + PKCE), OAuth app CRUD, client secret rotation | **[BETA]** |
+| **Use Chutes — deploy** | `chutes-deploy` — vLLM / diffusion / custom CDK deploy, teeify, rolling updates | **[BETA]** |
+| **Run with Chutes** | `chutes-mcp-portability` — Chutes MCP server + drop-in configs for Cursor / Cline / Aider | **[BETA]** |
+
+Wave-2 stubs (`chutes-routing`, `chutes-usage-and-billing`, `chutes-platform-ops`, `chutes-agent-registration`) exist in the Claude plugin tree and will mirror here when their walkthroughs land.
+
 ## Repo references
 
 For fuller docs, see:
 - `docs/credential-store.md`
 - `docs/hermes-integration-spec.md`
+- `docs/sign-in-with-chutes.md`
+- `docs/model-aliases.md`
 - `docs/llms-txt-review.md`
 - `other-agents/hermes/README.md`
 - `other-agents/hermes/config-examples/`
+- `plugins/chutes-ai/skills/chutes-ai/references/model-aliases.md`

@@ -67,6 +67,19 @@ That means:
 - keep examples realistic and tested
 - prefer narrow, mergeable downstream PRs over giant platform-specific dumps
 
+## Four product lanes (adopted 2026-04-13)
+
+All skill work is organized around four lanes, matching the Hermes `docs/chutes-maxi-proposal.md`:
+
+1. **Use Chutes** — account, keys, models, inference, TEE selection, billing basics. Skill: `chutes-ai` (hub).
+2. **Build on Chutes** — Sign in with Chutes, OAuth apps, framework adapters, client secret lifecycle. Skill: `chutes-sign-in` **[BETA]**.
+3. **Operate on Chutes** — model aliases, usage/quota/billing, token lifecycle. Wave-2 stubs: `chutes-routing`, `chutes-usage-and-billing`, `chutes-platform-ops`.
+4. **Run agents with Chutes** — Claude/Hermes/Cursor/Cline/Aider/MCP/agent-native registration. Skills: `chutes-deploy` **[BETA]**, `chutes-mcp-portability` **[BETA]**, wave-2 stub `chutes-agent-registration`.
+
+## Beta labeling policy
+
+Deploy-side features and anything not exercised against a live Chutes account before the commit that introduced it ship labeled **BETA**. A BETA label is removed only by a commit that references a concrete verification run. See `README.md` → "Beta features" and `docs/chutes-maxi-proposal.md`.
+
 ## Execution phases
 
 ### Phase 1: Foundation
@@ -103,10 +116,28 @@ That means:
 - propose upstream merge to Hermes/Nous
 - follow up with nicer routing ergonomics if needed
 
+### Phase 8: Sign in with Chutes + MCP surface (wave 1, 2026-04-13)
+
+Completed in wave 1 (all [BETA] until verified):
+
+- `chutes-sign-in` skill — register OAuth app, vendor upstream Next.js package, verify, rotate client secret.
+- `chutes-deploy` skill — vLLM / diffusion / custom CDK deploy, teeify, rolling updates, alias pinning.
+- `chutes-mcp-portability` skill — stdio MCP server exposing Chutes management + inference, `generate_agent_config.py` for Cursor / Cline / Aider / Hermes / system-prompt.
+- Symmetric `other-agents/hermes/skills/` mirror so Hermes has parity with Claude.
+- Hub `chutes-ai/SKILL.md` slim-down + sibling router.
+- Wave-2 stubs scaffolded to reserve trigger territory.
+
+Wave 2 (future):
+
+- Flesh out `chutes-routing`, `chutes-usage-and-billing`, `chutes-platform-ops`, `chutes-agent-registration`.
+- TEE attestation verification skill (`chutes-tee`) that parses TDX quotes.
+- Upstream framework adapters (Express, FastAPI) for `chutes-sign-in` when the SIWC repo ships them.
+- Hermes native provider PR (phase 6) using the wave-1 MCP server as one integration path.
+
 ## Non-goals right now
 
 These may happen later, but they are not the immediate focus:
-- building a full Chutes MCP server in this repo
+- ~~building a full Chutes MCP server in this repo~~ (shipped in wave 1 as `chutes-mcp-portability` **[BETA]**)
 - replacing the Chutes official docs
 - hardcoding static model lists as authoritative data
 - tightly coupling the toolkit to only one agent platform

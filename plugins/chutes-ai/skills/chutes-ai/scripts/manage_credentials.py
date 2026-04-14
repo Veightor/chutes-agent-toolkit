@@ -48,11 +48,20 @@ METADATA_FIELDS = {"username", "user_id"}
 ALL_FIELDS = SECRET_FIELDS | METADATA_FIELDS
 
 ENV_OVERRIDES = {
-    "api_key": "CHUTES_API_KEY",
-    "fingerprint": "CHUTES_FINGERPRINT",
-    "client_id": "CHUTES_CLIENT_ID",
-    "client_secret": "CHUTES_CLIENT_SECRET",
+    "api_key": ("CHUTES_API_KEY",),
+    "fingerprint": ("CHUTES_FINGERPRINT",),
+    "client_id": ("CHUTES_OAUTH_CLIENT_ID", "CHUTES_CLIENT_ID"),
+    "client_secret": ("CHUTES_OAUTH_CLIENT_SECRET", "CHUTES_CLIENT_SECRET"),
 }
+
+
+def env_override_value(field: str) -> Optional[str]:
+    """Return the first matching env var value for a field, or None."""
+    for env_var in ENV_OVERRIDES.get(field, ()):
+        val = os.environ.get(env_var)
+        if val:
+            return val
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -427,7 +436,7 @@ def cmd_get(args):
 
     # Environment variable override (highest priority)
     if args.field and args.field in ENV_OVERRIDES:
-        env_val = os.environ.get(ENV_OVERRIDES[args.field])
+        env_val = env_override_value(args.field)
         if env_val:
             print(env_val)
             return
@@ -527,11 +536,12 @@ def cmd_check(args):
         result["encrypted_file_secure"] = encrypted_mode == "0o600"
 
     # Check for env overrides
-    active_env = {
-        field: env_var
-        for field, env_var in ENV_OVERRIDES.items()
-        if os.environ.get(env_var)
-    }
+    active_env = {}
+    for field, env_vars in ENV_OVERRIDES.items():
+        for env_var in env_vars:
+            if os.environ.get(env_var):
+                active_env[field] = env_var
+                break
     if active_env:
         result["env_overrides"] = active_env
 

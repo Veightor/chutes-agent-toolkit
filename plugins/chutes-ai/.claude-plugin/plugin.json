@@ -1,7 +1,7 @@
 {
   "name": "chutes-ai",
-  "description": "Access decentralized open-source AI inference via Chutes.ai. Register accounts, manage API keys, discover models, make inference calls, set up model routing, and manage billing — all through Claude.",
-  "version": "1.0.0",
+  "description": "Access decentralized open-source AI inference via Chutes.ai. Register accounts, manage API keys, discover models, make inference calls, set up routing, add Sign in with Chutes to your app, deploy vLLM/diffusion chutes, and expose Chutes to any agent via MCP.",
+  "version": "1.1.0",
   "author": {
     "name": "Vincent Bontempo",
     "email": "bontempo.vincent@gmail.com"
@@ -19,6 +19,23 @@
     "qwen",
     "bittensor",
     "tee",
-    "model-routing"
+    "model-routing",
+    "model-aliases",
+    "oauth",
+    "sign-in",
+    "siwc",
+    "mcp",
+    "deploy",
+    "vllm",
+    "diffusion"
+  ],
+  "betaFeatures": [
+    "chutes-sign-in",
+    "chutes-deploy",
+    "chutes-mcp-portability",
+    "chutes-routing",
+    "chutes-usage-and-billing",
+    "chutes-platform-ops",
+    "chutes-agent-registration"
   ]
 }

@@ -2,9 +2,42 @@
 
 Give any AI agent access to [Chutes.ai](https://chutes.ai) — decentralized serverless inference for 40+ open-source AI models (DeepSeek, Llama, Qwen, GLM, Mistral, and more), powered by Bittensor.
 
-This repo is both a **Claude plugin marketplace** and a **multi-agent toolkit**. Install it in one command for Claude, or grab the system prompt for any other agent.
+This repo is both a **Claude plugin marketplace** and a **multi-agent toolkit**. The same skills, scripts, and docs work for Claude, Hermes, and any generic OpenAI-compatible client.
 
-It is also the staging ground for a Hermes integration path: first via named custom-provider docs and skills, then via a future first-class Chutes provider implementation in a Hermes fork/PR.
+It is also the staging ground for deeper Hermes integration: custom-provider configuration + symmetric skill tree today, first-class provider PR later.
+
+---
+
+## The four product lanes
+
+The toolkit is organized around four product lanes, each with one or more focused skills:
+
+| Lane | What it covers | Wave-1 skills |
+|---|---|---|
+| **Use Chutes** | Account, API keys, models, OpenAI-compatible inference, basic routing, TEE model selection. | `chutes-ai` (hub) |
+| **Build on Chutes** | "Sign in with Chutes" — OAuth 2.0 + OIDC + PKCE. Register apps, vendor the upstream Next.js package, manage scopes, rotate client secrets safely. | `chutes-sign-in` **[BETA]** |
+| **Operate on Chutes** | Model aliases, usage / quotas / discounts, token lifecycle, secret rotation. | wave-2 stubs (`chutes-routing`, `chutes-usage-and-billing`, `chutes-platform-ops`) |
+| **Run agents with Chutes** | Chutes deploy (vLLM / diffusion / teeify), MCP server + drop-in configs for Cursor / Cline / Aider / Hermes / Claude Desktop, multi-agent portability. | `chutes-deploy` **[BETA]**, `chutes-mcp-portability` **[BETA]**, wave-2 `chutes-agent-registration` stub |
+
+Wave-2 stubs exist today as frontmatter-only skills so triggers don't overlap with the hub; they will be fleshed out in a follow-up.
+
+---
+
+## Beta features
+
+Anything that touches chute deployment — or anything that hasn't been exercised against a live Chutes account before the commit that introduced it — ships labeled **BETA**. A BETA label is only removed by a commit that references a recorded verification run.
+
+### Currently labeled BETA
+
+- **`chutes-sign-in`** — until a live `register → vendor → verify → rotate` run is recorded. `rotate_secret.py` and `verify_siwc.py` stay BETA individually even after the rest graduates.
+- **`chutes-deploy`** — permanent BETA under the deploy-features policy. Every script (`build_image.py`, `deploy_vllm.py`, `deploy_diffusion.py`, `deploy_custom.py`, `teeify_chute.py`, `alias_deploy.py`) graduates only with a verified live run.
+- **`chutes-mcp-portability`** — until a live MCP health-check run (`chutes_list_models` over stdio) is recorded. MCP **write** tools (`chutes_deploy_vllm`, `chutes_deploy_diffusion`, `chutes_teeify`, `chutes_set_alias`, `chutes_delete_alias`, `chutes_create_api_key`) stay BETA permanently and prepend `[BETA] ` to their tool descriptions.
+- **Wave-2 stubs** — all four (`chutes-routing`, `chutes-usage-and-billing`, `chutes-platform-ops`, `chutes-agent-registration`) are born BETA by definition; they're stubs, not tested flows.
+- **Docs** — `docs/sign-in-with-chutes.md`, `docs/oauth-app-management.md`, `docs/model-aliases.md`, `docs/frameworks/nextjs-sign-in-with-chutes.md` all carry `Status: BETA` until their code paths are exercised.
+
+Read-only / inference / credential-management content that has been exercised is **not** BETA. The `chutes-ai` hub, `manage_credentials.py`, and MCP read tools (`chutes_list_models`, `chutes_list_chutes`, `chutes_list_aliases`, `chutes_get_usage`, `chutes_get_quota`, `chutes_get_discounts`, `chutes_oauth_introspect`) all ship without the label once their verification step has been run.
+
+---
 
 ## Install for Claude (Code / Cowork)
 
@@ -17,54 +50,77 @@ Add this repo as a marketplace, then install the plugin:
 /plugin install chutes-ai@chutes-agent-toolkit
 ```
 
-That's it. Claude now has full Chutes.ai capabilities. Try asking:
+Claude now has the full four-lane skill suite. Try asking:
 
-- *"Set me up with a Chutes account and API key"*
-- *"What open-source models are available on Chutes?"*
-- *"Set up model routing with TEE models for lowest latency"*
-- *"Show me how to call DeepSeek from Python using Chutes"*
+- *"Set me up with a Chutes account and API key"* → `chutes-ai` hub
+- *"Add Sign in with Chutes to my Next.js app"* → `chutes-sign-in` **[BETA]**
+- *"Deploy Qwen 3 as a vLLM chute with a stable alias"* → `chutes-deploy` **[BETA]**
+- *"Make Chutes available in Cursor via MCP"* → `chutes-mcp-portability` **[BETA]**
+- *"What open-source models are available on Chutes?"* → `chutes-ai` hub
+- *"Set up TEE-only routing for lowest latency"* → `chutes-ai` hub (deep recipes are wave-2 `chutes-routing`)
 
 ### Option 2: Direct Skill Copy
 
-If you prefer not to use the marketplace system, copy the skill directly:
+If you prefer not to use the marketplace system, copy the skills directly:
 
 ```bash
-cp -r plugins/chutes-ai/skills/chutes-ai ~/.claude/skills/chutes-ai
+cp -r plugins/chutes-ai/skills/* ~/.claude/skills/
 ```
 
 ## Install for Other Agents
 
-### Any LLM Agent (GPT, Gemini, Llama, etc.)
-
-Copy the contents of [`other-agents/system-prompt/chutes-agent-prompt.md`](other-agents/system-prompt/chutes-agent-prompt.md) into your agent's system prompt. It's a single self-contained file with all the API details, code examples, and instructions.
-
 ### Hermes
 
-Hermes works with Chutes today via named custom-provider configuration. See:
+Hermes works with Chutes today via named custom-provider configuration, and now has a symmetric skill tree at `other-agents/hermes/skills/` mirroring the Claude tree:
+
+- `other-agents/hermes/skills/chutes-ai/` — hub
+- `other-agents/hermes/skills/chutes-sign-in/` **[BETA]**
+- `other-agents/hermes/skills/chutes-deploy/` **[BETA]**
+- `other-agents/hermes/skills/chutes-mcp-portability/` **[BETA]**
+
+See also:
 - [`other-agents/hermes/README.md`](other-agents/hermes/README.md)
 - [`other-agents/hermes/config-examples/`](other-agents/hermes/config-examples/)
 
-### LangChain / LiteLLM / Vercel AI SDK / AutoGPT
+Scripts live in the Claude plugin tree; Hermes users invoke them from the repo root. There is one implementation, two skill trees.
 
-Chutes is OpenAI-compatible — change the base URL and you're done. See [`other-agents/openai-compatible/README.md`](other-agents/openai-compatible/README.md) for framework-specific setup.
+### Any OpenAI-compatible client (Aider, Cursor, Cline, LangChain, LiteLLM, …)
 
-Quick version:
+The `chutes-mcp-portability` skill generates drop-in configs:
+
+```bash
+python plugins/chutes-ai/skills/chutes-mcp-portability/scripts/generate_agent_config.py \
+  --target cursor,aider,hermes
+```
+
+For MCP-aware clients, install the stdio MCP server:
+
+```bash
+uv tool install chutes-mcp-server \
+  --from plugins/chutes-ai/skills/chutes-mcp-portability/mcp-server
+```
+
+See [`other-agents/openai-compatible/README.md`](other-agents/openai-compatible/README.md) for the raw OpenAI-compat setup.
+
+### Any LLM Agent (GPT, Gemini, Llama, etc.)
+
+Copy the contents of [`other-agents/system-prompt/chutes-agent-prompt.md`](other-agents/system-prompt/chutes-agent-prompt.md) (or generate a fresh one via `generate_agent_config.py --target system-prompt`) into your agent's system prompt.
+
+Quick OpenAI-compat snippet:
 
 ```python
 from openai import OpenAI
-
-client = OpenAI(
-    base_url="https://llm.chutes.ai/v1",
-    api_key="cpk_..."
-)
+client = OpenAI(base_url="https://llm.chutes.ai/v1", api_key="cpk_...")
 ```
 
-Chutes also publishes standard machine-readable interfaces for tool-based frameworks:
+Standard machine-readable interfaces:
 
 - **Plugin manifest**: `https://chutes.ai/.well-known/ai-plugin.json`
 - **OpenAPI spec**: `https://api.chutes.ai/openapi.json`
 
-## What Agents Can Do
+---
+
+## What agents can do
 
 - **Create accounts** — register on Chutes.ai with proper credential handling and backup
 - **Manage API keys** — create, list, and delete `cpk_` prefixed keys
@@ -72,11 +128,17 @@ Chutes also publishes standard machine-readable interfaces for tool-based framew
 - **Discover models** — browse 40+ models with real-time pricing, TTFT, and TPS data
 - **Make inference calls** — OpenAI-compatible API (Python, Node, cURL, any SDK)
 - **Model routing** — failover, latency-optimized, or throughput-optimized multi-model pools
+- **Model aliases** — stable semantic handles like `interactive-fast` that survive model churn
+- **Sign in with Chutes** **[BETA]** — turn any Next.js App Router app into an OAuth relying party
+- **Deploy chutes** **[BETA]** — vLLM / diffusion / custom CDK deploy, teeify affine chutes, stream build logs
+- **MCP portability** **[BETA]** — drive Chutes from Cursor / Cline / Aider / Hermes / Claude Desktop
 - **Billing** — top up via crypto ($TAO/Bittensor) or Stripe (25+ payment methods)
 - **Usage tracking** — quotas, invocation stats, per-model costs
 - **TEE models** — hardware-isolated inference via Intel TDX for privacy-sensitive workloads
 
-## Secure Credential Store
+---
+
+## Secure credential store
 
 This toolkit includes `manage_credentials.py` — a secure credential manager that stores API keys, fingerprints, and OAuth secrets in the **OS keychain** rather than plaintext files. Credentials persist across sessions and projects, so once saved, agents can read them back automatically in future conversations.
 
@@ -86,7 +148,7 @@ This toolkit includes `manage_credentials.py` — a secure credential manager th
 |------|---------|------------|
 | `api_key` (`cpk_...`) | OS keychain | Encrypted at rest, per-app access control |
 | `fingerprint` (32-char master credential) | OS keychain | Encrypted at rest, per-app access control |
-| `client_id` / `client_secret` (OAuth apps) | OS keychain | Encrypted at rest, per-app access control |
+| `client_id` / `client_secret` (OAuth apps, `cid_` / `csc_`) | OS keychain | Encrypted at rest, per-app access control |
 | `username`, `user_id` (non-secret metadata) | `~/.chutes/config` | `chmod 600`, directory `chmod 700` |
 
 **Backend auto-detection:**
@@ -120,12 +182,12 @@ python manage_credentials.py get
 # Update a single field
 python manage_credentials.py set --field api_key --value cpk_new...
 
-# Manage multiple profiles (default, production, research, etc.)
+# Manage multiple profiles (default, production, oauth.my-app, etc.)
 python manage_credentials.py set-profile --profile production --api-key cpk_prod...
 python manage_credentials.py get --profile production --field api_key
 python manage_credentials.py list-profiles
 
-# Save OAuth app credentials
+# Save OAuth app credentials (used by chutes-sign-in)
 python manage_credentials.py set-profile \
   --profile oauth.my-app \
   --client-id cid_... \
@@ -142,44 +204,67 @@ python manage_credentials.py delete --profile production
 
 For CI/CD and headless environments, env vars always take precedence over the stored keychain values:
 
-| Variable | Field |
-|----------|-------|
-| `CHUTES_API_KEY` | `api_key` |
-| `CHUTES_FINGERPRINT` | `fingerprint` |
-| `CHUTES_CLIENT_ID` | `client_id` |
-| `CHUTES_CLIENT_SECRET` | `client_secret` |
-| `CHUTES_PROFILE` | active profile name |
+| Variable | Field | Notes |
+|---|---|---|
+| `CHUTES_API_KEY` | `api_key` | |
+| `CHUTES_FINGERPRINT` | `fingerprint` | |
+| `CHUTES_OAUTH_CLIENT_ID` | `client_id` | preferred name (matches SIWC upstream) |
+| `CHUTES_CLIENT_ID` | `client_id` | legacy alias, still accepted |
+| `CHUTES_OAUTH_CLIENT_SECRET` | `client_secret` | preferred name |
+| `CHUTES_CLIENT_SECRET` | `client_secret` | legacy alias, still accepted |
+| `CHUTES_PROFILE` | active profile name | |
 
 ### Agent usage pattern
 
-When the Chutes skill is invoked in a new session, it first runs `manage_credentials.py check` to see if credentials already exist. If so, it reads the API key silently for use in API calls — never pasting raw secrets into the conversation. If not, it walks the user through account creation and saves credentials immediately after.
+When any Chutes skill is invoked in a new session, it first runs `manage_credentials.py check` to see if credentials already exist. If so, it reads the API key silently for use in API calls — never pasting raw secrets into the conversation. If not, it walks the user through account creation and saves credentials immediately after.
 
 > **Note on the deprecated `save_credentials.py`**: The original `save_credentials.py` script wrote credentials to a plaintext backup file. It is now deprecated and emits a warning — use `manage_credentials.py` for all new credential storage.
 
-## Repo Structure
+---
+
+## Repo structure
 
 ```
 chutes-agent-toolkit/
 ├── plugins/
 │   └── chutes-ai/
-│       ├── .claude-plugin/
-│       │   └── plugin.json
+│       ├── .claude-plugin/plugin.json
 │       └── skills/
-│           └── chutes-ai/
-│               ├── SKILL.md
-│               ├── references/
-│               │   ├── api-reference.md
-│               │   └── known-models.md
-│               └── scripts/
-│                   ├── manage_credentials.py
-│                   └── save_credentials.py
+│           ├── chutes-ai/                    # hub (Use Chutes lane)
+│           │   ├── SKILL.md
+│           │   ├── references/
+│           │   │   ├── api-reference.md
+│           │   │   ├── known-models.md
+│           │   │   └── model-aliases.md      # NEW
+│           │   └── scripts/
+│           │       ├── manage_credentials.py
+│           │       └── save_credentials.py   # deprecated
+│           ├── chutes-sign-in/                # [BETA] Build on Chutes
+│           │   ├── SKILL.md
+│           │   ├── references/ (oauth-flow, idp-endpoints, scope-cookbook, frameworks/)
+│           │   └── scripts/ (register_oauth_app, install_siwc, verify_siwc, rotate_secret)
+│           ├── chutes-deploy/                 # [BETA] Run agents with Chutes
+│           │   ├── SKILL.md
+│           │   ├── references/ (vllm-recipe, diffusion-recipe, teeify, rolling-updates)
+│           │   └── scripts/ (deploy_vllm, deploy_diffusion, build_image, deploy_custom, teeify_chute, alias_deploy)
+│           ├── chutes-mcp-portability/        # [BETA] Run agents with Chutes
+│           │   ├── SKILL.md
+│           │   ├── references/ (mcp-tool-map, cursor-setup, cline-setup, aider-setup, openrouter-style)
+│           │   ├── mcp-server/ (server.py, pyproject.toml)
+│           │   └── scripts/generate_agent_config.py
+│           ├── chutes-routing/                # [BETA] wave-2 stub
+│           ├── chutes-usage-and-billing/      # [BETA] wave-2 stub
+│           ├── chutes-platform-ops/           # [BETA] wave-2 stub
+│           └── chutes-agent-registration/     # [BETA] wave-2 stub
 ├── other-agents/
 │   ├── hermes/
 │   │   ├── README.md
 │   │   ├── config-examples/
-│   │   └── skills/
-│   │       └── chutes-ai/
-│   │           └── SKILL.md
+│   │   └── skills/                            # symmetric mirror of the Claude tree
+│   │       ├── chutes-ai/
+│   │       ├── chutes-sign-in/                # [BETA]
+│   │       ├── chutes-deploy/                 # [BETA]
+│   │       └── chutes-mcp-portability/        # [BETA]
 │   ├── system-prompt/
 │   │   └── chutes-agent-prompt.md
 │   └── openai-compatible/
@@ -189,47 +274,45 @@ chutes-agent-toolkit/
 │   ├── known-models.md
 │   ├── roadmap.md
 │   ├── hermes-integration-spec.md
+│   ├── chutes-maxi-proposal.md                # Hermes-generated proposal
 │   ├── credential-store.md
 │   ├── save-credentials-deprecation.md
 │   └── llms-txt-review.md
-├── evals/
-│   ├── evals.json
-│   └── README.md
-├── scripts/
-│   └── run_evals.py
-├── tests/
-│   ├── test_manage_credentials.py
-│   └── test_run_evals.py
+├── evals/ (evals.json, README.md)
+├── scripts/run_evals.py
+├── tests/ (test_manage_credentials.py, test_run_evals.py)
 ├── LICENSE
 └── README.md
 ```
 
-## Chutes.ai Links
+---
+
+## Chutes.ai links
 
 | Resource | URL |
 |----------|-----|
 | Dashboard | https://chutes.ai/app |
 | Documentation | https://chutes.ai/docs |
 | API Swagger UI | https://api.chutes.ai/docs |
+| OpenAPI spec | https://api.chutes.ai/openapi.json |
 | Models (JSON) | https://llm.chutes.ai/v1/models |
+| Sign in with Chutes (upstream) | https://github.com/chutesai/Sign-in-with-Chutes |
 | GitHub (SDK) | https://github.com/chutesai/chutes |
 
 ## Contributing
 
-PRs welcome! The shared docs live in `docs/` — update there and changes benefit all platforms. The Claude skill lives in `plugins/chutes-ai/skills/chutes-ai/SKILL.md`.
+PRs welcome. The shared canon lives in `docs/`; update there and changes benefit every platform. Wave-1 skills live in `plugins/chutes-ai/skills/`; Hermes mirrors live in `other-agents/hermes/skills/`. Scripts are single-sourced in the Claude plugin tree.
 
 Eval tooling:
 - `evals/evals.json`
 - `evals/README.md`
 - `scripts/run_evals.py`
 
-Useful planning docs in this repo:
+Useful planning docs:
 - `docs/roadmap.md`
-- `docs/pre-hermes-phase2-checklist.md`
 - `docs/hermes-integration-spec.md`
-- `docs/llms-txt-review.md`
+- `docs/chutes-maxi-proposal.md`
 - `docs/credential-store.md`
-- `docs/save-credentials-deprecation.md`
 
 ## License
 
