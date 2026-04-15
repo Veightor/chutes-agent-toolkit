@@ -112,12 +112,20 @@ See [`other-agents/openai-compatible/README.md`](other-agents/openai-compatible/
 
 Copy the contents of [`other-agents/system-prompt/chutes-agent-prompt.md`](other-agents/system-prompt/chutes-agent-prompt.md) (or generate a fresh one via `generate_agent_config.py --target system-prompt`) into your agent's system prompt.
 
-Quick OpenAI-compat snippet:
+Quick inference snippet (verified live auth shape):
 
 ```python
-from openai import OpenAI
-client = OpenAI(base_url="https://llm.chutes.ai/v1", api_key="cpk_...")
+import requests
+
+response = requests.get(
+    "https://llm.chutes.ai/v1/models",
+    headers={"X-API-Key": "cpk_..."},
+    timeout=30,
+)
+response.raise_for_status()
 ```
+
+Note: live tests on 2026-04-15 showed `X-API-Key: cpk_...` working for inference, while `Authorization: Bearer cpk_...` returned 401. Treat generic OpenAI-SDK compatibility as conditional until the inference surface accepts Bearer `cpk_...`.
 
 Standard machine-readable interfaces:
 
@@ -132,7 +140,7 @@ Standard machine-readable interfaces:
 - **Manage API keys** — create, list, and delete `cpk_` prefixed keys
 - **Secure credential store** — save keys to the OS keychain and read them back in future sessions
 - **Discover models** — browse 40+ models with real-time pricing, TTFT, and TPS data
-- **Make inference calls** — OpenAI-compatible API (Python, Node, cURL, any SDK)
+- **Make inference calls** — OpenAI-like request/response API; live auth currently prefers `X-API-Key` on the inference surface
 - **Model routing** — failover, latency-optimized, or throughput-optimized multi-model pools
 - **Model aliases** — stable semantic handles like `interactive-fast` that survive model churn
 - **Sign in with Chutes** **[BETA]** — turn any Next.js App Router app into an OAuth relying party

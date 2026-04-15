@@ -1,6 +1,6 @@
 ---
 name: chutes-mcp-portability
-description: "Make Chutes.ai available to any agent via MCP or drop-in OpenAI-compatible configs. Use this skill when the user wants to plug Chutes into Cursor, Cline, Aider, Claude Desktop, Hermes, or another OpenAI-compatible client. The skill installs the Chutes MCP server (stdio), writes per-agent config snippets, and runs a health check. Triggers on: MCP chutes, chutes MCP server, cursor chutes, cline chutes, aider chutes, claude desktop chutes, hermes chutes provider, openai-compatible chutes, drop-in chutes config, portable chutes, chutes for my agent."
+description: "Make Chutes.ai available to any agent via MCP or cautiously-used OpenAI-like configs. Use this skill when the user wants to plug Chutes into Cursor, Cline, Aider, Claude Desktop, Hermes, or another agent. The skill installs the Chutes MCP server (stdio), writes per-agent config snippets, and runs a health check. Triggers on: MCP chutes, chutes MCP server, cursor chutes, cline chutes, aider chutes, claude desktop chutes, hermes chutes provider, openai-compatible chutes, drop-in chutes config, portable chutes, chutes for my agent."
 ---
 
 # chutes-mcp-portability
@@ -18,9 +18,16 @@ description: "Make Chutes.ai available to any agent via MCP or drop-in OpenAI-co
 Makes Chutes usable from **any** agent environment with one of two mechanisms:
 
 1. **MCP server** (`mcp-server/server.py`). Stdio transport. Exposes Chutes management + inference as MCP tools. Any MCP-aware client (Claude Desktop, Cursor, Cline, Claude Code itself) can load it.
-2. **Drop-in configs** (`scripts/generate_agent_config.py`). For clients that don't speak MCP but do speak OpenAI-compatible HTTP (Aider, raw OpenAI SDKs, Hermes custom-provider YAML), generates ready-to-paste config snippets.
+2. **Config snippets** (`scripts/generate_agent_config.py`). For clients that don't speak MCP but do speak OpenAI-like HTTP. Some of these are still conditional/experimental because many clients hardcode `Authorization: Bearer` rather than allowing `X-API-Key`.
 
 Both paths read secrets from the keychain via `manage_credentials.py` and never echo `cpk_` into transcripts.
+
+Wave-3 live auth finding (verified 2026-04-15):
+- inference succeeded with `X-API-Key: cpk_...`
+- Bearer auth with a `cpk_...` key returned 401 on the inference surface
+- management endpoints worked with a JWT obtained from `POST /users/login` using the fingerprint
+
+The MCP server in this repo now mirrors that split auth model locally.
 
 ## Supported targets
 
@@ -49,7 +56,7 @@ uv tool install chutes-mcp-server --from plugins/chutes-ai/skills/chutes-mcp-por
 pipx install plugins/chutes-ai/skills/chutes-mcp-portability/mcp-server
 ```
 
-This gives the user a `chutes-mcp-server` command on PATH. The command reads `CHUTES_API_KEY` from env or falls back to `manage_credentials.py get --field api_key` for the active profile.
+This gives the user a `chutes-mcp-server` command on PATH. The command reads `CHUTES_API_KEY` from env or falls back to `manage_credentials.py get --field api_key` for inference. For management tools, it uses `CHUTES_FINGERPRINT` or the stored fingerprint to mint a short-lived JWT via `POST /users/login`.
 
 ### Step 3 — generate configs
 

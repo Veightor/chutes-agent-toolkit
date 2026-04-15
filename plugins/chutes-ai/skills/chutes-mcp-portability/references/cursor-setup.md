@@ -37,6 +37,8 @@ This writes `.cursor/mcp.json` at the workspace root:
 export CHUTES_API_KEY=$(python plugins/chutes-ai/skills/chutes-ai/scripts/manage_credentials.py get --field api_key)
 ```
 
+If you want the MCP server's management tools (`chutes_list_api_keys`, `chutes_get_quota`, etc.) to work, also ensure the credential store contains the account fingerprint or export `CHUTES_FINGERPRINT`.
+
 Do this in the shell profile (`~/.zshrc`, `~/.bashrc`) that Cursor inherits. Cursor reads `${env:CHUTES_API_KEY}` from the environment, not from `.env.local`.
 
 ## Restart Cursor
