@@ -16,6 +16,15 @@ description: "[BETA STUB — not yet implemented] Chutes.ai agent-native onboard
 - Storing the returned API key and fingerprint in the shared credential manager under a dedicated profile (e.g. `--profile agent`).
 - Guidance on when agent registration is the right on-ramp vs. a human-owned account with a delegated API key.
 
+## Wave-3 live constraints discovered outside this stub (verified 2026-04-15)
+
+- Human-owned account registration was not fully autonomous in practice.
+- A one-time token from `https://rtok.chutes.ai/users/registration_token` was required.
+- That token was behind Cloudflare/browser verification and may be IP-bound.
+- The registering coldkey needed at least `0.25 TAO`.
+
+Until this flow is better documented or changed upstream, assume agent bootstrap may still require a human to complete the verification/token handoff step.
+
 ## Endpoint map
 
 | Area | Endpoint |

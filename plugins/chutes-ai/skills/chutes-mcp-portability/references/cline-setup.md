@@ -31,6 +31,8 @@ The script writes `~/tmp/cline/cline-mcp-snippet.json`. Paste its contents into 
 
 VS Code on macOS/Linux inherits env from the shell that launched it. If you start VS Code from an application launcher, your `~/.zshrc` / `~/.bashrc` export is the right place for `CHUTES_API_KEY`.
 
+If you want the MCP server's management tools (`chutes_list_api_keys`, `chutes_get_quota`, etc.) to work, also ensure the credential store contains the account fingerprint or export `CHUTES_FINGERPRINT`.
+
 On Windows, set the env var in System → Environment Variables and restart VS Code.
 
 ## Verify

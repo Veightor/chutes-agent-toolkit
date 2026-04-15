@@ -37,9 +37,11 @@ Do not treat static model snapshots as authoritative.
 
 Use a `cpk_...` API key via:
 
-`Authorization: Bearer <token>`
+Authorization: Bearer <token>
 
 For Hermes, a common setup is a named custom provider configured with `CHUTES_API_KEY`.
+
+Important live-auth caveat (verified 2026-04-15): Hermes custom providers typically send an Authorization Bearer header, while Chutes inference succeeded in live tests with X-API-Key using a `cpk_...` key and returned 401 for Bearer `cpk_...`. So the YAML below is the intended target shape, but may remain blocked until Chutes accepts Bearer `cpk_...` or Hermes supports overriding the auth header.
 
 ## Hermes setup pattern
 
