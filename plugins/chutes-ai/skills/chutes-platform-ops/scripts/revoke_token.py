@@ -8,6 +8,12 @@ Usage:
 Destructive — every session using this token stops working.
 
 Wave-2 note: not exercised live; graduates when a test run is recorded.
+
+CONTENT-TYPE CAVEAT (openapi fetched 2026-06-11): the spec declares this
+endpoint's body as application/x-www-form-urlencoded (token required,
+token_type_hint optional) — this script currently POSTs JSON via
+idp_request(). Unverified whether the server also accepts JSON as of
+2026-06-11; expect to switch to form encoding before BETA graduation.
 """
 from __future__ import annotations
 

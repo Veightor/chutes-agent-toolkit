@@ -1,12 +1,28 @@
-custom_providers:
-  - name: Chutes
+# ~/.hermes/config.yaml
+# Two named Chutes endpoints: normal inference and opt-in research endpoint.
+# Use the research endpoint only when the user accepts prompt/response recording.
+
+providers:
+  chutes:
+    name: Chutes
     base_url: https://llm.chutes.ai/v1
     key_env: CHUTES_API_KEY
-    api_mode: chat_completions
-    model: default
+    transport: chat_completions
+    default_model: default:latency
+    discover_models: true
+    models:
+      default: {}
+      "default:latency": {}
+      "default:throughput": {}
 
-  - name: Chutes Research
+  chutes-research:
+    name: Chutes Research Opt-In
     base_url: https://research-data-opt-in-proxy.chutes.ai/v1
     key_env: CHUTES_API_KEY
-    api_mode: chat_completions
-    model: default:latency
+    transport: chat_completions
+    default_model: default:latency
+    discover_models: true
+    models:
+      default: {}
+      "default:latency": {}
+      "default:throughput": {}

@@ -1,6 +1,6 @@
 # Diffusion Chute Deploy Recipe **[BETA]**
 
-> Source of truth: `POST /chutes/diffusion`. Verify body shape against `https://api.chutes.ai/openapi.json` before the first live run.
+> Source of truth: `POST /chutes/diffusion`. Verify body shape against `https://api.chutes.ai/openapi.json` before the first live run. The endpoint is still present in the openapi schema (verified 2026-06-11), but the easy-deploy 403 gate documented in `vllm-recipe.md` applies to this lane too — last observed 2026-04-13, not re-probed (unverified as of 2026-06-11). The official SDK equivalent is `build_diffusion_chute(...)` (supports `revision=` and `tee=True`).
 
 ## Minimal request body
 
@@ -17,12 +17,14 @@
   "pipeline_args": {
     "torch_dtype": "float16"
   },
-  "revision": "main",
+  "revision": "<full-40-hex-HF-commit-sha>",
   "public": false
 }
 ```
 
 ## Field notes
+
+- **`revision`** — full 40-hex HF commit SHA; the API rejects branch names and short SHAs (`^[a-fA-F0-9]{40}$`, verified 2026-06-11). `deploy_diffusion.py` auto-resolves branch → SHA.
 
 - **`model`** — Hugging Face repo id of a diffusers-compatible pipeline (SDXL, SDXL-Turbo, SD 1.5, FLUX, etc.).
 - **`pipeline_args`** — passed to `DiffusionPipeline.from_pretrained()`. Common knobs:

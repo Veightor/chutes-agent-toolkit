@@ -43,7 +43,7 @@
 
 ## Token types
 
-- **Access token** — short-lived (minutes), used as `Authorization: Bearer <token>` against `llm.chutes.ai` and `api.chutes.ai`. Scoped to the scopes the user consented to.
+- **Access token** — short-lived (~1 hour per platform docs, unverified as of 2026-06-11), used as `Authorization: Bearer <token>` against `llm.chutes.ai` and `api.chutes.ai`. Scoped to the scopes the user consented to.
 - **ID token** — JWT containing OIDC claims. Your app uses this to establish session identity but **should not** forward it as a bearer to Chutes APIs.
 - **Refresh token** — long-lived, used to mint new access tokens without re-prompting the user. Server-side only — never ship to the browser.
 
@@ -51,7 +51,7 @@ The upstream Next.js package handles all three in a server-side session so the b
 
 ## Why PKCE matters
 
-PKCE (Proof Key for Code Exchange) stops an attacker who intercepts the authorization code from exchanging it. The `code_verifier` is a high-entropy random string generated per login and never leaves your server; the `code_challenge` in the redirect URL is just its hash. Chutes requires PKCE for all public and confidential clients.
+PKCE (Proof Key for Code Exchange) stops an attacker who intercepts the authorization code from exchanging it. The `code_verifier` is a high-entropy random string generated per login and never leaves your server; the `code_challenge` in the redirect URL is just its hash. Chutes requires PKCE for all public and confidential clients. The IdP's discovery document (`GET /.well-known/openid-configuration`, verified 2026-06-11) lists `code_challenge_methods_supported: ["plain", "S256"]` — always use `S256` — and `token_endpoint_auth_methods_supported: ["client_secret_post", "client_secret_basic", "none"]`, so public clients without a secret are supported.
 
 ## Where secrets live
 

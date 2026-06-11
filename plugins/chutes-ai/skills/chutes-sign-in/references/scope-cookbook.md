@@ -2,6 +2,32 @@
 
 > Rule of thumb: start with the smallest scope set that makes your app usable. Add scopes only when a feature actually requires them. Users see the scopes at consent time — long lists spook them.
 
+## Live scope list (verified 2026-06-11 via `GET /idp/scopes`)
+
+| Scope | Grants |
+|---|---|
+| `profile` / `profile:read` | Read basic profile information (username, user_id) |
+| `balance` / `balance:read` | Read account balance |
+| `billing:read` | Read billing information, payment history |
+| `quota` / `quota:read` | Read quota information and usage |
+| `usage` / `usage:read` | Read usage statistics and invocation history |
+| `account:read` | Read full account details including quotas, discounts, pricing |
+| `account:write` | Modify account settings |
+| `secrets:read` | Read secret names (not values) |
+| `secrets:write` | Create and manage secrets |
+| `chutes:read` | Read chute information and list chutes |
+| `chutes:write` | Create and modify chutes |
+| `chutes:delete` | Delete chutes |
+| `chutes:invoke` | Invoke/run chutes |
+| `images:read` / `images:write` / `images:delete` | Read / create+modify / delete images |
+| `invocations:read` | Read invocation history and details |
+| `admin` | Full access to all resources and actions — never request this for a relying party |
+
+Two caveats:
+
+- `openid` is **not** in the `/idp/scopes` list or in the discovery document's `scopes_supported` (verified 2026-06-11), even though platform OAuth docs describe it as the required base scope and the upstream SIWC package sends it. Keep sending it; whether the IdP requires or ignores it is unverified as of 2026-06-11.
+- Platform docs describe a per-chute scope `chutes:invoke:{chute_id}` that limits a token to invoking one specific chute — the tightest delegation available when your app only ever calls one model (unverified as of 2026-06-11).
+
 ## Recipes
 
 ### 1. Auth-only (minimal)
@@ -39,6 +65,11 @@ When to use: Your app uses Chutes as an identity provider ("Sign in with Chutes"
 
 User sees: "Verify your Chutes identity and see your display name."
 
+### 6. Single-model app (tightest delegation)
+**Scopes:** `openid profile chutes:invoke:{chute_id}`
+
+When to use: Your app only ever invokes one specific chute (e.g. one fixed model). The token cannot invoke anything else even if it leaks. Per-chute scope documented by the platform but unverified as of 2026-06-11 — fall back to plain `chutes:invoke` if the authorize request is rejected.
+
 ## Anti-patterns
 
 - **Requesting `billing:read` by default.** Users hate this. Only add when the feature actually exists in the UI.
@@ -52,4 +83,4 @@ When you change the scope list and the user logs in again, Chutes will show a ne
 
 ## Listing live scopes
 
-The authoritative scope list lives at `GET /idp/scopes`. If you need a dynamic UI (for example, a self-service integrations admin page), fetch the list live instead of hardcoding.
+The authoritative scope list lives at `GET /idp/scopes` (Bearer `cpk_` auth; verified live 2026-06-11). If you need a dynamic UI (for example, a self-service integrations admin page), fetch the list live instead of hardcoding.

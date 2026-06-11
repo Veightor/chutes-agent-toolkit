@@ -1,14 +1,22 @@
 #!/usr/bin/env python3
-"""Teeify an existing Chutes.ai affine chute. [BETA]
+"""Teeify an existing Chutes.ai affine chute. [BETA — DEFUNCT]
 
-Usage:
+*** WARNING: PUT /chutes/{chute_id}/teeify was REMOVED from the Chutes API. ***
+The path is absent from api.chutes.ai/openapi.json (verified 2026-06-11) and the
+current chutes SDK has no teeify command. This script is kept for reference only
+and WILL FAIL against the live API. TEE is now selected at deploy time via the
+SDK templates' tee=True kwarg (build_vllm_chute / build_sglang_chute /
+build_diffusion_chute). See references/teeify.md.
+
+Usage (historical):
   python teeify_chute.py --chute-id <chute_id>
 
-What it does:
+What it did:
   1. PUT /chutes/{chute_id}/teeify
   2. Prints the new TEE chute id and a reminder to verify attestation evidence manually.
 
-See references/teeify.md for the semantics. Deep attestation verification is wave-2 work.
+For attestation verification use the sibling chutes-tee skill
+(GET /chutes/{id}/evidence now requires ?nonce=<64 hex chars>).
 """
 from __future__ import annotations
 
@@ -23,10 +31,13 @@ def main() -> int:
     p.add_argument("--chute-id", required=True, help="chute_id of the existing affine chute")
     args = p.parse_args()
 
-    print("!! BETA — teeify creates a new TEE variant on specialized hardware.")
+    print("!! DEFUNCT — PUT /chutes/{id}/teeify was removed from the Chutes API")
+    print("   (gone from openapi.json as of 2026-06-11). This call is expected to fail.")
+    print("   Use tee=True at deploy time via the SDK templates instead.")
     print(f"   source chute_id: {args.chute_id}")
     print("   note: TEE guarantees are not automatically verified by this skill.")
-    print("         Use GET /chutes/{chute_id}/evidence to fetch attestation evidence manually.")
+    print("         Use GET /chutes/{chute_id}/evidence?nonce=<64-hex> (nonce required)")
+    print("         and the chutes-tee skill to verify attestation evidence.")
     try:
         confirm = input("Proceed? [y/N]: ").strip().lower()
     except EOFError:
@@ -57,8 +68,8 @@ def main() -> int:
         print(f"  new model_id: {new_model_id}")
     print()
     print("Next step (manual): fetch attestation evidence and verify it.")
-    print(f"  GET /chutes/{new_chute_id or args.chute_id}/evidence")
-    print("Deep verification lands in the future chutes-tee skill.")
+    print(f"  GET /chutes/{new_chute_id or args.chute_id}/evidence?nonce=<64-hex-chars>")
+    print("Deep verification: use the chutes-tee skill.")
     return 0
 
 

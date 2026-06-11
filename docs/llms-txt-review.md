@@ -1,6 +1,21 @@
 # Review Notes: chutes.ai/llms.txt
 
-This document captures concrete suggestions for improving `https://chutes.ai/llms.txt` based on a live review.
+This document captures concrete suggestions for improving `https://chutes.ai/llms.txt` based on a live review (April 2026). The original review is preserved below unchanged; see the status addendum first.
+
+## Status addendum (2026-06-11)
+
+`llms.txt` was re-fetched on 2026-06-11. Several of the suggestions below have since shipped upstream:
+
+- **Suggestion 10 (common misconceptions section) — SHIPPED.** `llms.txt` now has a "Common Misconceptions" section, including an explicit warning that the inference surface silently ignores `X-API-Key` and that `Authorization: Bearer cpk_...` is required everywhere.
+- **Suggestion 5 (routing cheat sheet) — SHIPPED.** Routing strings (`default`, `default:latency`, `default:throughput`, inline lists with strategy suffixes) are documented in `llms.txt`.
+- **Suggestion 2 (evidence endpoint inconsistency) — RESOLVED.** Both endpoints are real and now documented as chute-level (`GET /chutes/{chute_id}/evidence`, requires a 64-hex-char `nonce` query param — verified live) and instance-level (`GET /instances/{instance_id}/evidence`).
+- The platform's `ai-plugin.json` now advertises `llms_txt_url`, `llms_full_txt_url` (`https://chutes.ai/llms-full.txt`), and `docs_json_url` (`https://chutes.ai/docs.json`) — addressing discoverability concerns.
+
+One correction to the original review text: suggestion 3 (and the source-of-truth copy) implied `/v1/models` carries TTFT/TPS metadata. Verified 2026-06-11: **`/v1/models` has no TTFT/TPS fields** — per-model TPS/TTFT comes from `GET https://api.chutes.ai/invocations/stats/llm`. `/v1/models` remains the source of truth for inventory, pricing, `supported_features`, and `confidential_compute` (and is now public — no auth required). Note also the catalog is currently all-TEE (13 models, every one `confidential_compute: true`), so `llms.txt`'s own examples using older non-TEE ids (e.g. `DeepSeek-V3-0324`) are stale on the platform's side.
+
+Not re-checked this pass: the malformed auth sentence (suggestion 1) and the structural/ordering suggestions (unverified as of 2026-06-11).
+
+---
 
 ## Overall assessment
 

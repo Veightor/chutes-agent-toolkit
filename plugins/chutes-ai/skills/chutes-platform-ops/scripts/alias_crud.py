@@ -12,6 +12,11 @@ Same endpoints as chutes-routing/build_pool.py and chutes-deploy/alias_deploy.py
 but with operator lens: bulk list, destructive ops gated by --yes, no intent
 filters.
 
+WARNING (verified live 2026-06-11): GET /model_aliases/ returns a bare,
+account-scoped array of {alias, chute_ids, created_at, updated_at} — there is
+NO user_id/owner_id field, so --list --mine filters everything out and prints
+0 aliases. Use plain --list; it is already scoped to your account.
+
 Exit codes:
   0 ok
   1 bad input / missing credentials / dangerous op without --yes

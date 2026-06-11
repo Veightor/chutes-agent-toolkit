@@ -1,94 +1,68 @@
 # Known Chutes.ai Models (Reference Snapshot)
 
-This is a point-in-time snapshot of models available on Chutes.ai. For the live, authoritative list, always query `GET https://llm.chutes.ai/v1/models`. Use this file as a quick reference for model names and approximate performance characteristics.
+This is a point-in-time snapshot of models available on Chutes.ai. For the live, authoritative list, always query `GET https://llm.chutes.ai/v1/models` (public endpoint — no auth required). Use this file as a quick reference for model names, pricing, and capabilities.
 
-Last updated: April 2026
+Last updated: 2026-06-11 (verified against the live endpoint)
 
-## TEE Models (Confidential Compute)
-These run inside Intel TDX Trusted Execution Environments — hardware-isolated inference.
+## The catalog is now TEE-only
 
-| Model | TTFT (ms) | TPS |
-|-------|-----------|-----|
-| Qwen/Qwen3-Coder-Next-TEE | 1387 | 55.2 |
-| Qwen/Qwen3.5-397B-A17B-TEE | 1168 | 41.3 |
-| MiniMaxAI/MiniMax-M2.5-TEE | 1558 | 43.1 |
-| deepseek-ai/DeepSeek-V3.1-Terminus-TEE | 1012 | 39.9 |
-| chutesai/Mistral-Small-3.1-24B-Instruct-2503-TEE | 1460 | 19.6 |
-| openai/gpt-oss-20b-TEE | 1745 | 26.8 |
-| tngtech/DeepSeek-TNG-R1T2-Chimera-TEE | 1823 | 22.5 |
-| zai-org/GLM-4.7-TEE | 1864 | 26.5 |
-| openai/gpt-oss-120b-TEE | 2129 | 6.2 |
-| deepseek-ai/DeepSeek-R1-0528-TEE | 2150 | 27.1 |
-| Qwen/Qwen3-235B-A22B-Instruct-2507-TEE | 2284 | 10.0 |
-| XiaomiMiMo/MiMo-V2-Flash-TEE | 2346 | 37.5 |
-| zai-org/GLM-4.6-TEE | 2635 | 28.0 |
-| deepseek-ai/DeepSeek-V3.1-TEE | 2797 | 17.2 |
-| deepseek-ai/DeepSeek-V3.2-TEE | 3887 | 6.8 |
-| Qwen/Qwen3-32B-TEE | 4148 | 37.1 |
-| moonshotai/Kimi-K2.5-TEE | 5885 | 46.3 |
-| deepseek-ai/DeepSeek-V3-0324-TEE | 5998 | 10.0 |
-| zai-org/GLM-5-TEE | 22447 | 32.5 |
+As of 2026-06-11 the hosted LLM gateway serves exactly **13 models, all with `confidential_compute: true`** (Intel TDX Trusted Execution Environments) and `-TEE` suffixed IDs. The entire non-TEE chat tier that existed in April 2026 (unsloth Llama/gemma, Qwen2.5, GLM-4.x, Hermes, DeepSeek-R1, etc.) has been removed from the gateway. There are **zero Llama-family models** on the platform.
 
-## Non-TEE Models
+All 13 models advertise `json_mode`, `tools`, `structured_outputs`, and `reasoning` in `supported_features` (the two models with sparse metadata — Nemotron-3-Ultra and Mistral-Nemo — return `null` for features/modalities), and all expose `pricing.input_cache_read` at 50% of the input price for prompt-cache hits.
 
-| Model | TTFT (ms) | TPS |
-|-------|-----------|-----|
-| unsloth/Llama-3.2-1B-Instruct | 410 | 328.5 |
-| Qwen/Qwen3Guard-Gen-0.6B | 303 | 309.3 |
-| unsloth/gemma-3-4b-it | — | 81.9 |
-| unsloth/Mistral-Nemo-Instruct-2407 | 399 | 94.9 |
-| unsloth/gemma-3-12b-it | 475 | 78.3 |
-| Qwen/Qwen2.5-Coder-32B-Instruct | 486 | 106.0 |
-| zai-org/GLM-4.6V | 528 | 65.0 |
-| Qwen/Qwen3-30B-A3B | 570 | 182.7 |
-| rednote-hilab/dots.ocr | 557 | 126.2 |
-| Qwen/Qwen3-235B-A22B-Thinking-2507 | 723 | 101.2 |
-| unsloth/gemma-3-27b-it | 930 | 39.0 |
-| unsloth/Mistral-Small-24B-Instruct-2501 | 1012 | 127.1 |
-| NousResearch/Hermes-4-14B | 1093 | 85.4 |
-| chutesai/Mistral-Small-3.2-24B-Instruct-2506 | 1526 | 1252.6 |
-| zai-org/GLM-4.6-FP8 | 1573 | 54.5 |
-| zai-org/GLM-4.7-FP8 | 1623 | 49.8 |
-| Qwen/Qwen2.5-72B-Instruct | — | 92.3 |
-| Qwen/Qwen3-Next-80B-A3B-Instruct | — | 69.2 |
-| NousResearch/DeepHermes-3-Mistral-24B-Preview | — | 52.8 |
-| zai-org/GLM-5-Turbo | 5871 | 13.2 |
-| deepseek-ai/DeepSeek-R1-Distill-Llama-70B | 7890 | 38.9 |
-| unsloth/Llama-3.2-3B-Instruct | 21379 | 129.5 |
-| Qwen/Qwen2.5-VL-32B-Instruct | — | — |
+## Live model table (USD per 1M tokens, verified 2026-06-11)
+
+| Model ID | $ in | $ out | Context | Quant | Engine | Modalities |
+|---|---|---|---|---|---|---|
+| `moonshotai/Kimi-K2.6-TEE` | 0.74 | 3.50 | 262k | int4 | vllm | text+image+video |
+| `moonshotai/Kimi-K2.5-TEE` | 0.44 | 2.00 | 262k | int4 | vllm | text+image+video |
+| `zai-org/GLM-5.1-TEE` | 1.20 | 4.00 | 202k | fp8 | sglang | text |
+| `zai-org/GLM-5-TEE` | 0.95 | 2.55 | 202k | fp8 | sglang | text |
+| `Qwen/Qwen3.5-397B-A17B-TEE` | 0.45 | 3.00 | 262k | fp8 | sglang | text+image |
+| `Qwen/Qwen3.6-27B-TEE` | 0.30 | 2.00 | 262k | fp8 | vllm | text+image |
+| `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE` | 0.2989 | 1.1957 | 262k | bf16 | vllm | text |
+| `Qwen/Qwen3-32B-TEE` | 0.104 | 0.416 | 41k | fp8 | sglang | text |
+| `nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-TEE` | 1.50 | 4.00 | — | — | vllm | text |
+| `deepseek-ai/DeepSeek-V3.2-TEE` | 1.00 | 1.00 | 131k | fp8 | sglang | text |
+| `MiniMaxAI/MiniMax-M2.5-TEE` | 0.15 | 1.20 | 196k | fp8 | sglang | text |
+| `google/gemma-4-31B-turbo-TEE` | 0.15 | 0.42 | 131k | fp4 | vllm | text+image |
+| `unsloth/Mistral-Nemo-Instruct-2407-TEE` | 0.0245 | 0.0978 | — | — | sglang | text |
+
+Note: the models endpoint carries **no TTFT/TPS metadata** (verified 2026-06-11). For live latency/throughput numbers use `GET https://api.chutes.ai/invocations/stats/llm`, or let the `:latency` / `:throughput` routing suffixes pick for you.
 
 ## Quick Picks by Use Case
 
-**Fastest TTFT (latency-critical):**
-- Qwen/Qwen3Guard-Gen-0.6B (303ms) — tiny guard model
-- unsloth/Mistral-Nemo-Instruct-2407 (399ms) — general purpose
-- unsloth/Llama-3.2-1B-Instruct (410ms) — small but fast
+**Cheap-fast chat:**
+- `google/gemma-4-31B-turbo-TEE` ($0.15/$0.42, vision-capable)
+- `unsloth/Mistral-Nemo-Instruct-2407-TEE` ($0.0245/$0.0978 — cheapest on the platform)
 
-**Highest TPS (throughput-critical):**
-- chutesai/Mistral-Small-3.2-24B-Instruct-2506 (1252.6 t/s) — exceptional throughput
-- unsloth/Llama-3.2-1B-Instruct (328.5 t/s) — tiny and fast
-- Qwen/Qwen3Guard-Gen-0.6B (309.3 t/s) — guard model
+**Frontier coding / agentic:**
+- `moonshotai/Kimi-K2.6-TEE` (1T MoE, long-horizon agentic coding)
+- `zai-org/GLM-5.1-TEE` (frontier coding/reasoning)
+- Budget: `MiniMaxAI/MiniMax-M2.5-TEE` ($0.15/$1.20)
 
-**Best TEE models by latency:**
-- deepseek-ai/DeepSeek-V3.1-Terminus-TEE (1012ms TTFT)
-- Qwen/Qwen3.5-397B-A17B-TEE (1168ms TTFT)
-- Qwen/Qwen3-Coder-Next-TEE (1387ms TTFT)
+**Reasoning:**
+- `zai-org/GLM-5.1-TEE` or `nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-TEE` (long-horizon agent orchestration)
+- Budget: `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE` ($0.2989/$1.1957)
 
-**Best TEE models by throughput:**
-- Qwen/Qwen3-Coder-Next-TEE (55.2 t/s)
-- moonshotai/Kimi-K2.5-TEE (46.3 t/s)
-- MiniMaxAI/MiniMax-M2.5-TEE (43.1 t/s)
+**Vision / multimodal:**
+- `moonshotai/Kimi-K2.6-TEE` or `moonshotai/Kimi-K2.5-TEE` (only text+image+video models)
+- Cheaper: `Qwen/Qwen3.5-397B-A17B-TEE`, `Qwen/Qwen3.6-27B-TEE`, `google/gemma-4-31B-turbo-TEE` (text+image)
 
-**Reasoning models:**
-- deepseek-ai/DeepSeek-R1-0528-TEE (TEE, 27.1 t/s)
-- deepseek-ai/DeepSeek-R1-Distill-Llama-70B (non-TEE, 38.9 t/s)
-- Qwen/Qwen3-235B-A22B-Thinking-2507 (non-TEE, 101.2 t/s)
+**Privacy / confidential compute:**
+- All of them — every hosted LLM is `confidential_compute: true` now.
 
-**Coding models:**
-- Qwen/Qwen3-Coder-Next-TEE (TEE, 55.2 t/s)
-- Qwen/Qwen2.5-Coder-32B-Instruct (non-TEE, 106.0 t/s)
+## Beyond the LLM gateway
 
-**Vision/multimodal:**
-- Qwen/Qwen2.5-VL-32B-Instruct
-- zai-org/GLM-4.6V (65.0 t/s)
-- rednote-hilab/dots.ocr (126.2 t/s — OCR specialized)
+The wider chute catalog (`GET https://api.chutes.ai/chutes/?include_public=true`, ~497 public chutes) also includes, outside the OpenAI-compatible gateway:
+
+- **Embeddings:** `Qwen/Qwen3-Embedding-8B-TEE` (invoke path/pricing unverified as of 2026-06-11)
+- **Image:** `z-image-turbo`, `Qwen-Image-2512`, `Qwen-Image-Edit-2511`
+- **Video:** `turbowani2v`
+- **Audio/music/TTS:** `ACE-Step-15-Music-Generator`, `AudioDojo`, `kokoro`
+- **Moderation/segmentation:** `halo-guard`, `nsfw-classifier`, `sam3`
+- Hundreds of Bittensor Affine miner chutes (`*/Affine-*`)
+
+## Removed since the April 2026 snapshot
+
+If you see these IDs in old configs, they no longer exist on `/v1/models`: all non-TEE models (`unsloth/Llama-3.2-*`, `unsloth/gemma-3-*`, `Qwen/Qwen2.5-*`, `Qwen/Qwen3-30B-A3B`, `zai-org/GLM-4.6-FP8`, `zai-org/GLM-4.7-FP8`, `zai-org/GLM-5-Turbo`, `NousResearch/Hermes-4-14B`, `deepseek-ai/DeepSeek-R1-Distill-Llama-70B`, `rednote-hilab/dots.ocr`, ...) and many former TEE models (`Qwen/Qwen3-Coder-Next-TEE`, `deepseek-ai/DeepSeek-V3.1-TEE`, `deepseek-ai/DeepSeek-V3.1-Terminus-TEE`, `deepseek-ai/DeepSeek-R1-0528-TEE`, `deepseek-ai/DeepSeek-V3-0324-TEE`, `openai/gpt-oss-20b-TEE`, `openai/gpt-oss-120b-TEE`, `zai-org/GLM-4.6-TEE`, `zai-org/GLM-4.7-TEE`, `tngtech/DeepSeek-TNG-R1T2-Chimera-TEE`, `XiaomiMiMo/MiMo-V2-Flash-TEE`, `chutesai/Mistral-Small-3.1-24B-Instruct-2503-TEE`, `Qwen/Qwen3-235B-A22B-Instruct-2507-TEE`). Point aliases and configs at the live table above instead.

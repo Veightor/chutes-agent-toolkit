@@ -5,7 +5,7 @@ description: "Chutes.ai platform operator flows: OAuth app inventory + audits, c
 
 # chutes-platform-ops
 
-> **Status: VERIFIED LIVE 2026-04-13** via `docs/chutes-maxi-wave-2.md` Track A.3 — `list_apps.py`, `audit_stale_apps.py`, and `alias_crud.py` exercised against the dev Chutes account. `introspect_token.py` and `revoke_token.py` **cannot be live-exercised without a real OAuth access token**; both are documented here and marked individually BETA until a SIWC session produces a token to test them with.
+> **Status: VERIFIED LIVE 2026-04-13, read-only flows re-verified 2026-06-11** — `list_apps.py`, `audit_stale_apps.py`, `rotate_all.py --dry-run`, and `alias_crud.py --list` re-exercised against the dev Chutes account on 2026-06-11 (alias create/delete and real rotation last exercised 2026-04-13). `introspect_token.py` and `revoke_token.py` **cannot be live-exercised without a real OAuth access token**; both are documented here and marked individually BETA. Additionally, the openapi spec (fetched 2026-06-11) declares both token endpoints take **form-urlencoded** bodies while these scripts send JSON — see Steps 4–5.
 
 ## What this skill does
 
@@ -30,15 +30,19 @@ python <skill-scripts-dir>/list_apps.py --with-authorizations
 Prints a table of your OAuth apps joined with live authorization counts:
 
 ```
-=== my OAuth apps (16 of 425 platform-wide) ===
+=== OAuth apps (mine): 17 of 490 platform-wide ===
   name                            app_id        client_id              created     active  auths
+  Chutes Frontend Chat            520b9540...   cid_0b8xa2tqxoul...   2026-05-01  True    1
   Chutes Dropzone Local           f8769b1c...   cid_nkjg2ilriy5q...   2026-04-10  True    2
   Agent Test App                  38c3f2d6...   cid_eura0kxgeqbm...   2026-03-12  True    0
-  AI Week Presentation Port 3000  bbd1c6db...   cid_6nsmkugxzkbi...   2026-03-06  True    1
   ...
 ```
 
-**Wave-2 finding:** `GET /idp/apps?mine=true` and `?user_id=<uuid>` are **ignored** by the server — the response stays platform-wide paginated (425 total on the test account). `list_apps.py` paginates all pages and filters by `user_id` client-side.
+**Filtering (re-verified live 2026-06-11):**
+- `?mine=true` is still **ignored** (it is not a recognized param in openapi); the response stays platform-wide paginated (490 total on the test account as of 2026-06-11).
+- **NEW:** `GET /idp/apps?include_public=false` now scopes the listing to **your own apps server-side** (17 of 490 on the test account). openapi also declares `include_shared` and a `search=<substring>` name filter (search verified live: `?search=Test&include_public=false` → 6 hits).
+- `?user_id=<other-uuid>` returns **403** `{"detail":"This action can only be performed by billing admin accounts."}`; with your own uuid it has no visible effect (still platform-wide, likely because public apps are unioned in).
+- `list_apps.py` still paginates all pages and filters by `user_id` client-side — this works and also covers the `--all` case; `include_public=false` is the lighter server-side alternative.
 
 ### Step 2 — audit stale apps
 
@@ -56,14 +60,16 @@ Reports apps that look abandoned:
 Pure read-only report. Does **not** delete anything.
 
 ```
-=== stale OAuth app audit ===
-  Apps with zero active authorizations (candidates for cleanup):
-    - teryeure          app_id=d78bef04...  age=57d
-    - Test apppy        app_id=7eae13c6...  age=57d
-    - Agent Test App    app_id=38c3f2d6...  age=33d
+=== stale OAuth app audit (mine) ===
+  apps audited: 17
 
-  Total audited: 16 of your apps
-  Recommendation: inspect each before deleting — some may be staged for a future launch.
+  Zero-authorization apps (8):
+    - Test apppy        app_id=7eae13c6...  age=115d
+    - teryeure          app_id=d78bef04...  age=114d
+    - Agent Test App    app_id=38c3f2d6...  age=91d
+    ...
+
+  Recommendation: inspect each before taking action.
 ```
 
 ### Step 3 — bulk secret rotation
@@ -95,7 +101,7 @@ Wraps `POST /idp/token/introspect` (RFC 7662). Returns `{active, scope, client_i
 
 When to use: you suspect a token leaked, or you want to confirm a specific OAuth session is still valid.
 
-> **Status BETA:** this script has NOT been live-verified because the wave-2 verification environment has no real OAuth access token on hand (would require completing a full SIWC browser flow). Graduates as soon as one verified call lands.
+> **Status BETA:** this script has NOT been live-verified because the verification environment has no real OAuth access token on hand (would require completing a full SIWC browser flow). Additionally, the openapi spec (fetched 2026-06-11) declares the request body as **`application/x-www-form-urlencoded`** with fields `token` (required), `token_type_hint`, `client_id`, `client_secret` — but this script currently sends a **JSON** body. Whether the server also accepts JSON is unverified as of 2026-06-11; expect the script to need a form-encoding fix before it can graduate.
 
 ### Step 5 — token revocation
 
@@ -105,7 +111,7 @@ python <skill-scripts-dir>/revoke_token.py --token <access_or_refresh_token>
 
 Wraps `POST /idp/token/revoke`. Returns `{revoked: true}` on success. Use this on detected credential leaks or forced-logout scenarios.
 
-> **Status BETA:** same as introspection — not yet exercised live.
+> **Status BETA:** same as introspection — not yet exercised live, and openapi (2026-06-11) declares a **form-urlencoded** body (`token` required, `token_type_hint` optional) while the script sends JSON. Same caveat applies.
 
 ### Step 6 — alias fleet management
 
@@ -115,7 +121,9 @@ python <skill-scripts-dir>/alias_crud.py --create --alias team-fast --chute-id <
 python <skill-scripts-dir>/alias_crud.py --delete --alias team-fast --yes
 ```
 
-Same endpoints as `chutes-routing:build_pool.py` and `chutes-deploy:alias_deploy.py`, but with an operator lens: bulk list with owner/size, create with explicit chute_ids (no intent filter), delete with `--yes` gate.
+Same endpoints as `chutes-routing:build_pool.py` and `chutes-deploy:alias_deploy.py`, but with an operator lens: bulk list with size, create with explicit chute_ids (no intent filter), delete with `--yes` gate.
+
+**Alias schema (re-verified live 2026-06-11):** `GET /model_aliases/` returns a bare JSON array (no pagination envelope); each object carries exactly `{alias, chute_ids, created_at, updated_at}` and the list is scoped to your account. There is **no `user_id`/`owner_id` field**, so `alias_crud.py --list --mine` filters everything out (returns 0 aliases) — don't use `--mine`; the plain `--list` is already yours. `POST /model_aliases/` body is `{alias, chute_ids: [uuid, ...]}` per openapi `ModelAliasCreate` (both fields required; create/delete last exercised live 2026-04-13).
 
 When to use each:
 - `chutes-routing:build_pool.py` — when you're choosing a pool from an **intent**.
@@ -126,7 +134,7 @@ When to use each:
 
 | Area | Method | Path |
 |---|---|---|
-| List OAuth apps (platform-wide) | GET | `/idp/apps?page=<n>&limit=<n>` |
+| List OAuth apps (platform-wide) | GET | `/idp/apps?page=<n>&limit=<n>` — add `&include_public=false` to scope to your own apps server-side; `&search=<substring>` filters by name (both verified 2026-06-11) |
 | Read one app | GET | `/idp/apps/{app_id}` |
 | Update metadata | PATCH | `/idp/apps/{app_id}` |
 | Delete app | DELETE | `/idp/apps/{app_id}` |
@@ -134,31 +142,33 @@ When to use each:
 | List scopes | GET | `/idp/scopes` — returns `{scopes: {<name>: <description>}}` |
 | List authorizations (yours) | GET | `/idp/authorizations` — paginated `{total, page, limit, items}` |
 | Revoke authorization by app | DELETE | `/idp/authorizations/{app_id}` |
-| Introspect token | POST | `/idp/token/introspect` body `{token}` |
-| Revoke token | POST | `/idp/token/revoke` body `{token}` |
+| Introspect token | POST | `/idp/token/introspect` — openapi (2026-06-11) declares **form-urlencoded** body: `token` (required), `token_type_hint`, `client_id`, `client_secret` |
+| Revoke token | POST | `/idp/token/revoke` — openapi (2026-06-11) declares **form-urlencoded** body: `token` (required), `token_type_hint` |
 | OIDC userinfo | GET | `/idp/userinfo` — **needs OAuth access token, not `cpk_`** (401 otherwise) |
-| List aliases | GET | `/model_aliases/` |
-| Create alias | POST | `/model_aliases/` body `{alias, chute_ids: [uuid, ...]}` |
+| List aliases | GET | `/model_aliases/` — bare array of `{alias, chute_ids, created_at, updated_at}`, account-scoped (re-verified 2026-06-11) |
+| Create alias | POST | `/model_aliases/` body `{alias, chute_ids: [uuid, ...]}` (both required per openapi) |
 | Delete alias | DELETE | `/model_aliases/{alias}` |
 
-**Wave-2 finding:** `/idp/scopes` returns 22 named scopes including `admin`, `profile[:read]`, `balance[:read]`, `billing:read`, `quota[:read]`, `usage[:read]`, `account:{read,write}`, `chutes:{read,write,delete,invoke}`, `images:{read,write,delete}`, `invocations:read`, `secrets:{read,write}`. The standard OIDC `openid` scope is NOT in this list — it is still accepted by `POST /idp/apps` (wave-1 `register_oauth_app.py` confirmed it), just not enumerated here.
+**Wave-2 finding (re-verified 2026-06-11):** `/idp/scopes` returns the same 22 named scopes including `admin`, `profile[:read]`, `balance[:read]`, `billing:read`, `quota[:read]`, `usage[:read]`, `account:{read,write}`, `chutes:{read,write,delete,invoke}`, `images:{read,write,delete}`, `invocations:read`, `secrets:{read,write}`. The standard OIDC `openid` scope is still NOT in this list — it is accepted by `POST /idp/apps` (wave-1 `register_oauth_app.py` confirmed it), just not enumerated here. Per-chute invoke scopes of the form `chutes:invoke:{chute_id}` are documented in the Sign-in-with-Chutes docs but not enumerated by `/idp/scopes` either (unverified as of 2026-06-11).
 
-**Wave-2 finding:** `GET /idp/userinfo` returns HTTP 401 `{"detail":"Invalid or expired token"}` when called with a `cpk_` management API key. The endpoint is OAuth-access-token-only, per OIDC spec. Document, don't try to call it from operator scripts.
+**Wave-2 finding (re-verified 2026-06-11):** `GET /idp/userinfo` returns HTTP 401 when called with a `cpk_` management API key. The endpoint is OAuth-access-token-only, per OIDC spec. Document, don't try to call it from operator scripts.
+
+**Auth note (verified 2026-06-11):** all scripts here send `Authorization: Bearer cpk_...` to `api.chutes.ai` — this is the correct header. `X-API-Key` returns 401 on `api.chutes.ai` management endpoints (e.g. `/users/me`).
 
 ## Scripts in this skill
 
 | Script | Purpose | Status |
 |---|---|---|
-| `scripts/list_apps.py` | Paginate + filter my apps, join with authorizations | VERIFIED (2026-04-13) |
-| `scripts/audit_stale_apps.py` | Zero-auth / old-age audit report | VERIFIED (2026-04-13) |
-| `scripts/rotate_all.py` | Bulk secret rotation with dry-run + per-app keychain profiles | VERIFIED (dry-run, 2026-04-13) |
-| `scripts/introspect_token.py` | `POST /idp/token/introspect` wrapper | **[BETA]** — needs a live OAuth access token to exercise |
+| `scripts/list_apps.py` | Paginate + filter my apps, join with authorizations | VERIFIED (re-verified live 2026-06-11) |
+| `scripts/audit_stale_apps.py` | Zero-auth / old-age audit report | VERIFIED (re-verified live 2026-06-11) |
+| `scripts/rotate_all.py` | Bulk secret rotation with dry-run + per-app keychain profiles | VERIFIED (dry-run re-verified 2026-06-11; real rotation last exercised 2026-04-13) |
+| `scripts/introspect_token.py` | `POST /idp/token/introspect` wrapper | **[BETA]** — needs a live OAuth access token to exercise; openapi declares form-urlencoded body, script sends JSON |
 | `scripts/revoke_token.py` | `POST /idp/token/revoke` wrapper | **[BETA]** — same |
-| `scripts/alias_crud.py` | Alias list/create/delete with `--yes` gate for destructive ops | VERIFIED (2026-04-13) |
+| `scripts/alias_crud.py` | Alias list/create/delete with `--yes` gate for destructive ops | VERIFIED (`--list` re-verified 2026-06-11; create/delete last exercised 2026-04-13; avoid `--list --mine`, see Step 6) |
 
 ## Safety rules
 
-- **Destructive ops require explicit `--yes`.** `rotate_all.py`, `alias_crud.py --delete`, `audit_stale_apps.py --delete` all refuse to mutate state without it. Dry-run is the default everywhere.
+- **Destructive ops require explicit `--yes`.** `rotate_all.py` and `alias_crud.py --delete` refuse to mutate state without it (`audit_stale_apps.py` has no destructive mode at all). Dry-run is the default everywhere.
 - **`rotate_all.py` is sequential, not parallel.** A mid-run failure leaves a partial rotation and the script reports where it stopped; you re-run with `--skip-until <app_id>` to continue.
 - **Never print `csc_` values.** Rotation stores new secrets via `manage_credentials.py` under timestamped profiles. Only redacted previews appear on stdout.
 - **Never delete apps from an audit.** `audit_stale_apps.py` is advisory; deletion is user-initiated via `DELETE /idp/apps/{app_id}` explicitly.

@@ -12,6 +12,13 @@ Wraps RFC 7662 introspection. Returns a JSON object like:
 Wave-2 note: this script has NOT been exercised against a live token
 because the verification environment doesn't complete a SIWC browser
 flow to produce one. Graduates out of BETA when a test run is recorded.
+
+CONTENT-TYPE CAVEAT (openapi fetched 2026-06-11): the spec declares this
+endpoint's request body as application/x-www-form-urlencoded with fields
+token (required), token_type_hint, client_id, client_secret — but this
+script currently POSTs JSON via idp_request(). Whether the server also
+accepts JSON is unverified as of 2026-06-11; expect to switch to form
+encoding before this can graduate from BETA.
 """
 from __future__ import annotations
 

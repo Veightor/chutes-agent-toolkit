@@ -1,10 +1,10 @@
-# Pre-Hermes Phase 2 Checklist
+# Hermes Asset Maintenance Checklist
 
-This checklist defines the work that should be finished in `chutes-agent-toolkit` before starting first-class Chutes provider work in a Hermes fork.
+This checklist used to gate pre-provider work. It now tracks the Hermes-facing assets that should stay current in `chutes-agent-toolkit`.
 
 ## Goal
 
-Enter Hermes implementation work with:
+Maintain Hermes-facing integration work with:
 - a clean repo
 - stable toolkit docs
 - tested credential tooling
@@ -41,8 +41,9 @@ If these toolkit-side pieces are incomplete, Hermes integration work will end up
 ### 4. Hermes-ready assets in this repo
 - Hermes quickstart doc
 - Hermes config examples
-- Hermes-oriented Chutes skill export/package layout
-- clear distinction between current custom-provider support and future first-class provider support
+- complete Hermes-oriented Chutes skill mirror
+- MCP setup guidance using current `hermes mcp add/test/list` commands
+- clear distinction between custom-provider setup, MCP setup, and possible future native-provider work
 
 ### 5. Eval foundation
 - multiple categorized eval prompts

@@ -5,7 +5,9 @@ description: "Chutes.ai model routing and pooling. Use this skill when the user 
 
 # chutes-routing
 
-> **Status: VERIFIED LIVE 2026-04-13** via `docs/chutes-maxi-wave-2.md` Track A.1 — `build_pool.py` dry-runs exercised against live `/v1/models`; one alias round-trip via `POST /model_aliases/` + `DELETE`. Fleshed out from the wave-1 stub.
+> **Status: read paths VERIFIED LIVE 2026-06-11** — `build_pool.py` dry-runs (interactive-fast, tee-chat, agent-coder) and `audit_pool.py --alias` exercised against live `/v1/models` + `GET /model_aliases/`. The alias **write** round-trip (`POST /model_aliases/` + `DELETE`) was last verified 2026-04-13 (read-only constraint this run). Originally fleshed out via `docs/chutes-maxi-wave-2.md` Track A.1.
+
+> **Catalog note (2026-06-11):** the hosted LLM gateway is now **TEE-only** — `/v1/models` returns 13 models, every one with `confidential_compute: true` and a `-TEE` id suffix. `--tee-only` and the `private-reasoning` / `tee-chat` filters therefore currently match the entire catalog; they remain useful as future-proofing and as an explicit statement of intent, not as a discriminator. The non-TEE tier (Llama, Qwen2.5, GLM-4.x, etc.) is gone from the gateway.
 
 ## What this skill does
 
@@ -41,22 +43,17 @@ Ask the user what they're optimizing for. The intents above are a curated shortl
 python <skill-scripts-dir>/build_pool.py --intent interactive-fast --size 4
 ```
 
-Default output:
+Default output (live run, 2026-06-11):
 
 ```
 === interactive-fast (4 models) ===
-  1. <model_id>  prompt=$0.08/1M  completion=$0.24/1M  ctx=131072
-  2. <model_id>  prompt=$0.11/1M  completion=$0.33/1M  ctx=65536
-  ...
+  1. Qwen/Qwen3-32B-TEE  TEE  prompt=$ 0.104  completion=$ 0.416  ctx=40960  [json_mode,tools,structured_outputs,reasoning]
+  2. google/gemma-4-31B-turbo-TEE  TEE  prompt=$  0.15  completion=$  0.42  ctx=131072  [json_mode,tools,structured_outputs,reasoning]
+  3. MiniMaxAI/MiniMax-M2.5-TEE  TEE  prompt=$  0.15  completion=$   1.2  ctx=196608  [json_mode,tools,structured_outputs,reasoning]
+  4. Qwen/Qwen3-235B-A22B-Thinking-2507-TEE  TEE  prompt=$0.2989  completion=$1.1957  ctx=262144  [json_mode,structured_outputs,tools,reasoning]
 
-Inline routing string (append :latency or :throughput as needed):
-  <m1>,<m2>,<m3>,<m4>
-
-Example usage:
-  response = client.chat.completions.create(
-      model="<m1>,<m2>,<m3>,<m4>:latency",
-      messages=[...],
-  )
+Inline routing string:
+  Qwen/Qwen3-32B-TEE,google/gemma-4-31B-turbo-TEE,MiniMaxAI/MiniMax-M2.5-TEE,Qwen/Qwen3-235B-A22B-Thinking-2507-TEE:latency
 ```
 
 Flags:
@@ -77,7 +74,7 @@ The output inline string is pure failover by default. Append one of the strategy
 - `:throughput` — Chutes picks the highest-TPS member right now.
 - `:premium` — (if documented on your account) prefer premium chutes.
 
-See `references/routing-strings-spec.md` for the full grammar.
+The `default` / `default:latency` / `default:throughput` / inline-list forms are now documented in Chutes' own agent-facing doc at `https://chutes.ai/llms.txt` (routing behavior on `chat/completions` itself not re-exercised 2026-06-11 — paid endpoint). See `references/routing-strings-spec.md` for the full grammar.
 
 ### Step 4 — audit an existing pool periodically
 
@@ -107,10 +104,10 @@ To delete a stale alias: `python <skill-scripts-dir>/audit_pool.py --alias <name
 | Purpose | Method | Path |
 |---|---|---|
 | Live models (source of truth) | GET | `https://llm.chutes.ai/v1/models` |
-| List aliases | GET | `/model_aliases/` |
+| List aliases | GET | `/model_aliases/` — returns `[{alias, chute_ids: [uuid, ...], created_at, updated_at}]` (verified 2026-06-11) |
 | Create alias | POST | `/model_aliases/` body `{alias, chute_ids: [uuid, ...]}` |
 | Delete alias | DELETE | `/model_aliases/{alias}` |
-| Per-chute performance (optional) | GET | `/chutes/miner_means/{chute_id}` |
+| Per-chute performance (optional) | GET | `/chutes/miner_means/{chute_id}` (200 verified 2026-06-11) |
 | Platform pricing (TAO rate, GPU rates) | GET | `/pricing` |
 | User discounts | GET | `/users/me/discounts` |
 | User price overrides | GET | `/users/me/price_overrides` |
@@ -123,8 +120,8 @@ To delete a stale alias: `python <skill-scripts-dir>/audit_pool.py --alias <name
 
 | Script | Purpose | Status |
 |---|---|---|
-| `scripts/build_pool.py` | Intent → filter + rank + print routing string; optional alias pin | VERIFIED (2026-04-13) |
-| `scripts/audit_pool.py` | Re-check an existing routing string or alias against live data | VERIFIED (2026-04-13) |
+| `scripts/build_pool.py` | Intent → filter + rank + print routing string; optional alias pin | Read path VERIFIED (2026-06-11); alias write path last verified 2026-04-13 |
+| `scripts/audit_pool.py` | Re-check an existing routing string or alias against live data | Audit path VERIFIED (2026-06-11); `--delete` path last verified 2026-04-13 |
 
 ## Safety rules
 

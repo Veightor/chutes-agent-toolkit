@@ -133,6 +133,11 @@ export async function POST(req: Request) {
 
 Inference quota and billing hit the **user's** Chutes account, not yours. That's the point of delegated OAuth.
 
+## Gotchas (refreshed 2026-06-11)
+
+- **Upstream points inference at `lm.chutes.ai`.** The upstream repo has been dormant since 2025-12-29, and its final commit changed the chat completions endpoint to `lm.chutes.ai`. The canonical inference base is `https://llm.chutes.ai/v1` — `lm.chutes.ai` returned 401 on `/v1/models` when probed 2026-06-11. After vendoring, grep the copied files for `lm.chutes.ai` and switch to `llm.chutes.ai`.
+- **User claims are minimal.** The IdP's discovery document (`GET https://api.chutes.ai/.well-known/openid-configuration`, verified live 2026-06-11) advertises `claims_supported: ["sub", "username", "created_at"]`. Don't build UI that expects `email` or `name`.
+
 ## Related
 
 - `docs/sign-in-with-chutes.md`

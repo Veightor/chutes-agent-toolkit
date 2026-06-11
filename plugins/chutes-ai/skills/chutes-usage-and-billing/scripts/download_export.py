@@ -4,8 +4,16 @@
 Usage:
   python download_export.py --year 2026 --month 04 --day 13 --hour 14 [--out FILE]
 
-The hour format is one that Chutes accepts on the URL path — we pass it
-zero-padded. The response is written to the output file (default: stdout).
+The hour path segment must be zero-padded WITH a `.csv` suffix
+(e.g. /invocations/exports/2026/04/13/14.csv) — re-verified live 2026-06-11.
+A bare hour returns HTTP 400 "Invalid format"; `.json` is rejected too.
+The response is written to the output file (default: stdout).
+
+Known platform state as of 2026-06-11:
+  - Latest available hourly export is 2026-04-20; later dates return 404
+    "Invocations export not found".
+  - GET /invocations/exports/recent returns HTTP 500 (server-side), so
+    --recent is broken until the platform fixes it.
 
 **These exports are platform-wide**, not personal spend. Use spend_summary.py
 or cost_breakdown.py for personal data.
@@ -46,7 +54,9 @@ def main() -> int:
     if args.recent:
         path = "/invocations/exports/recent"
     else:
-        path = f"/invocations/exports/{args.year}/{args.month:02d}/{args.day:02d}/{args.hour:02d}"
+        # `.csv` suffix is required on the hour segment (HTTP 400 without it;
+        # re-verified live 2026-06-11).
+        path = f"/invocations/exports/{args.year}/{args.month:02d}/{args.day:02d}/{args.hour:02d}.csv"
 
     # Exports are CSV (wave-2 A.2 finding). Do a raw fetch so we don't try
     # to JSON-parse the body.

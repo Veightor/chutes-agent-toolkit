@@ -5,15 +5,16 @@ You have access to Chutes.ai, a decentralized serverless AI inference platform. 
 ## Base URLs
 
 - **Management API**: `https://api.chutes.ai`
-- **Inference API**: `https://llm.chutes.ai/v1` (OpenAI-like response schema, but auth differs in live tests)
+- **Inference API**: `https://llm.chutes.ai/v1` (OpenAI-compatible, standard Bearer auth)
 
-Wave-3 live auth finding (verified 2026-04-15):
-- Inference succeeded with `X-API-Key: cpk_...`
-- `Authorization: Bearer cpk_...` returned HTTP 401 on live `/v1/models` and `/v1/chat/completions` tests
-- Management endpoints like `/users/me` worked with the JWT returned by `POST /users/login` using the fingerprint
-- `GET /api_keys/` worked with hotkey-signed headers via the `chutes` CLI flow
+Live auth finding (re-verified 2026-06-11 with read-only GETs — this INVERTS the 2026-04-15 wave-3 finding):
+- `Authorization: Bearer cpk_...` returned HTTP 200 on `GET llm.chutes.ai/v1/models` AND on `GET api.chutes.ai/users/me` — one Bearer header now works on both surfaces for GETs
+- Bearer is the platform-recommended header (chutes.ai's own `ai-plugin.json` says to use the `cpk_` key "as a Bearer token")
+- `X-API-Key: cpk_...` returned 200 on `/v1/models` but **401 on `api.chutes.ai/users/me`**; official `llms.txt` docs say X-API-Key is silently ignored on the inference surface — do not use it
+- `GET /v1/models` is public: 200 with no auth at all
+- The fingerprint-login JWT (`POST /users/login`) still works for management and remains the path for write endpoints; Bearer `cpk_` on management writes and on `POST /chat/completions` was not re-tested (unverified as of 2026-06-11)
 
-Do not tell agents that one Bearer header works for every Chutes surface.
+Default to `Authorization: Bearer cpk_...` everywhere.
 
 All POST/PATCH requests require `Content-Type: application/json`. List endpoints return paginated responses (0-indexed pages, default limit 25): `{ "total", "page", "limit", "items": [...] }`. Errors return `{ "detail": "..." }`.
 
@@ -58,29 +59,23 @@ List: `GET https://api.chutes.ai/api_keys/` | Delete: `DELETE https://api.chutes
 ```
 GET https://llm.chutes.ai/v1/models
 ```
-Response: `{ "object": "list", "data": [...] }`. Key fields per model: `id` (use in API calls), `confidential_compute` (true = TEE/hardware-isolated), `owned_by` ("sglang"/"vllm"), `pricing.prompt`/`pricing.completion` (USD per 1M tokens), `context_length`, `max_output_length`, `supported_features` (["tools", "json_mode", "structured_outputs", "reasoning"]), `supported_sampling_parameters`, `input_modalities`, `output_modalities`, `quantization`.
+Public endpoint (no auth required; verified 2026-06-11). Response: `{ "object": "list", "data": [...] }`. Key fields per model: `id` (use in API calls), `confidential_compute` (true = TEE/hardware-isolated), `owned_by` ("sglang"/"vllm"), `pricing.prompt`/`pricing.completion` (USD per 1M tokens, plus `input_cache_read` prompt-cache pricing, typically 50% of input), `context_length`, `max_output_length`, `supported_features` (["tools", "json_mode", "structured_outputs", "reasoning"]), `supported_sampling_parameters`, `input_modalities`, `output_modalities`, `quantization`.
 
-Available model types: LLMs (DeepSeek, Llama, Qwen, GLM, Mistral, Gemma), image generation, video generation, TTS (54 voices, 9 languages), STT, music generation, content moderation, custom inference.
+As of 2026-06-11 the hosted LLM catalog is **13 models, all TEE** (`-TEE` id suffix, `confidential_compute: true`): DeepSeek-V3.2, Kimi K2.5/K2.6, GLM-5/5.1, Qwen 3/3.5/3.6, MiniMax-M2.5, Gemma 4, Nemotron 3 Ultra, Mistral Nemo. There are no Llama models and no non-TEE LLMs — always treat `/v1/models` as the source of truth rather than hardcoding ids. Beyond LLMs, the wider chute catalog (`GET https://api.chutes.ai/chutes/?include_public=true`) has image generation, video generation, TTS, STT, music generation, embeddings, content moderation, and custom inference chutes.
 
 ---
 
 ## Inference
 
-Chutes uses OpenAI-like request/response shapes on the inference surface, but live auth is not fully drop-in for generic OpenAI SDKs.
-
-Verified live 2026-04-15:
-- direct HTTP inference worked with `X-API-Key: cpk_...`
-- Bearer auth with a `cpk_...` key returned 401 on the inference surface
-
-So only treat generic SDK compatibility as full drop-in if the client can override the auth header or Chutes starts accepting Bearer `cpk_...`.
+Chutes uses OpenAI-compatible request/response shapes on the inference surface with standard Bearer auth, so generic OpenAI SDKs work by changing the base URL and key. (Bearer `cpk_` verified live on `GET /v1/models` 2026-06-11; the paid `POST /chat/completions` call itself was not re-exercised — unverified as of 2026-06-11.)
 
 ```python
 import requests
 response = requests.post(
     "https://llm.chutes.ai/v1/chat/completions",
-    headers={"X-API-Key": "cpk_...", "Content-Type": "application/json"},
+    headers={"Authorization": "Bearer cpk_...", "Content-Type": "application/json"},
     json={
-        "model": "deepseek-ai/DeepSeek-V3-0324",
+        "model": "deepseek-ai/DeepSeek-V3.2-TEE",
         "messages": [{"role": "user", "content": "Hello!"}],
     },
 )
@@ -112,7 +107,7 @@ response = client.chat.completions.create(
 
 Manage aliases via API: `GET/POST https://api.chutes.ai/model_aliases/`
 
-Best practices: mix providers for resilience, filter by `confidential_compute: true` for privacy, check TTFT/TPS from models endpoint for data-driven pool construction.
+Best practices: mix providers for resilience, filter by `confidential_compute: true` for privacy, check per-model TPS/TTFT from `GET https://api.chutes.ai/invocations/stats/llm` for data-driven pool construction (the `/v1/models` response does not include TTFT/TPS).
 
 ---
 
@@ -150,7 +145,7 @@ Returns: `username`, `user_id`, `balance` (USD), `payment_address` (Bittensor SS
 
 ## TEE (Confidential Compute)
 
-Models with `confidential_compute: true` run in Intel TDX enclaves — hardware-isolated, operator-blind. Attestation: `GET https://api.chutes.ai/chutes/{chute_id}/evidence`.
+Models with `confidential_compute: true` run in Intel TDX enclaves — hardware-isolated, operator-blind. As of 2026-06-11 that is every hosted LLM. Attestation: `GET https://api.chutes.ai/chutes/{chute_id}/evidence?nonce=<nonce>` — the `nonce` query param is required and must be exactly 64 hex characters (32 bytes). Per-instance evidence: `GET /instances/{instance_id}/evidence`.
 
 ## Harvard Research Discount (25% off)
 

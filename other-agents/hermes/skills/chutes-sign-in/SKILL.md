@@ -12,7 +12,7 @@ metadata:
 
 # Chutes Sign-In for Hermes **[BETA]**
 
-> **Status: BETA** — mirrors the Claude-plugin version at `plugins/chutes-ai/skills/chutes-sign-in/`. Shared scripts and references live there; this skill is a thin Hermes entry point. BETA until a live register → vendor → verify → rotate run is recorded.
+> **Status: BETA only for dev-server verification.** Live register → vendor → rotate was exercised on 2026-04-13 against a scratch Next.js App Router project. `verify_siwc.py` steps 1-3 are verified; step 4 still requires running the user's dev server and remains BETA. Shared scripts and references live in the Claude-plugin tree; this file is the Hermes entry point.
 
 ## When to use this skill
 

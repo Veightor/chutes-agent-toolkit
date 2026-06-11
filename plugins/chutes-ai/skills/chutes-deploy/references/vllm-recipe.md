@@ -6,6 +6,8 @@
 
 **As of wave-2 live verification (2026-04-13) the easy-lane `POST /chutes/vllm` and `POST /chutes/diffusion` endpoints return HTTP 403 with `{"detail":"Easy deployment is currently disabled!"}`** on at least some account classes. When this is in effect, the easy lane cannot be used; the `chutes-deploy` skill falls back to the custom CDK lane via `build_image.py` + `deploy_custom.py`. `deploy_vllm.py` detects this exact error and prints a fall-back hint.
 
+**Status refresh 2026-06-11:** both endpoints are still present in `api.chutes.ai/openapi.json` (verified, read-only GET), but the 403 gate itself was not re-probed (no POSTs in this refresh) and the official docs (vLLM template page, CLI deploy, FAQ) describe only the SDK/CLI deployment path and never mention `POST /chutes/vllm` — assume the gate is still on (unverified as of 2026-06-11). The official deploy path is `build_vllm_chute()` via the `chutes` SDK + `chutes deploy --accept-fee`.
+
 Re-probe the endpoint if you see the gate turn off:
 
 ```bash
@@ -19,11 +21,11 @@ curl -s -w '\nHTTP %{http_code}\n' -X POST \
 
 A `422` (validation error) means the endpoint is live but the body is wrong. A `403` with the "Easy deployment is currently disabled" message means the gate is still on.
 
-## `revision` must be a commit SHA
+## `revision` must be a full 40-hex commit SHA
 
-Chutes rejects branch names on the `revision` field with `{"msg":"Value error, Invalid revision specified."}`. You must pass a **full or short commit SHA**, not `main` / `master` / `v1`.
+The API enforces `revision` against `^[a-fA-F0-9]{40}$` (verified in the chutes-api source, 2026-06-11): a **full 40-character git commit SHA**. Branch names (`main` / `master` / `v1`) **and short SHAs** are rejected with `{"msg":"Value error, Invalid revision specified."}`.
 
-`deploy_vllm.py` auto-resolves branch names via `GET https://huggingface.co/api/models/{repo}` and substitutes the real SHA before posting. You can override with `--revision <sha>` explicitly.
+`deploy_vllm.py` auto-resolves branch names via `GET https://huggingface.co/api/models/{repo}` and substitutes the real SHA before posting. You can override with `--revision <full-40-hex-sha>` explicitly. The official SDK matches: `build_vllm_chute()` now requires `revision=` as a top-level kwarg (omitting it raises a ValueError that suggests the current HF `refs/heads/main` SHA, and passing `--revision` inside `engine_args` is rejected).
 
 ## Minimal request body
 
@@ -41,7 +43,7 @@ Chutes rejects branch names on the `revision` field with `{"msg":"Value error, I
     "max_model_len": 32768,
     "gpu_memory_utilization": 0.9
   },
-  "revision": "main",
+  "revision": "<full-40-hex-HF-commit-sha>",
   "public": false
 }
 ```
@@ -50,8 +52,8 @@ Chutes rejects branch names on the `revision` field with `{"msg":"Value error, I
 
 - **`name`** — `owner/chute-name`. Must be unique within the owner namespace. The deploy script defaults to `<your_username>/<model-slug>` if not supplied.
 - **`model`** — Hugging Face repo id (for the easy vLLM lane, this is usually enough).
-- **`revision`** — HF commit SHA (**not** a branch name; Chutes rejects `main`). `deploy_vllm.py` auto-resolves a branch to its current SHA.
-- **`node_selector`** — `gpu_count` + `gpu_type`. `gpu_type` uses the key name from `GET /nodes/supported`, e.g. `a4000` ($0.20/hr, 16GB, cheapest), `3090` ($0.25/hr, 24GB), `l40s` ($0.85/hr, 48GB), `a100_40gb` ($1.10/hr, 40GB), `h100` ($1.79/hr, 80GB), `h200` ($2.75/hr, 140GB). Check `GET /nodes/supported` live for the authoritative list and pricing — wave-2 verification saw 27 supported types spanning $0.20/hr → $4.50/hr.
+- **`revision`** — full 40-hex HF commit SHA (**not** a branch name or short SHA; the API enforces `^[a-fA-F0-9]{40}$`). `deploy_vllm.py` auto-resolves a branch to its current SHA.
+- **`node_selector`** — `gpu_count` + `gpu_type`. `gpu_type` uses the key name from `GET /nodes/supported`, e.g. `a4000` ($0.20/hr, 16GB, cheapest), `3090` ($0.25/hr, 24GB), `l40s` ($0.85/hr, 48GB), `a100_40gb` ($1.10/hr, 40GB), `h100` ($1.79/hr, 80GB), `pro_6000` ($1.80/hr, 96GB Blackwell, the self-serve private-TEE class), `h200` ($2.75/hr, 140GB), `b200`/`b300` ($4.50/hr). Check the public `GET /pricing` (no auth) or `GET /nodes/supported` live for the authoritative list — re-verified 2026-06-11: 27 supported types spanning $0.20/hr → $4.50/hr, plus the live TAO/USD rate.
 - **`vllm_args`** — passes through to the vLLM server. Common knobs:
   - `max_model_len` — context window. Cannot exceed model's native max.
   - `gpu_memory_utilization` — 0.85–0.95 is typical.
@@ -86,7 +88,7 @@ Server-sent events with `data: <log_line>\n\n`. The deploy script tails this unt
 ## Warmup polling
 
 ```
-GET /chutes/warmup/{chute_id}
+GET /chutes/warmup/{chute_id_or_name}
 ```
 
 Returns either:

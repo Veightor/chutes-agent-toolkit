@@ -122,6 +122,8 @@ The inference quota and billing hit the **user's** Chutes account, not yours. Th
 
 ## Gotchas
 
+- **Upstream's last commit points inference at `lm.chutes.ai`.** The `chutesai/Sign-in-with-Chutes` repo has been dormant since 2025-12-29, and its final commit changed the chat completions endpoint to `lm.chutes.ai`. The canonical inference base is `https://llm.chutes.ai/v1` — `lm.chutes.ai` resolved but returned 401 on `/v1/models` when probed 2026-06-11. After vendoring, grep the copied files for `lm.chutes.ai` and switch to `llm.chutes.ai` if present.
+- **Session `user` claims are minimal.** The IdP discovery document advertises `claims_supported: ["sub", "username", "created_at"]` (verified 2026-06-11). Code like `user.name ?? user.preferred_username` should fall back to `user.username` — don't expect `email` or `name`.
 - **`http://` localhost redirects must be explicitly allowed.** Chutes will reject redirect URIs that aren't in the app's list. If dev breaks, check `PATCH /idp/apps/{id}` to add the localhost variant.
 - **Sessions are cookie-scoped.** If your app is split across subdomains (`app.example.com` vs `www.example.com`), cookie domain settings on the session may cause mysterious 401s.
 - **Refresh tokens expire.** If you're seeing forced re-logins every few days, that's the refresh token TTL and it's correct behavior.

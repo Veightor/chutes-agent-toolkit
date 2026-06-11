@@ -20,18 +20,20 @@ This file contains detailed endpoint specifications beyond what's in SKILL.md. R
 
 ## Authentication Details
 
-Wave-3 live auth finding (verified 2026-04-15): authentication is split by surface.
+Re-verified live 2026-06-11 — this **reverses** the April 2026 (wave-3) finding. `Authorization: Bearer cpk_...` is now the universal header on both surfaces:
 
 Inference (`https://llm.chutes.ai/v1`):
 ```
-X-API-Key: cpk_...
+Authorization: Bearer cpk_...
 ```
-`Authorization: Bearer cpk_...` returned HTTP 401 in live tests against both `/v1/models` and `/v1/chat/completions`, while `X-API-Key` succeeded on `/v1/models` and reached the model gateway on `/v1/chat/completions`.
+- Bearer `cpk_...` returned 200 on `GET /v1/models` (verified 2026-06-11), and is the header the platform documents in its `ai-plugin.json` and `llms.txt` for all of `llm.chutes.ai/v1`. (Bearer on `POST /v1/chat/completions` was not re-exercised in the read-only 2026-06-11 run.)
+- `GET /v1/models` is now **public** — 200 with no auth headers at all (verified 2026-06-11).
+- Do **not** use `X-API-Key` on the inference surface: per the platform's llms.txt it is silently ignored and the request falls through to the anonymous path (a 200 on the public `/v1/models` proves nothing about authentication).
 
 Management API (`https://api.chutes.ai`):
-- fingerprint login returns a short-lived JWT/token for `/users/me` and authenticated management calls
-- hotkey-signed requests are used by the `chutes` CLI for CRUD operations like `GET /api_keys/`
-- `cpk_...` keys did **not** work against `/users/me` in live tests
+- Bearer `cpk_...` now works directly — verified 200 on `GET /users/me` and `GET /model_aliases/` (2026-06-11). The fingerprint-login JWT is no longer required for these reads.
+- `X-API-Key: cpk_...` returns **401** here (`{"detail":"Can't find a user with that api key in our db :("}`), verified 2026-06-11.
+- hotkey-signed requests were used by the `chutes` CLI for CRUD operations like `GET /api_keys/` in April 2026 testing (not re-verified as of 2026-06-11)
 
 API keys are prefixed `cpk_`. The key structure is `cpk_<key_id>.<user_id_hex>.<secret>`.
 
@@ -168,7 +170,7 @@ Returns bare array (NOT paginated). Each: `{ "user_id", "chute_id", "quota", "is
 ```
 GET https://api.chutes.ai/users/me/subscription_usage
 ```
-Returns `{ "subscription": false }` if no plan. Otherwise: monthly cap + 4-hour rolling window usage.
+Returns `{ "subscription": false }` if no plan. Otherwise (shape verified live 2026-06-11): `{ "subscription": true, "custom": false, "monthly_price": 20.0, "anchor_date": ..., "four_hour": { "usage", "cap", "remaining", "reset_at" }, "monthly": { "usage", "cap", "remaining", "reset_at" } }`. Caps are **dollar-denominated usage value**, not request counts — e.g. the $20/mo Pro plan carries `monthly.cap: 100.0` with a `four_hour.cap` of 8.333 (monthly/12) on a rolling window. Plans per the pricing page: Plus $10/mo, Pro $20/mo, Enterprise custom (plan tiers unverified as of 2026-06-11).
 
 ### Per-Chute Quota Usage
 ```
@@ -207,6 +209,8 @@ GET https://llm.chutes.ai/v1/models
 ```
 Response: `{ "object": "list", "data": [...] }`
 
+Public endpoint — no auth required (verified 2026-06-11). As of 2026-06-11 it returns **13 models, all with `confidential_compute: true`** (the hosted LLM surface is TEE-only). The wider chute catalog (`GET https://api.chutes.ai/chutes/?include_public=true`) additionally holds image/audio/utility chutes and Affine miner chutes, which are not on this gateway.
+
 Full model object fields:
 - `id` — model identifier for API calls
 - `root` — base model name (strips `-TEE` suffix for TEE models)
@@ -229,8 +233,8 @@ Full model object fields:
 ### Filtering for TEE Models (Python example)
 ```python
 import requests
-models = requests.get("https://llm.chutes.ai/v1/models", headers={"X-API-Key": "cpk_..."}).json()["data"]
-tee_models = [m for m in models if m["confidential_compute"]]
+models = requests.get("https://llm.chutes.ai/v1/models").json()["data"]  # public endpoint
+tee_models = [m for m in models if m["confidential_compute"]]  # currently: all of them
 ```
 
 ---
@@ -239,9 +243,9 @@ tee_models = [m for m in models if m["confidential_compute"]]
 
 Base URL: `https://llm.chutes.ai/v1`
 
-OpenAI-like request/response shape, but live auth is currently split:
-- direct inference worked with `X-API-Key: cpk_...`
-- Bearer auth with a `cpk_...` key returned 401 in live verification on 2026-04-15
+OpenAI-like request/response shape with standard OpenAI-style auth:
+- `Authorization: Bearer cpk_...` — verified 200 on `/v1/models` 2026-06-11 and platform-documented for the whole surface (the April 2026 Bearer-401 finding is obsolete)
+- `X-API-Key` is silently ignored on this surface (per platform llms.txt) — do not use it
 
 Always check `supported_features` and `supported_sampling_parameters` from the models endpoint before using advanced features. Behavior differs between `sglang` and `vllm` engines.
 
@@ -318,8 +322,15 @@ chutes deploy my_chute:chute
 
 ### Get Attestation Evidence
 ```
-GET https://api.chutes.ai/chutes/{chute_id}/evidence
+GET https://api.chutes.ai/chutes/{chute_id_or_name}/evidence?nonce=<64 hex chars>
 ```
+The `nonce` query param is **required** and must be exactly 64 hex characters (32 bytes); otherwise the API returns `$.query.nonce: required parameter missing` / `Nonce must be exactly 64 hex characters (32 bytes)`. Returns per-instance `{quote, gpu_evidence[], instance_id, certificate}` plus `failed_instance_ids` (verified live 2026-06-11). Per-instance variant: `GET /instances/{instance_id}/evidence`.
+
+### Golden TEE Measurements
+```
+GET https://api.chutes.ai/servers/tee/measurements
+```
+Named measurement sets (e.g. `8xh200`) with `mrtd` + `boot_rtmrs` (RTMR0-2) to compare evidence against (unverified as of 2026-06-11).
 
 ### E2E Encryption Instances
 ```
@@ -378,6 +389,7 @@ Streams instance logs (no prompt/response data included).
 ```
 GET https://api.chutes.ai/pricing
 ```
+Public, no auth (verified 2026-06-11). Returns `tao_usd` (live TAO/USD rate), `compute_unit_estimate` (USD per second), and `gpu_price_estimates` — per-GPU hourly/second rates in USD and TAO (3090, 4090, 5090, a4000, a5000, a6000, a6000_ada, l4, pro_6000, ...).
 
 ### Model Aliases & Routing
 ```
@@ -404,11 +416,10 @@ model="modelA,modelB,modelC:latency"  # pick fastest TTFT
 model="modelA,modelB,modelC:throughput" # pick highest TPS
 ```
 
-### Key Performance Metrics from Models API
-Each model in `GET https://llm.chutes.ai/v1/models` includes real-time performance data that informs routing decisions:
-- **TTFT** (Time to First Token) — lower is better for latency
-- **TPS** (Tokens per second) — higher is better for throughput
-- **pricing.prompt** / **pricing.completion** — cost per 1M tokens
+### Key Performance Metrics for Routing
+`GET https://llm.chutes.ai/v1/models` carries **no TTFT/TPS fields** (verified 2026-06-11) — it gives you cost via `pricing.prompt` / `pricing.completion` (USD per 1M tokens). Live performance data comes from:
+- `GET https://api.chutes.ai/invocations/stats/llm` — per-model `average_ttft` (Time to First Token, lower = better latency) and `average_tps` (tokens/second, higher = better throughput)
+- The `:latency` / `:throughput` routing suffixes use these live metrics server-side
 
 ### Routing Best Practices
 - Mix providers in your pool (e.g., DeepSeek + Qwen + GLM) so a single provider outage doesn't cause total failure

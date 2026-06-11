@@ -6,11 +6,11 @@ Usage:
 
 Targets:
   cursor         → .cursor/mcp.json
-  cline          → settings.json snippet
+  cline          → cline_mcp_settings.json snippet (paste via Cline's MCP Servers UI)
   claude-desktop → claude_desktop_config.json snippet
   aider          → .aider.conf.yml
   openrouter     → env-var block (stdout)
-  hermes         → other-agents/hermes/*.yml (if found in repo)
+  hermes         → other-agents/hermes/config-examples/*.yaml
   system-prompt  → other-agents/system-prompt/chutes-prompt.md
 
 Secrets are resolved from the keychain at generation time via
@@ -62,12 +62,18 @@ def cursor_config(out: Path) -> Path:
 
 
 def cline_config(out: Path) -> Path:
+    # Cline reads a global cline_mcp_settings.json (VS Code globalStorage,
+    # saoudrizwan.claude-dev/settings/), edited via Cline's MCP Servers > Configure UI —
+    # NOT VS Code settings.json. Shape uses the standard "mcpServers" key with optional
+    # per-server "disabled"/"autoApprove" fields (per docs.cline.bot; unverified as of 2026-06-11).
     target = out / "cline-mcp-snippet.json"
     payload = {
-        "mcp.servers": {
+        "mcpServers": {
             "chutes": {
                 "command": "chutes-mcp-server",
                 "env": {"CHUTES_API_KEY": "${env:CHUTES_API_KEY}"},
+                "disabled": False,
+                "autoApprove": [],
             }
         }
     }
@@ -96,7 +102,9 @@ def aider_config(out: Path) -> Path:
         f"{ENV_NOTE}\n"
         "openai-api-base: https://llm.chutes.ai/v1\n"
         "openai-api-key: ${CHUTES_API_KEY}\n"
-        "model: deepseek-ai/DeepSeek-V3-0324\n"
+        # All hosted Chutes LLMs are -TEE variants as of 2026-06-11; non-TEE ids
+        # like deepseek-ai/DeepSeek-V3-0324 no longer exist on /v1/models.
+        "model: deepseek-ai/DeepSeek-V3.2-TEE\n"
         "edit-format: diff\n"
     )
     return target
@@ -115,20 +123,92 @@ def openrouter_style(out: Path) -> Path:
 
 
 def hermes_config(out: Path) -> Path:
-    hermes_dir = REPO_ROOT / "other-agents" / "hermes"
-    target = hermes_dir / "chutes-provider.yml"
+    """Refresh the checked-in Hermes config examples.
+
+    Hermes v0.16 supports the newer keyed `providers:` shape and still accepts
+    the older `custom_providers:` list for compatibility. Prefer `providers:` in
+    generated snippets because it is easier to extend with model lists and
+    `discover_models`, while still selecting it as `custom:chutes` at runtime.
+    """
+    hermes_dir = REPO_ROOT / "other-agents" / "hermes" / "config-examples"
     hermes_dir.mkdir(parents=True, exist_ok=True)
-    target.write_text(
-        "# Hermes custom provider for Chutes.ai\n"
-        f"{ENV_NOTE}\n"
-        "custom_providers:\n"
-        "  - name: Chutes\n"
+
+    provider_common_latency = (
+        "    name: Chutes\n"
         "    base_url: https://llm.chutes.ai/v1\n"
         "    key_env: CHUTES_API_KEY\n"
-        "    api_mode: chat_completions\n"
-        "    model: default\n"
+        "    transport: chat_completions\n"
+        "    default_model: default:latency\n"
+        "    discover_models: true\n"
+        "    models:\n"
+        "      default: {}\n"
+        "      \"default:latency\": {}\n"
+        "      \"default:throughput\": {}\n"
     )
-    return target
+    provider_common_throughput = provider_common_latency.replace(
+        "default_model: default:latency", "default_model: default:throughput"
+    )
+
+    examples = {
+        "chutes-basic.yaml": (
+            "# ~/.hermes/config.yaml\n"
+            "# Chutes as a named Hermes provider entry.\n"
+            "# Put CHUTES_API_KEY=*** in ~/.hermes/.env, not in this file.\n\n"
+            "providers:\n"
+            "  chutes:\n"
+            f"{provider_common_latency}\n"
+            "model:\n"
+            "  provider: custom:chutes\n"
+            "  default: default:latency\n"
+        ),
+        "chutes-cheap-routing.yaml": (
+            "# ~/.hermes/config.yaml\n"
+            "# Keep your primary model/provider elsewhere, and let Hermes route cheap/simple work to Chutes.\n\n"
+            "providers:\n"
+            "  chutes:\n"
+            f"{provider_common_latency}\n"
+            "smart_model_routing:\n"
+            "  enabled: true\n"
+            "  cheap_model:\n"
+            "    provider: custom:chutes\n"
+            "    model: default:latency\n"
+        ),
+        "chutes-delegation.yaml": (
+            "# ~/.hermes/config.yaml\n"
+            "# Use your normal primary model/provider for orchestration, and Chutes for delegated/background subtasks.\n\n"
+            "providers:\n"
+            "  chutes:\n"
+            f"{provider_common_throughput}\n"
+            "delegation:\n"
+            "  provider: custom:chutes\n"
+            "  model: default:throughput\n"
+            "  reasoning_effort: medium\n"
+        ),
+        "chutes-dual-endpoints.yaml": (
+            "# ~/.hermes/config.yaml\n"
+            "# Two named Chutes endpoints: normal inference and opt-in research endpoint.\n"
+            "# Use the research endpoint only when the user accepts prompt/response recording.\n\n"
+            "providers:\n"
+            "  chutes:\n"
+            f"{provider_common_latency}\n"
+            "  chutes-research:\n"
+            "    name: Chutes Research Opt-In\n"
+            "    base_url: https://research-data-opt-in-proxy.chutes.ai/v1\n"
+            "    key_env: CHUTES_API_KEY\n"
+            "    transport: chat_completions\n"
+            "    default_model: default:latency\n"
+            "    discover_models: true\n"
+            "    models:\n"
+            "      default: {}\n"
+            "      \"default:latency\": {}\n"
+            "      \"default:throughput\": {}\n"
+        ),
+    }
+
+    for name, content in examples.items():
+        target = hermes_dir / name
+        target.write_text(content)
+    return hermes_dir
 
 
 def system_prompt(out: Path) -> Path:
@@ -139,11 +219,10 @@ def system_prompt(out: Path) -> Path:
         "# Chutes.ai — System Prompt Block\n\n"
         "Paste this into any system prompt to tell a generic agent how to call Chutes:\n\n"
         "---\n\n"
-        "You have access to Chutes.ai, a decentralized inference network serving 40+ open-source models via an OpenAI-like inference API.\n\n"
+        "You have access to Chutes.ai, a decentralized inference network serving open-source models via an OpenAI-compatible inference API. As of 2026-06-11 every hosted LLM runs in a TEE (`confidential_compute: true`, `-TEE` id suffix).\n\n"
         "Base URL: `https://llm.chutes.ai/v1`\n"
-        "Auth for direct HTTP calls: `X-API-Key: cpk_...` (never log or echo the key)\n"
-        "Live note: direct Bearer use with a `cpk_...` key returned 401 in verification on 2026-04-15.\n"
-        "List models: `GET /models` (always treat this as source of truth; do not hardcode ids).\n"
+        "Auth for direct HTTP calls: `Authorization: Bearer cpk_...` (never log or echo the key). Verified live 2026-06-11 on GET /v1/models; Bearer is the platform-recommended header. X-API-Key is no longer recommended on the inference surface.\n"
+        "List models: `GET /models` (public, no auth required; always treat this as source of truth; do not hardcode ids).\n"
         "Chat: `POST /chat/completions` with `{model, messages, max_tokens, temperature}`.\n"
         "Routing: pass `default:latency` or `default:throughput` as the model for smart pools.\n"
         "Privacy: filter models by `confidential_compute: true` for TEE-isolated inference.\n\n"
@@ -208,8 +287,9 @@ def main() -> int:
     print("\nSummary:")
     print(json.dumps(results, indent=2))
     print("\nNext:")
-    print("  1. load CHUTES_API_KEY from: python plugins/chutes-ai/skills/chutes-ai/scripts/manage_credentials.py get --field api_key")
-    print("  2. install the MCP server (uv tool install chutes-mcp-server) for MCP targets")
+    print(f"  1. load CHUTES_API_KEY from: {sys.executable} plugins/chutes-ai/skills/chutes-ai/scripts/manage_credentials.py get --field api_key")
+    # chutes-mcp-server is NOT on PyPI (404 verified 2026-06-11) — local-path install only.
+    print("  2. install the MCP server for MCP targets: uv tool install chutes-mcp-server --from plugins/chutes-ai/skills/chutes-mcp-portability/mcp-server")
     print("  3. restart the target client so it picks up the new config")
     return 0
 

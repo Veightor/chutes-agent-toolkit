@@ -1,10 +1,10 @@
 # Rolling Updates on Chutes **[BETA]**
 
-> `GET /chutes/rolling_updates`
+> `GET /chutes/rolling_updates` — still present in `api.chutes.ai/openapi.json` (verified 2026-06-11).
 
 ## What a rolling update is
 
-When a chute's underlying image or configuration changes, Chutes will roll the update out across the pool of nodes running the chute instead of cutting over all at once. That means:
+When a chute's underlying image or configuration changes, Chutes will roll the update out across the pool of nodes running the chute instead of cutting over all at once. This is **server-side and automatic**: it is triggered when a code/image change to an existing chute lands (e.g. a new image build completing) — there is no user-facing CLI command for rollouts, and updates to existing chutes do not incur a new deployment fee (verified in the chutes-api source and SDK README, 2026-06-11). Implications:
 
 - Some callers continue to hit the old revision for a brief window.
 - A new revision is warming up on some nodes while the old one is still serving on others.
@@ -51,5 +51,5 @@ States worth knowing:
 ## Related
 
 - `GET /images/{image_id}/logs` — build logs for the new revision.
-- `GET /chutes/warmup/{chute_id}` — warmup status for instances already on the new revision.
+- `GET /chutes/warmup/{chute_id_or_name}` — warmup status for instances already on the new revision.
 - `chutes_list_chutes` in the `chutes-mcp-portability` MCP server — includes chute status fields that flag rollouts.

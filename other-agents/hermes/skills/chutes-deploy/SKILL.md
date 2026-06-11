@@ -12,7 +12,7 @@ metadata:
 
 # Chutes Deploy for Hermes **[BETA — permanent until verified live runs]**
 
-> **Status: BETA (permanent).** Mirror of the Claude-plugin `chutes-deploy` skill. Stays BETA until every script has a recorded live run against a dev Chutes account. Time alone does not remove the label.
+> **Status: permanent BETA for deploy-side writes.** Wave-2 live verification reached the Chutes deploy API and found server-side gating for easy deploy (`HTTP 403 Easy deployment is currently disabled!`) on at least some account classes. Scripts now surface fallback hints and resolve branch names to SHAs, but deploy-side writes keep BETA by policy.
 
 ## When to use this skill
 

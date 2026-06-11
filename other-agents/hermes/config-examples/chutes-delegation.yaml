@@ -1,6 +1,18 @@
-model:
-  default: gpt-5.4
-  provider: openai-codex
+# ~/.hermes/config.yaml
+# Use your normal primary model/provider for orchestration, and Chutes for delegated/background subtasks.
+
+providers:
+  chutes:
+    name: Chutes
+    base_url: https://llm.chutes.ai/v1
+    key_env: CHUTES_API_KEY
+    transport: chat_completions
+    default_model: default:throughput
+    discover_models: true
+    models:
+      default: {}
+      "default:latency": {}
+      "default:throughput": {}
 
 delegation:
   provider: custom:chutes

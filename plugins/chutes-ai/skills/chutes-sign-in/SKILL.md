@@ -1,6 +1,6 @@
 ---
 name: chutes-sign-in
-description: "Add Sign in with Chutes (OAuth 2.0 + OIDC + PKCE) to a user's application. Use this skill when the user wants to register a Chutes OAuth app, vendor the chutesai/Sign-in-with-Chutes Next.js package into their project, wire up sign-in routes, manage scopes, store client credentials in the OS keychain, or rotate a client secret. Triggers on: sign in with chutes, SIWC, OAuth app, /idp/apps, cid_, csc_, chutes oauth, PKCE chutes, chutes login button, useChutesSession, Next.js chutes auth, rotate oauth secret."
+description: "Add Sign in with Chutes (OAuth 2.0 + OIDC + PKCE) to a user's application. Use this skill when the user wants to register a Chutes OAuth app, vendor the chutesai/Sign-in-with-Chutes Next.js package into their project, wire up sign-in routes, manage scopes, store client credentials in the OS keychain, or rotate a client secret. Triggers on: sign in with chutes, SIWC, OAuth app, /idp/apps, cid_, csc_, chutes oauth, PKCE chutes, chutes login button, useChutesSession, Next.js chutes auth, rotate oauth secret, chutes oauth scopes, /idp/scopes, chutes:invoke, token introspect, chutes OIDC, openid-configuration."
 ---
 
 # chutes-sign-in
@@ -10,6 +10,8 @@ description: "Add Sign in with Chutes (OAuth 2.0 + OIDC + PKCE) to a user's appl
 > **Graduated:** `register_oauth_app.py`, `install_siwc.py`, `rotate_secret.py`, the skill itself.
 >
 > **Still BETA — `verify_siwc.py`** — steps 1-3 (files / env / keychain match) passed live but step 4 (dev server `/api/auth/chutes/session` hit) was not exercised (would require `npm install` + `npm run dev`, out of scope for automated verification). Stays BETA until step 4 is exercised end-to-end.
+>
+> **Refresh 2026-06-11 (read-only re-verification):** all `/idp/*` paths re-confirmed present in the live `openapi.json`; `GET /idp/scopes`, `GET /idp/apps`, and `GET /.well-known/openid-configuration` exercised live (see `references/idp-endpoints.md` for the verified scope list, OIDC discovery contents, and new endpoints: app sharing, consent pages, CLI hotkey login). Upstream `chutesai/Sign-in-with-Chutes` is dormant — no commits since 2025-12-29, no releases/tags, no breaking changes; its last commit points inference at `lm.chutes.ai`, which returned 401 on probe — use `llm.chutes.ai`. Mutating flows (`POST /idp/apps`, regenerate-secret, install) were NOT re-exercised this run; their VERIFIED status below still refers to the 2026-04-13 run.
 >
 > **Wave-2 bug fixes that live verification caught:**
 >
@@ -55,10 +57,10 @@ Stub paths should not register an OAuth app. Pointing at the upstream repo and s
 
 Default: `openid profile chutes:invoke`. Always confirm before adding:
 
-- `account:read` — lets the app display username / balance. Add when the UI shows account info.
-- `billing:read` — lets the app display usage / quotas. Add only when the app needs spend visibility.
+- `account:read` — lets the app display full account details (quotas, discounts, pricing). Add when the UI shows account info.
+- `billing:read` — lets the app display billing information / payment history. Add only when the app needs spend visibility.
 
-Point the user at `references/scope-cookbook.md` for least-privilege recipes.
+The live IdP exposes many more scopes than these (verified 2026-06-11 via `GET /idp/scopes`): `balance:read`, `quota:read`, `usage:read`, `invocations:read`, `chutes:read/write/delete`, `images:read/write/delete`, `secrets:read/write`, `account:write`, `admin`. Platform docs also describe a per-chute `chutes:invoke:{chute_id}` scope for single-model apps (unverified as of 2026-06-11). Point the user at `references/scope-cookbook.md` for the full table and least-privilege recipes.
 
 ### Step 3 — register the OAuth app
 
@@ -144,22 +146,27 @@ python <skill-scripts-dir>/rotate_secret.py --profile oauth.my-app
 
 ## Endpoint map (`/idp/*`)
 
-See `references/idp-endpoints.md` for the full list. Summary:
+See `references/idp-endpoints.md` for the full list. Summary (all paths verified present in openapi.json 2026-06-11):
 
 | Action | Method | Path |
 |---|---|---|
+| OIDC discovery (public) | GET | `/.well-known/openid-configuration` |
 | Create OAuth app | POST | `/idp/apps` |
-| List my OAuth apps | GET | `/idp/apps` |
+| List OAuth apps (own + public + shared by default; use `include_public=false&include_shared=false` for own only) | GET | `/idp/apps` |
 | Get one app | GET | `/idp/apps/{app_id}` |
 | Update app metadata | PATCH | `/idp/apps/{app_id}` |
 | Delete app | DELETE | `/idp/apps/{app_id}` |
 | Regenerate client secret | POST | `/idp/apps/{app_id}/regenerate-secret` |
+| Share / list shares / unshare app | POST / GET / DELETE | `/idp/apps/{app_id}/share`, `/idp/apps/{app_id}/shares`, `/idp/apps/{app_id}/share/{user_id}` |
 | List available scopes | GET | `/idp/scopes` |
 | List authorizations | GET | `/idp/authorizations` |
 | Revoke authorization | DELETE | `/idp/authorizations/{app_id}` |
-| Token introspect | POST | `/idp/token/introspect` |
+| Authorize (PKCE entry point) | GET | `/idp/authorize` |
+| Token exchange | POST | `/idp/token` |
+| Token introspect (form-encoded only) | POST | `/idp/token/introspect` |
 | Token revoke | POST | `/idp/token/revoke` |
-| Userinfo | GET | `/idp/userinfo` |
+| Userinfo (access token, not `cpk_`) | GET | `/idp/userinfo` |
+| CLI hotkey login | GET | `/idp/cli_login`, `/idp/cli_login/nonce` |
 
 ## Scripts in this skill
 

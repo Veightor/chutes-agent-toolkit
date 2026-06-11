@@ -1,11 +1,13 @@
 ---
 name: chutes-mcp-portability
-description: "Make Chutes.ai available to any agent via MCP or cautiously-used OpenAI-like configs. Use this skill when the user wants to plug Chutes into Cursor, Cline, Aider, Claude Desktop, Hermes, or another agent. The skill installs the Chutes MCP server (stdio), writes per-agent config snippets, and runs a health check. Triggers on: MCP chutes, chutes MCP server, cursor chutes, cline chutes, aider chutes, claude desktop chutes, hermes chutes provider, openai-compatible chutes, drop-in chutes config, portable chutes, chutes for my agent."
+description: "Make Chutes.ai available to any agent via MCP or OpenAI-compatible configs. Use this skill when the user wants to plug Chutes into Cursor, Cline, Aider, Claude Desktop, Hermes, or another agent. The skill installs the Chutes MCP server (stdio), writes per-agent config snippets, and runs a health check. Triggers on: MCP chutes, chutes MCP server, cursor chutes, cline chutes, aider chutes, claude desktop chutes, hermes chutes provider, openai-compatible chutes, drop-in chutes config, portable chutes, chutes for my agent."
 ---
 
 # chutes-mcp-portability
 
 > **Status: VERIFIED LIVE 2026-04-13** via `docs/chutes-maxi-wave-2.md` Track C.2 + C.6. `chutes-mcp-server --self-check` passed, and 7 read tools were exercised against a real `cpk_` with non-empty responses.
+>
+> **Refresh 2026-06-11 (read-only GETs):** auth headers re-verified live — `Authorization: Bearer cpk_...` now returns 200 on both `llm.chutes.ai/v1/models` and `api.chutes.ai/users/me` (the April finding is inverted; see auth note below). The server's inference calls now send Bearer. Catalog re-verified: 13 models, all `-TEE` / `confidential_compute: true`. The MCP server itself was not re-run this pass, so the 2026-04-13 tool-exercise record stands as the last full server run.
 >
 > **Read tools graduated out of BETA (verified):** `chutes_list_models`, `chutes_get_quota`, `chutes_list_aliases`, `chutes_list_chutes`, `chutes_get_usage`, `chutes_get_discounts`, `chutes_list_api_keys`.
 >
@@ -18,27 +20,28 @@ description: "Make Chutes.ai available to any agent via MCP or cautiously-used O
 Makes Chutes usable from **any** agent environment with one of two mechanisms:
 
 1. **MCP server** (`mcp-server/server.py`). Stdio transport. Exposes Chutes management + inference as MCP tools. Any MCP-aware client (Claude Desktop, Cursor, Cline, Claude Code itself) can load it.
-2. **Config snippets** (`scripts/generate_agent_config.py`). For clients that don't speak MCP but do speak OpenAI-like HTTP. Some of these are still conditional/experimental because many clients hardcode `Authorization: Bearer` rather than allowing `X-API-Key`.
+2. **Config snippets** (`scripts/generate_agent_config.py`). For clients that don't speak MCP but do speak OpenAI-like HTTP. These are much closer to drop-in now that the platform recommends standard Bearer auth (see below), but stay [BETA] until a paid completion round-trip is re-verified.
 
 Both paths read secrets from the keychain via `manage_credentials.py` and never echo `cpk_` into transcripts.
 
-Wave-3 live auth finding (verified 2026-04-15):
-- inference succeeded with `X-API-Key: cpk_...`
-- Bearer auth with a `cpk_...` key returned 401 on the inference surface
-- management endpoints worked with a JWT obtained from `POST /users/login` using the fingerprint
+Live auth finding (re-verified 2026-06-11, read-only GETs — this **inverts** the wave-3 2026-04-15 finding):
+- `Authorization: Bearer cpk_...` → 200 on `GET llm.chutes.ai/v1/models` AND on `GET api.chutes.ai/users/me`. Bearer is the platform-recommended header per chutes.ai's own `ai-plugin.json` and `llms.txt`.
+- `X-API-Key: cpk_...` → 200 on `GET /v1/models` (which is now public, so this proves little) but **401 on `api.chutes.ai/users/me`**. Official llms.txt says X-API-Key is silently ignored on the inference surface. Do not use it.
+- `GET /v1/models` requires no auth at all.
+- The fingerprint→JWT flow (`POST /users/login`) is still what the MCP server uses for management writes; Bearer-cpk behavior on management writes and on `POST /chat/completions` is unverified as of 2026-06-11 (read-only constraint).
 
-The MCP server in this repo now mirrors that split auth model locally.
+The MCP server in this repo now sends Bearer on the inference surface and keeps the fingerprint→JWT path for management tools.
 
 ## Supported targets
 
 | Target | Mechanism | Notes |
 |---|---|---|
-| Claude Desktop | MCP | Writes to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS path; shown for other OSes) |
+| Claude Desktop | MCP | Writes to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS path; shown for other OSes). Claude Desktop also supports one-click MCP Bundles (`.mcpb`) for local servers — not packaged here yet (unverified as of 2026-06-11) |
 | Claude Code | MCP | `claude mcp add` equivalent or direct config snippet |
-| Cursor | MCP | `.cursor/mcp.json` at the workspace root |
-| Cline | MCP | VS Code `settings.json` MCP block |
+| Cursor | MCP | `.cursor/mcp.json` at the workspace root (or `~/.cursor/mcp.json` for global) |
+| Cline | MCP | Global `cline_mcp_settings.json` via Cline's MCP Servers → Configure UI (not VS Code `settings.json`) |
 | Aider | OpenAI-compat | `~/.aider.conf.yml` with `openai-api-base` + model allowlist |
-| Hermes | OpenAI-compat | Updates `other-agents/hermes/` custom provider YAML |
+| Hermes | OpenAI-compat + MCP | Refreshes `other-agents/hermes/config-examples/*.yaml`; Hermes can also add the stdio MCP server with `hermes mcp add chutes --command chutes-mcp-server` |
 | Generic OpenAI SDK | OpenAI-compat | Prints an env var block |
 | System-prompt agents | prompt | Writes a paste-able instruction block to `other-agents/system-prompt/` |
 
@@ -56,7 +59,7 @@ uv tool install chutes-mcp-server --from plugins/chutes-ai/skills/chutes-mcp-por
 pipx install plugins/chutes-ai/skills/chutes-mcp-portability/mcp-server
 ```
 
-This gives the user a `chutes-mcp-server` command on PATH. The command reads `CHUTES_API_KEY` from env or falls back to `manage_credentials.py get --field api_key` for inference. For management tools, it uses `CHUTES_FINGERPRINT` or the stored fingerprint to mint a short-lived JWT via `POST /users/login`.
+This gives the user a `chutes-mcp-server` command on PATH. **Local-path install only:** `chutes-mcp-server` is NOT published on PyPI (404 verified 2026-06-11), so the `--from <local path>` form is required — a bare `uv tool install chutes-mcp-server` will fail. The command reads `CHUTES_API_KEY` from env or falls back to `manage_credentials.py get --field api_key` for inference (sent as `Authorization: Bearer`). For management tools, it uses `CHUTES_FINGERPRINT` or the stored fingerprint to mint a short-lived JWT via `POST /users/login`.
 
 ### Step 3 — generate configs
 
@@ -67,7 +70,7 @@ python <skill-scripts-dir>/generate_agent_config.py --target cursor,aider,hermes
 `--target` accepts a comma-separated list. For each target, the script:
 
 - Reads `cpk_` from the keychain to inject into env-var-style targets.
-- Writes the config file to the target's conventional location (or prints a diff if the file already exists).
+- Writes config files to each target's conventional location or, for Hermes, refreshes the checked-in examples in `other-agents/hermes/config-examples/`.
 - Prints next-step commands (restart the client, reload window, etc.).
 
 ### Step 4 — health check
@@ -91,14 +94,14 @@ For OpenAI-compat targets, the script prints a one-liner `curl https://llm.chute
 | `chutes_list_chutes` | `GET /chutes/` | read |
 | `chutes_deploy_vllm` | `POST /chutes/vllm` | **[BETA]** write |
 | `chutes_deploy_diffusion` | `POST /chutes/diffusion` | **[BETA]** write |
-| `chutes_teeify` | `PUT /chutes/{id}/teeify` | **[BETA]** write |
+| `chutes_teeify` | `PUT /chutes/{id}/teeify` | **[BETA]** write — endpoint GONE from openapi as of 2026-06-11; use `tee=True` at deploy time instead |
 | `chutes_list_aliases` | `GET /model_aliases/` | read |
 | `chutes_set_alias` | `POST /model_aliases/` | **[BETA]** write |
 | `chutes_delete_alias` | `DELETE /model_aliases/{alias}` | **[BETA]** write |
 | `chutes_get_usage` | `GET /invocations/usage` | read |
 | `chutes_get_quota` | `GET /users/me/quotas` | read |
 | `chutes_get_discounts` | `GET /users/me/discounts` | read |
-| `chutes_get_evidence` | `GET /chutes/{id}/evidence` | read |
+| `chutes_get_evidence` | `GET /chutes/{id}/evidence?nonce=<64 hex chars>` (nonce required; auto-generated) | read |
 | `chutes_oauth_introspect` | `POST /idp/token/introspect` | read |
 | `chutes_list_api_keys` | `GET /api_keys/` | read |
 | `chutes_create_api_key` | `POST /api_keys/` | **[BETA]** write |

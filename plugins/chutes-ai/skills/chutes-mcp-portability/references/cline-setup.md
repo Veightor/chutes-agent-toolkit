@@ -14,18 +14,22 @@ python plugins/chutes-ai/skills/chutes-mcp-portability/scripts/generate_agent_co
   --target cline --out ~/tmp/cline
 ```
 
-The script writes `~/tmp/cline/cline-mcp-snippet.json`. Paste its contents into VS Code's Cline settings under the "MCP Servers" section:
+The script writes `~/tmp/cline/cline-mcp-snippet.json`. Cline's MCP config is **not** VS Code `settings.json` — it lives in a global `cline_mcp_settings.json` under VS Code's globalStorage (`.../saoudrizwan.claude-dev/settings/`). Open it via Cline's **MCP Servers → Configure MCP Servers** UI and merge the snippet in:
 
 ```json
 {
-  "mcp.servers": {
+  "mcpServers": {
     "chutes": {
       "command": "chutes-mcp-server",
-      "env": { "CHUTES_API_KEY": "${env:CHUTES_API_KEY}" }
+      "env": { "CHUTES_API_KEY": "${env:CHUTES_API_KEY}" },
+      "disabled": false,
+      "autoApprove": []
     }
   }
 }
 ```
+
+Per-server `disabled` and `autoApprove` fields are supported by Cline (per docs.cline.bot; config shape unverified end-to-end as of 2026-06-11).
 
 ## Set the env var
 

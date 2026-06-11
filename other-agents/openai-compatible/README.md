@@ -24,7 +24,7 @@ Full REST API spec. Swagger UI available at `https://api.chutes.ai/docs`.
 https://llm.chutes.ai/v1/models
 ```
 
-Structured JSON of all available models with pricing, context length, TEE status, supported features, and per-token cost in USD and TAO.
+Structured JSON of all available models with pricing, context length, TEE status, supported features, and per-token cost in USD and TAO. Public — no auth required (verified 2026-06-11). As of 2026-06-11 every hosted LLM is a `-TEE` variant with `confidential_compute: true` (13 models); treat this endpoint as the source of truth instead of hardcoding model ids.
 
 ## Docs Index (Machine-Readable)
 
@@ -44,7 +44,7 @@ from langchain_openai import ChatOpenAI
 llm = ChatOpenAI(
     base_url="https://llm.chutes.ai/v1",
     api_key="cpk_...",
-    model="deepseek-ai/DeepSeek-V3-0324"
+    model="deepseek-ai/DeepSeek-V3.2-TEE"
 )
 ```
 
@@ -54,7 +54,7 @@ llm = ChatOpenAI(
 import litellm
 
 response = litellm.completion(
-    model="chutes_ai/deepseek-ai/DeepSeek-V3-0324",
+    model="chutes_ai/deepseek-ai/DeepSeek-V3.2-TEE",
     messages=[{"role": "user", "content": "Hello"}],
     api_key="cpk_..."
 )
@@ -76,3 +76,5 @@ const chutes = createChutes({ apiKey: 'cpk_...' });
 ### Any OpenAI-Compatible Client
 
 Chutes is a drop-in replacement for the OpenAI API. Change the base URL to `https://llm.chutes.ai/v1` and use a `cpk_` API key. That's it.
+
+Auth note (re-verified 2026-06-11): the standard `Authorization: Bearer cpk_...` header is the platform-recommended one and returns 200 on `GET /v1/models` — so clients that hardcode Bearer (i.e. all OpenAI SDKs) work as-is. The legacy `X-API-Key` header is silently ignored on the inference surface per official Chutes docs and returns 401 on `api.chutes.ai` management endpoints; don't use it. (`POST /chat/completions` auth specifically was not re-exercised — unverified as of 2026-06-11.)

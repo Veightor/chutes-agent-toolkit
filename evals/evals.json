@@ -26,7 +26,7 @@
       "id": 4,
       "category": "routing",
       "prompt": "I'm building a chatbot and need it to be fast and reliable. Can you set up model routing on Chutes so if one model is slow or down, it automatically fails over? I want the lowest latency possible and I care about privacy so TEE models only.",
-      "expected_output": "Should explain model routing strategies (default, default:latency, default:throughput), recommend using default:latency for a chatbot, filter available TEE models by TTFT, build a routing pool of 3-4 fast TEE models, and provide working code examples using either inline routing strings or the default alias.",
+      "expected_output": "Should explain model routing strategies (default, default:latency, default:throughput), recommend using default:latency for a chatbot, note that as of 2026-06-11 every hosted model is TEE-backed (confidential_compute=true) so the TEE-only constraint is satisfied by the whole catalog, build a routing pool of 3-4 fast models, and provide working code examples using either inline routing strings or the default alias.",
       "files": []
     },
     {
@@ -92,7 +92,7 @@
       "category": "chute-deploy-vllm",
       "status": "beta",
       "prompt": "Deploy Qwen/Qwen3-8B as a vLLM chute on an H100 and give it a stable alias called 'interactive-fast' so my team can point at the alias instead of hardcoding the model id.",
-      "expected_output": "Should route to the chutes-deploy skill (permanent BETA). Should explicitly acknowledge that deploy consumes real paid compute, confirm before POSTing, POST /chutes/vllm with a templated body (model Qwen/Qwen3-8B, gpu_type h100, gpu_count 1), stream build logs from GET /images/{image_id}/logs, poll GET /chutes/warmup/{chute_id} until ready, then POST /model_aliases/ with {alias: interactive-fast, model: <model_id>}. Should return the base_url + model_id for inference. Must warn about BETA status.",
+      "expected_output": "Should route to the chutes-deploy skill (permanent BETA). Should explicitly acknowledge that deploy consumes real paid compute, confirm before POSTing, POST /chutes/vllm with a templated body (model Qwen/Qwen3-8B, gpu_type h100, gpu_count 1, revision pinned to a full 40-hex HF commit SHA — the API rejects branch names and short SHAs), stream build logs from GET /images/{image_id}/logs, poll GET /chutes/warmup/{chute_id} until ready, then POST /model_aliases/ with {alias: interactive-fast, chute_ids: [<chute_uuid>]} — NOT {alias, model}. Should return the base_url + model_id for inference. Must warn about BETA status and that the easy-deploy lane may be server-side gated (403) on some account classes.",
       "files": []
     },
     {
@@ -128,7 +128,7 @@
       "id": 17,
       "category": "platform-ops-audit",
       "prompt": "Audit my OAuth apps - I want to see which ones I can clean up.",
-      "expected_output": "Should route to chutes-platform-ops:list_apps.py + audit_stale_apps.py. Must paginate /idp/apps (wave-2 finding: ?mine=true and ?user_id= are IGNORED by the server, client-side filter is required), filter to user_id == my user_id, join with /idp/authorizations to compute per-app auth counts, and print a report flagging zero-authorization apps and apps aged >= 90 days. Must NOT delete anything - report only. Must exit with code 3 when stale apps are found.",
+      "expected_output": "Should route to chutes-platform-ops:list_apps.py + audit_stale_apps.py. Must paginate /idp/apps (2026-06-11 findings: ?mine=true is still IGNORED by the server, but ?include_public=false now scopes server-side to your own apps and ?search= filters by name; ?user_id=<other-uuid> returns 403; client-side filtering on user_id remains the safe fallback), join with /idp/authorizations to compute per-app auth counts, and print a report flagging zero-authorization apps and apps aged >= 90 days. Must NOT delete anything - report only. Must exit with code 3 when stale apps are found.",
       "files": []
     },
     {
@@ -143,7 +143,7 @@
       "id": 19,
       "category": "tee-attestation",
       "prompt": "I'm using a confidential_compute=true chute for sensitive prompts. Verify that the attestation evidence actually looks right.",
-      "expected_output": "Should route to chutes-tee:attest_chute.py. Must GET /instances/nonce or generate a 64-hex nonce via secrets.token_hex(32), then GET /chutes/{id}/evidence?nonce=<nonce> (wave-2 finding: nonce query param is REQUIRED and must be exactly 64 hex chars), parse the TDX v4 quote header (version=4, tee_type=0x81, att_key_type=2), extract mrtd + rtmr[0..3] + report_data, parse one NVIDIA Hopper GPU certificate, and return a verdict of 'shape-valid' if crypto validation isn't available (explicitly labeled 'not run - install Intel DCAP for verified mode'). Must NOT claim 'verified' unless DCAP tooling actually ran. Must explain honest limits of TEE (see references/what-tee-does-not-protect.md).",
+      "expected_output": "Should route to chutes-tee:attest_chute.py. Must GET /instances/nonce or generate a 64-hex nonce via secrets.token_hex(32), then GET /chutes/{id}/evidence?nonce=<nonce> (wave-2 finding: nonce query param is REQUIRED and must be exactly 64 hex chars), parse the TDX v4 quote header (version=4, tee_type=0x81, att_key_type=2), extract mrtd + rtmr[0..3] + report_data, parse one NVIDIA GPU certificate (arch is fleet-dependent - Blackwell observed live 2026-06-11, Hopper previously; do not hardcode), optionally cross-check mrtd/rtmr0 against the public GET /servers/tee/measurements golden sets, and return a verdict of 'shape-valid' if crypto validation isn't available (explicitly labeled 'not run - install Intel DCAP for verified mode'). Must NOT claim 'verified' unless DCAP tooling actually ran. Must explain honest limits of TEE (see references/what-tee-does-not-protect.md).",
       "files": []
     }
   ]

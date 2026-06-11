@@ -1,6 +1,6 @@
 # Chutes as a Generic OpenAI-Like Endpoint **[BETA]**
 
-For any tool that expects OpenAI-style request/response payloads, Chutes is close — but live auth currently differs from the standard OpenAI Bearer-token pattern.
+For any tool that expects OpenAI-style request/response payloads, Chutes now matches the standard pattern: `Authorization: Bearer cpk_...` is the platform-recommended header (re-verified live 2026-06-11 on `GET /v1/models`, which is itself now public). The label stays **[BETA]** because a paid `POST /chat/completions` round-trip was not re-exercised (unverified as of 2026-06-11).
 
 ## Generate the env block
 
@@ -18,7 +18,7 @@ OPENAI_BASE_URL=https://llm.chutes.ai/v1
 OPENAI_API_KEY=cpk_...
 ```
 
-Important: many OpenAI-style clients will send `Authorization: Bearer $OPENAI_API_KEY`. In live verification on 2026-04-15, Chutes inference accepted `X-API-Key: cpk_...` but returned 401 for `Authorization: Bearer cpk_...`. So this env pattern is best treated as experimental until Bearer `cpk_...` is accepted on the inference surface.
+OpenAI-style clients send `Authorization: Bearer $OPENAI_API_KEY` — and that is exactly right for Chutes now. The April 2026 finding (Bearer → 401) is inverted: re-verified 2026-06-11, Bearer `cpk_...` returns 200 on `GET llm.chutes.ai/v1/models` and even on management GETs like `api.chutes.ai/users/me`. Official Chutes docs (`llms.txt`) say the old `X-API-Key` header is silently ignored on the inference surface — do not rely on it.
 
 Source it in your shell:
 
@@ -31,23 +31,23 @@ export CHUTES_API_KEY=$(python plugins/chutes-ai/skills/chutes-ai/scripts/manage
 
 ## Works with
 
+- Any OpenAI SDK or wrapper that lets you set the base URL — the standard Bearer header is the right one now
 - Raw HTTP clients where you control headers directly
-- SDKs/wrappers only if they let you override the auth header to `X-API-Key`
-- MCP clients via the `chutes-mcp-server` bridge (recommended)
+- MCP clients via the `chutes-mcp-server` bridge (for management tools too)
 
 ## Caveats
 
-- **OpenAI env vars alone are not sufficient in many clients today.** If the client hardcodes `Authorization: Bearer $OPENAI_API_KEY`, expect a 401 until Chutes accepts Bearer `cpk_...` on the inference surface.
+- **Completions auth not re-exercised.** Bearer `cpk_...` is verified on `GET /v1/models` (2026-06-11) and platform-recommended for everything; `POST /chat/completions` is a paid call and was not re-verified this pass (unverified as of 2026-06-11).
 - **Different engines accept different sampling params.** `temperature`, `top_p`, `top_k`, `max_tokens` are safe. `n > 1` is usually fine but test.
 - **Tool calling works** on models whose `supported_features` includes `tools`. Not every model does.
 - **Embeddings and TTS/STT endpoints** are not OpenAI-compatible on Chutes today; use the Chutes-native endpoints instead.
 
 ## Switching between OpenAI and Chutes cleanly
 
-If a project needs to flip between real OpenAI and Chutes, prefer a thin wrapper that can change both the base URL and the auth header. If the client cannot send `X-API-Key` for Chutes mode, the switch is not truly drop-in yet.
+If a project needs to flip between real OpenAI and Chutes, swapping the base URL and key is enough — both use standard Bearer auth.
 
 ```bash
-# Chutes mode (only works if the client can send X-API-Key)
+# Chutes mode
 export OPENAI_API_BASE=https://llm.chutes.ai/v1
 export OPENAI_API_KEY=cpk_...
 

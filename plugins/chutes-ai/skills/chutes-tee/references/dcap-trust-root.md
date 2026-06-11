@@ -52,7 +52,11 @@ As of wave-2 (2026-04), NVIDIA's standalone GPU attestation verifier is less dev
 - Parse the GPU certificate manually and verify against NVIDIA's published root (PEM from <https://kb.nvidia.com/>).
 - `attest_chute.py` falls back to X.509 cert parsing + validity + subject check when no NVIDIA verifier is present.
 
+Note the fleet now includes Blackwell-class GPUs: the 2026-06-11 live probe returned `arch: BLACKWELL` with a GB20X cert chain (`CN=GB20X A01 GSP FMC LF` issued by `CN=GB20X A01 GSP BROM`, `ecdsa-with-SHA384`) — make sure whatever NVIDIA verifier you use supports Blackwell attestation, not just Hopper.
+
 ## Graduation rule for `chutes-tee`
+
+**[BETA] Implementation status (2026-06-11):** this graduation rule is the spec, not current behavior — the bundled scripts detect DCAP availability but do not yet execute the validation pipeline, so the practical verdict ceiling is `shape-valid`. Run DCAP / `nv-trust` manually against a saved envelope to get cryptographic assurance today.
 
 The skill outputs `verdict: verified` only when:
 

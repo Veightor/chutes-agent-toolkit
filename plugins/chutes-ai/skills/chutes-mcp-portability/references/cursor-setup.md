@@ -7,7 +7,7 @@ uv tool install chutes-mcp-server \
   --from plugins/chutes-ai/skills/chutes-mcp-portability/mcp-server
 ```
 
-`uv tool install` puts `chutes-mcp-server` on your PATH.
+`uv tool install` puts `chutes-mcp-server` on your PATH. The `--from <local path>` form is required — the package is not published on PyPI (404 verified 2026-06-11).
 
 ## Generate the config
 

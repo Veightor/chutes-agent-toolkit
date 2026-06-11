@@ -1,6 +1,6 @@
 # OAuth App Management on Chutes
 
-> **Status: BETA** — applies to the `/idp/apps` surface area. Verify endpoint paths against `https://api.chutes.ai/openapi.json` before production use.
+> **Status: BETA** — applies to the `/idp/apps` surface area. All paths below re-verified present in the live `https://api.chutes.ai/openapi.json` on 2026-06-11; mutating flows last exercised end-to-end 2026-04-13. Verify request/response shapes before production use.
 
 ## Lifecycle
 
@@ -10,8 +10,15 @@
     PATCH /idp/apps/{id}     ──► update metadata, redirect URIs, scopes
     POST /idp/apps/{id}/
          regenerate-secret   ──► rotate
+    POST /idp/apps/{id}/
+         share               ──► share with another user (new since April snapshot)
+    GET  /idp/apps/{id}/shares      ──► list users it's shared with
+    DELETE /idp/apps/{id}/
+           share/{user_id}   ──► unshare
     DELETE /idp/apps/{id}    ──► delete
 ```
+
+Note on listing: `GET /idp/apps` returns a paginated envelope (`{total, page, limit, items}`) and by default includes **public apps and apps shared with you**, not just your own (verified live 2026-06-11). For an "apps I own" audit, pass `include_public=false&include_shared=false`.
 
 ## Creating an app
 
@@ -69,7 +76,7 @@ Safe rotation procedure:
 1. Announce the rotation window internally.
 2. Run `rotate_secret.py --profile oauth.my-app`. The script rotates the secret, writes the new value to the keychain, and prints a redeploy checklist.
 3. Update env vars on every deployment (Vercel, Docker, bare metal) and redeploy.
-4. Verify each service is healthy via `POST /idp/token/introspect` with a live access token.
+4. Verify each service is healthy via `POST /idp/token/introspect` with a live access token (`application/x-www-form-urlencoded` body only — the openapi spec accepts no JSON, verified 2026-06-11).
 5. Do **not** skip the redeploy step. The script does not auto-redeploy on purpose — blast radius is too large.
 
 ## Authorizations

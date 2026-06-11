@@ -1,6 +1,20 @@
-custom_providers:
-  - name: Chutes
+# ~/.hermes/config.yaml
+# Chutes as a named Hermes provider entry.
+# Put CHUTES_API_KEY=*** in ~/.hermes/.env, not in this file.
+
+providers:
+  chutes:
+    name: Chutes
     base_url: https://llm.chutes.ai/v1
     key_env: CHUTES_API_KEY
-    api_mode: chat_completions
-    model: default
+    transport: chat_completions
+    default_model: default:latency
+    discover_models: true
+    models:
+      default: {}
+      "default:latency": {}
+      "default:throughput": {}
+
+model:
+  provider: custom:chutes
+  default: default:latency

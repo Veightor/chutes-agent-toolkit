@@ -4,7 +4,7 @@
 
 ## Why aliases
 
-A **model alias** is a stable semantic handle that points at a Chutes model or routing pool. Instead of hardcoding `deepseek-ai/DeepSeek-V3-0324` across your team, you define `interactive-fast` once and repoint it when a better model lands. Code does not change.
+A **model alias** is a stable semantic handle that points at a Chutes model or routing pool. Instead of hardcoding `deepseek-ai/DeepSeek-V3.2-TEE` across your team, you define `interactive-fast` once and repoint it when a better model lands. Code does not change. (The entire non-TEE catalog was removed between April and June 2026 — every hardcoded non-TEE ID broke; aliases just needed a repoint.)
 
 Aliases encode policy ("our fast lane = X") in one place, which is the single most useful operational primitive Chutes offers.
 
@@ -13,10 +13,10 @@ Aliases encode policy ("our fast lane = X") in one place, which is the single mo
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/model_aliases/` | List aliases (yours + any public ones) |
-| `POST` | `/model_aliases/` | Create an alias (`{"alias": "...", "model": "..."}`) |
+| `POST` | `/model_aliases/` | Create an alias (`{"alias": "...", "chute_ids": ["<chute_uuid>", ...]}` — the openapi `ModelAliasCreate` schema requires `chute_ids`, verified 2026-06-11; there is no `model` field) |
 | `DELETE` | `/model_aliases/{alias}` | Remove an alias |
 
-Bearer auth with `cpk_`, same as the rest of `api.chutes.ai`.
+Bearer auth with `cpk_`, same as the rest of `api.chutes.ai` (GET verified live 2026-06-11).
 
 ## Recommended alias packs
 
@@ -61,7 +61,7 @@ Or standalone:
 
 ```bash
 python plugins/chutes-ai/skills/chutes-deploy/scripts/alias_deploy.py \
-  --alias interactive-fast --model myuser/qwen3-8b
+  --alias interactive-fast --chute-id <chute_uuid>
 ```
 
 Or from any MCP client via `chutes_set_alias` (a **[BETA]** write tool).

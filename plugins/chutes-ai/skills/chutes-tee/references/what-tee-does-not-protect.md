@@ -1,6 +1,6 @@
 # What TEE (honestly) does not protect
 
-> When a chute advertises `confidential_compute: true`, prompts and responses run inside an Intel TDX enclave on a Hopper GPU with NVIDIA confidential compute enabled. That's a real property — but it's not "my data is safe." Here's what it doesn't guarantee.
+> When a chute advertises `confidential_compute: true`, prompts and responses run inside an Intel TDX trust domain with NVIDIA GPU confidential compute enabled — on Hopper (H200) or Blackwell (B200/B300/RTX Pro 6000) hardware per the platform's published measurement classes (live evidence returned `arch: BLACKWELL` as of 2026-06-11). Chutes' security-architecture docs describe NVIDIA Protected PCIe (PPCIE) securing the CPU-to-GPU channel (reported from docs; unverified as of 2026-06-11). That's a real property — but it's not "my data is safe." Here's what it doesn't guarantee.
 
 ## What TEE does protect
 
@@ -44,10 +44,10 @@ If `chutes-tee` reports `verdict: shape-valid` instead of `verdict: verified`, t
 
 TEE is necessary but not sufficient for "privacy-preserving AI inference." Pair with:
 
-- **Known-good `mrtd` reference** captured at deploy time, with monitoring alerts on drift.
+- **Known-good `mrtd` reference** — compare against Chutes' published golden measurement sets (`GET /servers/tee/measurements`, public; verified 2026-06-11) and/or capture your own at deploy time, with monitoring alerts on drift.
 - **Attestation verification on every session** (not cached), to prevent time-of-check-to-time-of-use drift.
 - **Strict scope on what enters the prompt** — TEE doesn't save you from a prompt containing something it shouldn't.
-- **End-to-end encryption of the prompt/response** at the application layer if your threat model includes network intermediaries.
+- **End-to-end encryption of the prompt/response** at the application layer if your threat model includes network intermediaries. Chutes has announced post-quantum end-to-end encrypted inference (blog 2026-03-26) and the management API exposes `/encrypted_logs/*` and `/e2e/*` endpoint groups, but those flows are not covered by this skill (unverified as of 2026-06-11).
 
 ## The one thing TEE absolutely guarantees (when verified)
 

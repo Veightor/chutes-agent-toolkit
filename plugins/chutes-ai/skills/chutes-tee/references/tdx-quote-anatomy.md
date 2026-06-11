@@ -4,7 +4,7 @@
 
 ## Quote envelope
 
-A Chutes evidence record contains a base64-encoded quote that decodes to **~5000 bytes** for TDX v4 with GPU co-attestation. The envelope is:
+A Chutes evidence record contains a base64-encoded quote that decodes to **~5200 bytes** (5243 bytes on the 2026-06-11 live probe) for TDX v4 with GPU co-attestation. The envelope is:
 
 ```
 | Quote Header   (48 bytes)  |
@@ -27,7 +27,7 @@ The auth data contains the ECDSA signature + the signing key + the QE (quoting e
 | 12 | `qe_vendor_id` | 16 bytes | Intel QE vendor id |
 | 28 | `user_data` | 20 bytes | Vendor-specific |
 
-Wave-2 parse against a live Chutes TEE chute confirmed `version=4, att_key_type=2, tee_type=0x81`. `verify_quote.py` extracts and prints these.
+Live parses against a Chutes TEE chute (wave-2 2026-04-13, re-verified 2026-06-11) confirmed `version=4, att_key_type=2, tee_type=0x81`. `verify_quote.py` extracts and prints these.
 
 ## TD report body (584 bytes, starting at offset 48)
 
@@ -51,9 +51,9 @@ This is the core — the measurements that prove what ran inside the TD.
 | 472 | `rtmr[3]` | 48 bytes | Runtime measurement 3 |
 | 520 | `report_data` | 64 bytes | User-controlled — **nonce commitment lives here** |
 
-The **`report_data`** field is where the caller's nonce (what `fetch_evidence.py` supplies as `?nonce=...`) is committed into the quote. A valid quote's `report_data` must incorporate the nonce; otherwise the attestation can be replayed. `verify_quote.py --check-nonce` performs this check.
+The **`report_data`** field is where the caller's nonce (what `fetch_evidence.py` supplies as `?nonce=...`) is committed into the quote. A valid quote's `report_data` must incorporate the nonce; otherwise the attestation can be replayed. The bundled scripts extract and print `report_data` but do **not** verify the binding (no `--check-nonce` flag exists as of 2026-06-11). Live check 2026-06-11: `report_data` is not the literal nonce hex nor a plain SHA-256/384 of the nonce bytes — the commitment derivation is undocumented (unverified as of 2026-06-11), so a real binding check needs Chutes' scheme.
 
-**`mrtd`** is the measurement of the trust domain — effectively a hash of what code is running inside the TD. Change the code, and `mrtd` changes. Auditors typically capture a reference `mrtd` for a known-good release and alert on drift.
+**`mrtd`** is the measurement of the trust domain — effectively a hash of what code is running inside the TD. Change the code, and `mrtd` changes. Chutes publishes golden `mrtd` + RTMR sets per server class at `GET /servers/tee/measurements` (public; verified 2026-06-11) — compare against those, and/or capture a reference `mrtd` for a known-good release and alert on drift.
 
 ## Auth data (variable)
 
@@ -84,4 +84,4 @@ Those belong to full-crypto mode, which requires DCAP.
 
 - Intel DCAP docs: <https://download.01.org/intel-sgx/latest/dcap-latest/linux/docs/>
 - TDX v4 spec sections on attestation quote layout.
-- NVIDIA Hopper Confidential Compute attestation: <https://docs.nvidia.com/confidential-computing/>
+- NVIDIA Confidential Compute attestation (Hopper and Blackwell): <https://docs.nvidia.com/confidential-computing/>

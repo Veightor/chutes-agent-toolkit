@@ -52,7 +52,7 @@ Rule of thumb: cap by cost for cost-sensitive use cases; leave the pool mixed fo
 
 ## Discount interaction
 
-Wave-2 live probe showed `/users/me/discounts` returned `[]` on the test account (no active discounts). Scripts handle empty gracefully. When discounts exist, they look roughly like:
+Live probes (wave-2, re-checked 2026-06-11) show `/users/me/discounts` returns `[]` on the test account (no active discounts). Scripts handle empty gracefully. When discounts exist, they look roughly like:
 
 ```json
 [
@@ -73,7 +73,7 @@ The `scope` field is important. `"research-endpoint"` means the 25% Harvard rese
 
 ```json
 [
-  {"model": "deepseek-ai/DeepSeek-V3-0324", "prompt": 0.05, "completion": 0.15}
+  {"model": "deepseek-ai/DeepSeek-V3.2-TEE", "prompt": 0.05, "completion": 0.15}
 ]
 ```
 
@@ -82,6 +82,6 @@ Power users who have negotiated overrides should set `--apply-overrides` on `bui
 ## Watch-outs
 
 - **Cache-hit pricing is invisible pre-request.** You see `pricing.input_cache_read`, but whether a given prompt will hit the cache is not knowable from the routing layer. Assume worst case (`pricing.prompt`) when budgeting.
-- **TEE chutes cost 2-5× non-TEE.** Don't blindly mix them into a cost-ranked pool unless you actually want TEE semantics — the cheap non-TEE member will dominate, and you lose the privacy property on most requests.
+- **TEE vs non-TEE cost mixing is currently moot on the hosted gateway.** As of 2026-06-11 all 13 gateway models are TEE (`confidential_compute: true`), so a cost-ranked pool can't accidentally lose the privacy property. The old caution stands only for pools that mix in self-deployed non-TEE chutes: the cheap non-TEE member will dominate a cost-ranked pool and you lose TEE semantics on most requests.
 - **Pool cost rankings rot.** Chutes reprices models; a pool that was cheap last quarter may not be today. `audit_pool.py` catches this if you run it monthly.
 - **Cost != bill.** Pool construction caps per-token costs at selection time; it does **not** enforce a per-day spend cap. Hard spend limits are `chutes-usage-and-billing`'s job.

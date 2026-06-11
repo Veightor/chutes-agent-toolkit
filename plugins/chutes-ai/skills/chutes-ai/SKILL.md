@@ -1,13 +1,13 @@
 ---
 name: chutes-ai
-description: "Chutes.ai hub skill — the entry point for decentralized open-source AI inference on Chutes. Use this skill when a user mentions Chutes, chutes.ai, decentralized AI, DeepSeek/Llama/Qwen API access, serverless GPU inference, or wants to register, manage API keys, discover models, or make OpenAI-compatible inference calls. This is the hub: it handles the session credential check, account lifecycle, API key lifecycle, basic inference, and routes to sibling skills (chutes-sign-in, chutes-deploy, chutes-mcp-portability, chutes-routing, chutes-usage-and-billing, chutes-platform-ops, chutes-agent-registration) for everything else."
+description: "Chutes.ai hub skill — the entry point for decentralized open-source AI inference on Chutes. Use this skill when a user mentions Chutes, chutes.ai, decentralized AI, DeepSeek/Qwen/Kimi/GLM API access, TEE or confidential-compute inference, serverless GPU inference, or wants to register, manage API keys, discover models, or make OpenAI-compatible inference calls. This is the hub: it handles the session credential check, account lifecycle, API key lifecycle, basic inference, and routes to sibling skills (chutes-sign-in, chutes-deploy, chutes-mcp-portability, chutes-routing, chutes-usage-and-billing, chutes-platform-ops, chutes-agent-registration) for everything else."
 ---
 
 # Chutes.ai — Hub Skill (four product lanes)
 
 This skill is the **hub** for Chutes.ai integration. It covers the "Use Chutes" lane end-to-end (account → API keys → models → inference) and routes to sibling skills for the other three lanes.
 
-Chutes provides OpenAI-compatible inference for top open-source models (DeepSeek, Llama, Qwen, and many more) on decentralized GPU infrastructure. Many models are free or very cheap. Any tool that talks to OpenAI can point at Chutes instead.
+Chutes provides OpenAI-compatible inference for top open-source models (DeepSeek, Qwen, Kimi, GLM, Gemma, MiniMax, Nemotron) on decentralized GPU infrastructure, very cheaply. As of 2026-06-11 the entire hosted LLM catalog runs in TEEs (confidential compute) — every model on `/v1/models` has `confidential_compute: true`. There are no Llama models on the platform. Any tool that talks to OpenAI can point at Chutes instead.
 
 ## Four product lanes
 
@@ -18,7 +18,7 @@ Chutes provides OpenAI-compatible inference for top open-source models (DeepSeek
 | **Operate on Chutes** | Model aliases, usage/quota/billing, secret rotation, token lifecycle | `chutes-routing` / `chutes-usage-and-billing` / `chutes-platform-ops` (wave 2 stubs) |
 | **Run agents with Chutes** | Claude / Hermes / Cursor / Aider via MCP + drop-in configs | `chutes-mcp-portability` **[BETA]** |
 
-Plus: deploying your own chutes (vLLM / diffusion / custom CDK / teeify) lives in `chutes-deploy` **[BETA]**, and agent-native self-onboarding lives in `chutes-agent-registration` (wave 2 stub).
+Plus: deploying your own chutes (vLLM / diffusion / custom CDK / TEE via `tee=True`) lives in `chutes-deploy` **[BETA]**, TEE attestation verification lives in `chutes-tee`, and agent-native self-onboarding lives in `chutes-agent-registration` (wave 2 stub).
 
 ## Skill router — when to hand off
 
@@ -27,7 +27,7 @@ Hand off to the matching sibling skill immediately when the user says anything i
 | Hand off to | User intent |
 |---|---|
 | `chutes-sign-in` | "Add Sign in with Chutes to my app", OAuth app, `/idp/apps`, PKCE, `cid_`/`csc_`, rotate client secret, scopes, Next.js auth |
-| `chutes-deploy` | Deploy a model on Chutes, vLLM chute, diffusion chute, build a chute image, teeify, rolling updates, `POST /chutes/`, `POST /images/` |
+| `chutes-deploy` | Deploy a model on Chutes, vLLM chute, diffusion chute, build a chute image, TEE deploy (`tee=True`), rolling updates, `POST /chutes/`, `POST /images/` |
 | `chutes-mcp-portability` | Use Chutes from Cursor / Cline / Aider / Hermes / Claude Desktop, MCP server, drop-in config, make Chutes available to another agent |
 | `chutes-routing` (stub) | `default:latency`, `default:throughput`, inline model pools, stable model aliases, routing recipes, cost-aware routing |
 | `chutes-usage-and-billing` (stub) | Chutes spend, quotas, discounts, subscription usage, payment history, invocation stats |
@@ -66,13 +66,12 @@ Two base URLs:
 | Account management (keys, billing, chutes, `/idp/*`) | `https://api.chutes.ai` |
 | Inference (OpenAI-like request/response shape) | `https://llm.chutes.ai/v1` |
 
-Wave-3 live auth finding (verified 2026-04-15): auth differs by surface.
-- Inference worked with `X-API-Key: cpk_...`
-- Bearer auth with a `cpk_...` key returned 401 on live `/v1/models` and `/v1/chat/completions` tests
-- Management endpoints like `/users/me` worked with the JWT returned by `POST /users/login` (fingerprint)
-- CLI CRUD endpoints like `GET /api_keys/` worked with hotkey-signed headers, not `cpk_...`
-
-Do not assume one auth header works everywhere.
+Auth (re-verified live 2026-06-11 — this **reverses** the April 2026 finding):
+- **`Authorization: Bearer cpk_...` is the universal header.** Verified 200 on `GET llm.chutes.ai/v1/models` AND on management GETs (`/users/me`, `/model_aliases/`) at `api.chutes.ai`. It is also the header the platform's own `ai-plugin.json` and `llms.txt` document.
+- `X-API-Key` returns **401 on `api.chutes.ai`** management endpoints. On the inference surface it appears to "work" only because `/v1/models` is now public (200 with no auth at all); the platform's llms.txt states `X-API-Key` is silently ignored on inference and falls through to the anonymous path. **Do not use `X-API-Key`.**
+- `GET /v1/models` requires no auth (verified 2026-06-11).
+- The fingerprint-login JWT is no longer needed for `GET /users/me` — a plain Bearer `cpk_` key works.
+- CLI CRUD endpoints like `GET /api_keys/` used hotkey-signed headers in April 2026 testing (not re-verified as of 2026-06-11).
 
 ---
 
@@ -168,18 +167,21 @@ Security details live in `references/api-reference.md` and `docs/credential-stor
 
 ```
 GET https://llm.chutes.ai/v1/models
-X-API-Key: cpk_...
+Authorization: Bearer cpk_...   # optional — endpoint is public (verified 2026-06-11)
 ```
 
-Each model exposes `id`, `root`, `chute_id`, `confidential_compute` (boolean — **use this, not the `-TEE` suffix**, as source of truth), `owned_by` (`sglang` / `vllm`), `pricing.{prompt,completion,input_cache_read}` (USD per 1M tokens), `context_length`, `max_output_length`, `supported_features` (`tools`, `json_mode`, `structured_outputs`, `reasoning`), `supported_sampling_parameters`, `input_modalities`, `output_modalities`, `quantization`.
+As of 2026-06-11 the catalog is **13 LLMs, all TEE** (`confidential_compute: true`, `-TEE` suffixed IDs). Each model exposes `id`, `root`, `chute_id`, `confidential_compute` (boolean — **use this, not the `-TEE` suffix**, as source of truth), `owned_by` (`sglang` / `vllm`), `pricing.{prompt,completion,input_cache_read}` (USD per 1M tokens), `context_length`, `max_output_length`, `supported_features` (`tools`, `json_mode`, `structured_outputs`, `reasoning`), `supported_sampling_parameters`, `input_modalities`, `output_modalities`, `quantization`.
 
 Chutes hosts more than LLMs: **image, video, TTS (54 voices / 9 languages), STT, music, moderation, and custom inference.**
 
 Quick static reference: `references/known-models.md`. Always query the live endpoint for authoritative data.
 
-When helping users choose:
-- **Task** → DeepSeek-R1 (reasoning), DeepSeek-V3 / Llama / Qwen (chat), specialized code models.
-- **Privacy** → filter `confidential_compute: true`.
+When helping users choose (live catalog as of 2026-06-11):
+- **Frontier coding/agentic** → `moonshotai/Kimi-K2.6-TEE` or `zai-org/GLM-5.1-TEE`; budget → `MiniMaxAI/MiniMax-M2.5-TEE`.
+- **Reasoning** → `zai-org/GLM-5.1-TEE`, `nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-TEE`; budget → `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE`.
+- **Cheap-fast chat** → `google/gemma-4-31B-turbo-TEE`; absolute cheapest → `unsloth/Mistral-Nemo-Instruct-2407-TEE`.
+- **Vision/multimodal** → `moonshotai/Kimi-K2.6-TEE` (text+image+video), `Qwen/Qwen3.5-397B-A17B-TEE`, `google/gemma-4-31B-turbo-TEE`.
+- **Privacy** → everything: all hosted LLMs are `confidential_compute: true` now.
 - **Cost** → `pricing.prompt`, `pricing.completion`, cache hits via `pricing.input_cache_read`.
 - **Features** → `supported_features` (not every model has tools / structured output).
 - **Context** → match `context_length`.
@@ -188,25 +190,23 @@ When helping users choose:
 
 ## Step 4: Making Inference Calls
 
-Chutes uses OpenAI-like request/response shapes on the inference surface, but live auth currently differs from OpenAI SDK defaults.
+Chutes uses OpenAI-like request/response shapes on the inference surface, and auth now matches OpenAI SDK defaults.
 
-Verified live 2026-04-15:
-- `X-API-Key: cpk_...` worked for inference
-- Bearer auth with a `cpk_...` key returned 401 on `/v1/models` and `/v1/chat/completions`
+Verified live 2026-06-11 (reverses the April 2026 finding):
+- `Authorization: Bearer cpk_...` returned 200 on `/v1/models` and is the header the platform documents (ai-plugin.json, llms.txt) for all of `llm.chutes.ai/v1`
+- `X-API-Key` is silently ignored on the inference surface per llms.txt — unauthenticated requests fall to the anonymous path
 
-So for direct HTTP calls, use `X-API-Key`.
+So use standard `Authorization: Bearer` everywhere. Generic OpenAI SDKs that hardcode Bearer work as-is — just set `base_url="https://llm.chutes.ai/v1"` and `api_key="cpk_..."`. (Bearer on `POST /v1/chat/completions` itself was not re-exercised in the 2026-06-11 read-only verification run, but it is the platform-documented header and verified on `/v1/models`.)
 
-For generic OpenAI SDKs that hardcode `Authorization: Bearer`, treat Chutes as **conditionally compatible** until the platform accepts Bearer `cpk_...` on the inference surface.
-
-**Python (raw HTTP until Bearer `cpk_...` is accepted live):**
+**Python:**
 ```python
 import requests
 
 response = requests.post(
     "https://llm.chutes.ai/v1/chat/completions",
-    headers={"X-API-Key": "cpk_...", "Content-Type": "application/json"},
+    headers={"Authorization": "Bearer cpk_...", "Content-Type": "application/json"},
     json={
-        "model": "deepseek-ai/DeepSeek-V3-0324",
+        "model": "deepseek-ai/DeepSeek-V3.2-TEE",
         "messages": [{"role": "user", "content": "Hello!"}],
     },
     timeout=60,
@@ -218,21 +218,21 @@ print(response.json()["choices"][0]["message"]["content"])
 **cURL:**
 ```bash
 curl https://llm.chutes.ai/v1/chat/completions \
-  -H "X-API-Key: cpk_..." \
+  -H "Authorization: Bearer cpk_..." \
   -H "Content-Type: application/json" \
-  -d '{"model":"deepseek-ai/DeepSeek-V3-0324","messages":[{"role":"user","content":"Hello!"}]}'
+  -d '{"model":"deepseek-ai/DeepSeek-V3.2-TEE","messages":[{"role":"user","content":"Hello!"}]}'
 ```
 
-**Node (raw fetch until Bearer `cpk_...` is accepted live):**
+**Node:**
 ```javascript
 const response = await fetch('https://llm.chutes.ai/v1/chat/completions', {
   method: 'POST',
   headers: {
-    'X-API-Key': 'cpk_...',
+    'Authorization': 'Bearer cpk_...',
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({
-    model: 'deepseek-ai/DeepSeek-V3-0324',
+    model: 'deepseek-ai/DeepSeek-V3.2-TEE',
     messages: [{ role: 'user', content: 'Hello!' }],
   }),
 });
@@ -246,7 +246,7 @@ Different engines (`sglang` vs `vllm`) accept different sampling params — chec
 
 Pass a comma-separated model list as `model` for sequential failover, append `:latency` or `:throughput` to rank by live metrics:
 ```
-model="zai-org/GLM-5-Turbo,zai-org/GLM-4.7-TEE,Qwen/Qwen3-32B-TEE:latency"
+model="zai-org/GLM-5.1-TEE,moonshotai/Kimi-K2.6-TEE,Qwen/Qwen3-32B-TEE:latency"
 ```
 
 Saved pools via the dashboard use `default`, `default:latency`, `default:throughput`. For routing recipes, stable aliases, and cost-aware routing, hand off to the `chutes-routing` skill (wave 2 stub — use the MCP tools meanwhile).
@@ -257,10 +257,10 @@ Saved pools via the dashboard use `default`, `default:latency`, `default:through
 
 ```
 GET https://api.chutes.ai/users/me
+Authorization: Bearer cpk_...
 ```
-Use the JWT returned by `POST /users/login` (fingerprint) for this endpoint.
 
-Live finding: `cpk_...` did not work against `/users/me`; Bearer JWT did.
+Live finding (verified 2026-06-11): a plain Bearer `cpk_...` key now works on `/users/me` — the fingerprint-login JWT workaround is no longer needed for this read. `X-API-Key` returns 401 here.
 
 Returns `username`, `user_id`, `balance` (USD), `payment_address` (Bittensor SS58), `hotkey`/`coldkey`, `quotas`, `permissions`.
 
@@ -270,12 +270,12 @@ For anything beyond a balance check — discounts, quotas by chute, subscription
 
 ## Special features (one-line summaries, deep content in siblings)
 
-- **TEE (confidential compute).** Models with `confidential_compute: true` run in Intel TDX. Attestation evidence: `GET /chutes/{chute_id}/evidence`. Full verification flow is wave 2.
+- **TEE (confidential compute).** As of 2026-06-11 **every** hosted LLM runs in Intel TDX (`confidential_compute: true`). Attestation evidence: `GET /chutes/{chute_id}/evidence?nonce=<64 hex chars>` — the nonce query param is required and must be exactly 64 hex characters (32 bytes). Golden TEE measurements: `GET /servers/tee/measurements` (unverified as of 2026-06-11). See the `chutes-tee` skill for the verification flow.
 - **Harvard research endpoint (25% off).** Drop-in replacement base URL `https://research-data-opt-in-proxy.chutes.ai/v1`. Trade-off: prompts/responses are recorded for research. Do not send sensitive data.
 - **Cache hit pricing.** Repeated prompts transparently hit the cache and pay `pricing.input_cache_read`.
 - **Sign in with Chutes.** OAuth 2.0 + PKCE. `POST /idp/apps`, `cid_` / `csc_` returned. Full integrator flow lives in `chutes-sign-in`.
 - **Model aliases.** Stable semantic handles via `/model_aliases/`. Recommended packs (`interactive-fast`, `private-reasoning`, `cheap-background`, `agent-coder`, `tee-chat`) live in `chutes-routing` stub; create one with `chutes-deploy` → `alias_deploy.py` **[BETA]**.
-- **Custom deployment.** `chutes-deploy` **[BETA]** covers vLLM / diffusion / teeify / rolling updates.
+- **Custom deployment.** `chutes-deploy` **[BETA]** covers vLLM / diffusion / TEE (`tee=True` template kwarg — there is no "teeify" command in the SDK) / rolling updates. The pricing page now advertises self-serve private TEE deployments (RTX Pro 6000 96GB Blackwell, $1.80/hr + one-time deploy fee of 3x the hourly rate) **[BETA]** (unverified as of 2026-06-11).
 
 ---
 
@@ -304,7 +304,9 @@ For anything beyond a balance check — discounts, quotas by chute, subscription
 | Discounts | GET | `https://api.chutes.ai/users/me/discounts` |
 | List / create model alias | GET / POST | `https://api.chutes.ai/model_aliases/` |
 | OAuth app create | POST | `https://api.chutes.ai/idp/apps` |
-| Chute TEE evidence | GET | `https://api.chutes.ai/chutes/{id}/evidence` |
+| Chute TEE evidence | GET | `https://api.chutes.ai/chutes/{id}/evidence?nonce=<64-hex>` |
+| Platform pricing (public, incl. live TAO/USD rate) | GET | `https://api.chutes.ai/pricing` |
+| Subscription usage | GET | `https://api.chutes.ai/users/me/subscription_usage` |
 
 Everything else: see `references/api-reference.md` or `https://api.chutes.ai/openapi.json`.
 

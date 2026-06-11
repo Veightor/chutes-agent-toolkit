@@ -1,6 +1,6 @@
 # Sign in with Chutes — Express **[STUB — upstream pending]**
 
-> **Status: STUB.** The upstream `chutesai/Sign-in-with-Chutes` repository does not yet ship an Express adapter. This skill refuses to run the installer against Express projects until upstream lands.
+> **Status: STUB.** The upstream `chutesai/Sign-in-with-Chutes` repository does not yet ship an Express adapter (re-checked 2026-06-11: no commits upstream since 2025-12-29, still Next.js-only). This skill refuses to run the installer against Express projects until upstream lands.
 
 ## What to tell the user
 

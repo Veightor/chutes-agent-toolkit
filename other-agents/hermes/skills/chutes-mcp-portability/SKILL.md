@@ -10,9 +10,9 @@ metadata:
     status: beta
 ---
 
-# Chutes MCP + Portability for Hermes **[BETA]**
+# Chutes MCP + Portability for Hermes
 
-> **Status: BETA** — mirror of the Claude-plugin `chutes-mcp-portability` skill. BETA until a live MCP health check (`chutes_list_models` over stdio against a real `cpk_`) has been executed and recorded. Write / deploy tools stay BETA permanently under the deploy-features policy.
+> **Status: read tools verified live 2026-04-13.** `chutes-mcp-server --self-check` passed and 7 read tools were exercised against a real `cpk_`. The remaining unexercised read tools (`chutes_chat_complete`, `chutes_get_evidence`, `chutes_oauth_introspect`) stay BETA; all write/deploy tools stay permanent BETA under the deploy-features policy.
 
 ## When to use this skill
 
@@ -40,7 +40,14 @@ python plugins/chutes-ai/skills/chutes-mcp-portability/scripts/generate_agent_co
 chutes-mcp-server --self-check
 ```
 
-For Hermes specifically, the `--target hermes` path regenerates `other-agents/hermes/chutes-provider.yml` from a template that stays in sync with whatever the current Chutes inference API shape is. Run it again whenever this repo is updated.
+For Hermes specifically, the `--target hermes` path refreshes the YAML examples in `other-agents/hermes/config-examples/` from templates that stay in sync with the current Chutes inference API shape. Run it again whenever this repo is updated.
+
+Hermes can also connect to the MCP server directly:
+
+```bash
+hermes mcp add chutes --command chutes-mcp-server --env CHUTES_API_KEY=${CHUTES_API_KEY}
+hermes mcp test chutes
+```
 
 ## MCP tool surface
 

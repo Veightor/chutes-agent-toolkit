@@ -35,35 +35,45 @@ Do not treat static model snapshots as authoritative.
 
 ## Authentication
 
-Use a `cpk_...` API key via:
+Use a `cpk_...` API key. Store it as `CHUTES_API_KEY` in `~/.hermes/.env` or in this repo's keychain-backed credential manager; never paste the raw key into config examples or chat.
 
-Authorization: Bearer <token>
-
-For Hermes, a common setup is a named custom provider configured with `CHUTES_API_KEY`.
-
-Important live-auth caveat (verified 2026-04-15): Hermes custom providers typically send an Authorization Bearer header, while Chutes inference succeeded in live tests with X-API-Key using a `cpk_...` key and returned 401 for Bearer `cpk_...`. So the YAML below is the intended target shape, but may remain blocked until Chutes accepts Bearer `cpk_...` or Hermes supports overriding the auth header.
+Chutes auth was re-verified in the shared Chutes skills on 2026-06-11: use standard bearer authorization semantics (`Authorization: Bearer` plus the `cpk_...` value) for configured providers. `GET /v1/models` is public and should not be used as proof that a specific auth header works. Older April notes about `X-API-Key` are superseded for Hermes-facing setup.
 
 ## Hermes setup pattern
 
 Typical Hermes config:
 
 ```yaml
-custom_providers:
-  - name: Chutes
+providers:
+  chutes:
+    name: Chutes
     base_url: https://llm.chutes.ai/v1
     key_env: CHUTES_API_KEY
-    api_mode: chat_completions
-    model: default
+    transport: chat_completions
+    default_model: default:latency
+    discover_models: true
+    models:
+      default: {}
+      "default:latency": {}
+      "default:throughput": {}
+
+model:
+  provider: custom:chutes
+  default: default:latency
 ```
+
+Legacy Hermes configs may use `custom_providers:` with equivalent `name`, `base_url`, `key_env`, `api_mode`, and `model` fields.
 
 Optional research profile:
 
 ```yaml
-  - name: Chutes Research
+providers:
+  chutes-research:
+    name: Chutes Research Opt-In
     base_url: https://research-data-opt-in-proxy.chutes.ai/v1
     key_env: CHUTES_API_KEY
-    api_mode: chat_completions
-    model: default:latency
+    transport: chat_completions
+    default_model: default:latency
 ```
 
 ## Routing guidance
@@ -102,11 +112,16 @@ This skill is the Hermes-facing **hub**. For deeper capabilities, hand off to si
 
 | Lane | Skill | Status |
 |---|---|---|
-| **Build on Chutes** | `chutes-sign-in` — Sign in with Chutes (OAuth + PKCE), OAuth app CRUD, client secret rotation | **[BETA]** |
-| **Use Chutes — deploy** | `chutes-deploy` — vLLM / diffusion / custom CDK deploy, teeify, rolling updates | **[BETA]** |
-| **Run with Chutes** | `chutes-mcp-portability` — Chutes MCP server + drop-in configs for Cursor / Cline / Aider | **[BETA]** |
+| **Build on Chutes** | `chutes-sign-in` — Sign in with Chutes (OAuth + PKCE), OAuth app CRUD, client secret rotation | **BETA for dev-server verification** |
+| **Operate on Chutes** | `chutes-routing` — intent-based model pools, routing strings, alias audits | VERIFIED |
+| **Operate on Chutes** | `chutes-usage-and-billing` — read-only spend, quotas, discounts, exports | VERIFIED |
+| **Operate on Chutes** | `chutes-platform-ops` — OAuth fleet and alias ops | MIXED; token scripts BETA |
+| **Run agents with Chutes** | `chutes-deploy` — vLLM / diffusion / custom CDK deploy, teeify, rolling updates | **permanent BETA for deploy-side writes** |
+| **Run agents with Chutes** | `chutes-mcp-portability` — Chutes MCP server + drop-in configs for Hermes / Cursor / Cline / Aider | READ TOOLS VERIFIED; write tools BETA |
+| **Run agents with Chutes** | `chutes-agent-registration` — Bittensor-backed agent registration prep | **BETA** |
+| **Use/Verify Chutes** | `chutes-tee` — evidence fetch + TDX/GPU attestation parsing | SHAPE-VALID |
 
-Wave-2 stubs (`chutes-routing`, `chutes-usage-and-billing`, `chutes-platform-ops`, `chutes-agent-registration`) exist in the Claude plugin tree and will mirror here when their walkthroughs land.
+These Hermes skills are thin entry points. Shared scripts and deep references stay single-sourced under `plugins/chutes-ai/skills/`.
 
 ## Repo references
 

@@ -78,9 +78,12 @@ def check_session_route(base_url: str) -> tuple[int, str]:
 
 def introspect_token(token: str, expected_client_id: str) -> dict:
     bearer = api_key()
-    body = {"token": token}  # urlencoded form would be more correct
-    # Note: /idp/token/introspect is typically form-encoded per RFC 7662.
-    # Upstream may accept JSON; adjust in verified run.
+    body = {"token": token}
+    # KNOWN ISSUE (confirmed via openapi.json 2026-06-11): /idp/token/introspect
+    # declares application/x-www-form-urlencoded as its ONLY content type, per
+    # RFC 7662. This sends JSON and will likely be rejected. Fix to form-encoding
+    # during the next live verification run (step 5 has never been exercised —
+    # part of why this script stays [BETA]).
     return idp_request("POST", "/idp/token/introspect", bearer=bearer, body=body)
 
 

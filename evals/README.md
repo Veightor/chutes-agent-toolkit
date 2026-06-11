@@ -96,4 +96,6 @@ When an eval depends on current Chutes model inventory, pricing, TEE state, or c
 
 `https://llm.chutes.ai/v1/models`
 
+(Public — no auth required as of 2026-06-11. Note it carries pricing, `supported_features`, and `confidential_compute`, but **not** TTFT/TPS; per-model latency/throughput stats come from `GET https://api.chutes.ai/invocations/stats/llm`.)
+
 Static docs and snapshots in this repo are convenience references only.

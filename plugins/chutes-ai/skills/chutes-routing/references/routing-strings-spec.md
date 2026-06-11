@@ -1,6 +1,6 @@
 # Chutes Routing Strings — Spec
 
-> What the inference router actually accepts as the `model` parameter on `POST https://llm.chutes.ai/v1/chat/completions`. Behavior confirmed via live models, routing string suffixes confirmed via Chutes' dashboard UI.
+> What the inference router actually accepts as the `model` parameter on `POST https://llm.chutes.ai/v1/chat/completions`. Behavior confirmed via live models, routing string suffixes confirmed via Chutes' dashboard UI. As of 2026-06-11 the `default` / `default:latency` / `default:throughput` / inline-list forms are also documented in Chutes' own `https://chutes.ai/llms.txt` (routing behavior on completions not re-exercised this run — paid endpoint).
 
 ## Grammar (summary)
 
@@ -48,20 +48,22 @@ strategy        := "latency"
 
 ```python
 # 1. Single model, no routing
-model="deepseek-ai/DeepSeek-V3-0324"
+model="deepseek-ai/DeepSeek-V3.2-TEE"
 
 # 2. Saved alias (preferred for production)
 model="interactive-fast"
 
 # 3. Inline failover
-model="zai-org/GLM-5-Turbo,Qwen/Qwen3-32B-TEE,deepseek-ai/DeepSeek-V3-0324"
+model="google/gemma-4-31B-turbo-TEE,Qwen/Qwen3-32B-TEE,deepseek-ai/DeepSeek-V3.2-TEE"
 
 # 4. Inline with latency ranking
-model="zai-org/GLM-5-Turbo,Qwen/Qwen3-32B-TEE,deepseek-ai/DeepSeek-V3-0324:latency"
+model="google/gemma-4-31B-turbo-TEE,Qwen/Qwen3-32B-TEE,deepseek-ai/DeepSeek-V3.2-TEE:latency"
 
 # 5. Alias with throughput ranking
 model="cheap-background:throughput"
 ```
+
+(Model ids refreshed against live `/v1/models` 2026-06-11 — the earlier examples used `deepseek-ai/DeepSeek-V3-0324` and `zai-org/GLM-5-Turbo`, both since removed from the catalog.)
 
 ## Inline vs alias — which to pick
 

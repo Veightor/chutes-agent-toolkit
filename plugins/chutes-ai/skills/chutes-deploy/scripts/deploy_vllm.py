@@ -37,16 +37,26 @@ import urllib.request
 from _common import api_key, idp_request
 
 
-SHA_RE = re.compile(r"^[0-9a-f]{7,40}$")
+# Chutes' API enforces revision against ^[a-fA-F0-9]{40}$ — a FULL 40-hex commit
+# SHA. Branch names AND short SHAs are rejected with "Invalid revision specified."
+# (verified server-side in the chutes-api schema, 2026-06-11)
+SHA_RE = re.compile(r"^[0-9a-fA-F]{40}$")
+SHORT_HEX_RE = re.compile(r"^[0-9a-fA-F]{7,39}$")
 
 
 def resolve_hf_revision(model: str, revision: str) -> str:
     """Turn a branch name like 'main' into the current commit SHA on Hugging Face.
 
-    Chutes' /chutes/vllm endpoint requires a pinned commit SHA, not a branch name.
+    Chutes' /chutes/vllm endpoint requires a pinned FULL 40-hex commit SHA —
+    branch names and short SHAs are both rejected (verified 2026-06-11).
     """
     if SHA_RE.match(revision or ""):
         return revision
+    if SHORT_HEX_RE.match(revision or ""):
+        raise RuntimeError(
+            f"revision {revision!r} looks like a short commit SHA; Chutes requires "
+            "the full 40-hex SHA. Pass --revision with the full SHA."
+        )
     url = f"https://huggingface.co/api/models/{model}"
     try:
         with urllib.request.urlopen(url, timeout=15) as resp:
@@ -177,7 +187,8 @@ def main() -> int:
     p.add_argument("--dry-run", action="store_true", help="Print the body and exit")
     args = p.parse_args()
 
-    # Auto-resolve branch name → commit SHA; Chutes rejects branch names.
+    # Auto-resolve branch name → full 40-hex commit SHA; Chutes rejects branch
+    # names and short SHAs (^[a-fA-F0-9]{40}$, verified 2026-06-11).
     try:
         resolved = resolve_hf_revision(args.model, args.revision)
     except RuntimeError as e:

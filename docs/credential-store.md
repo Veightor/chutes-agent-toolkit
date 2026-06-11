@@ -22,6 +22,7 @@ Secret fields:
 - `fingerprint`
 - `client_id`
 - `client_secret`
+- `app_id` (OAuth app UUID; added in wave 2 — `chutes-sign-in` secret rotation targets `app_id`, not `client_id`)
 
 Non-secret metadata:
 - `username`
@@ -129,9 +130,11 @@ Environment variables have highest priority for secret retrieval.
 Supported overrides:
 - `CHUTES_API_KEY`
 - `CHUTES_FINGERPRINT`
-- `CHUTES_CLIENT_ID`
-- `CHUTES_CLIENT_SECRET`
+- `CHUTES_OAUTH_CLIENT_ID` (preferred; matches SIWC upstream naming) / `CHUTES_CLIENT_ID` (legacy alias, still accepted)
+- `CHUTES_OAUTH_CLIENT_SECRET` (preferred) / `CHUTES_CLIENT_SECRET` (legacy alias, still accepted)
 - `CHUTES_PROFILE`
+
+There is no env override for `app_id`; it is read from the stored profile.
 
 Implications:
 - CI/CD can inject secrets without writing them to disk
@@ -167,7 +170,7 @@ python manage_credentials.py check
 python manage_credentials.py get --field api_key
 ```
 
-3. Use the credential in API headers, not in conversation text.
+3. Use the credential in API headers, not in conversation text. Send it as `Authorization: Bearer cpk_...` — this works on both `llm.chutes.ai` and `api.chutes.ai` (verified live 2026-06-11; `X-API-Key` returns 401 on the management API).
 
 4. If no credentials exist, walk through account/API key setup, then immediately save them with `set-profile`.
 

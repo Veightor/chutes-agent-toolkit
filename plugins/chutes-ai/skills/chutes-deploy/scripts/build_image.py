@@ -19,6 +19,9 @@ Exit codes:
   1 bad input
   2 Chutes API error or build failure
 
+Note: the platform requires >= $50 account balance to build images (per the
+official SDK README, verified 2026-06-11 — not exercised live this run).
+
 Note: multipart upload uses urllib.request manually to avoid a third-party
 dependency. If the repo adopts httpx or requests, migrate this to that.
 """

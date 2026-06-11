@@ -2,9 +2,11 @@
 """Create or update a stable model alias on Chutes.ai. [BETA]
 
 Usage:
-  python alias_deploy.py --alias interactive-fast --model myuser/qwen3-8b
-  python alias_deploy.py --alias tee-chat --model deepseek-ai/DeepSeek-V3-0324-TEE --replace
+  python alias_deploy.py --alias interactive-fast --chute-id <chute_uuid>
+  python alias_deploy.py --alias tee-chat --chute-id <uuid1> --chute-id <uuid2> --replace
 
+Aliases point at chute UUIDs (a list, for failover pools) — POST /model_aliases/
+with {alias, chute_ids}. Live GET /model_aliases/ re-verified 2026-06-11.
 Aliases are listed + recommended in:
   plugins/chutes-ai/skills/chutes-ai/references/model-aliases.md
 

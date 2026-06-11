@@ -33,6 +33,11 @@ from _common import get_secret
 
 # Pin an upstream commit here to guarantee reproducibility.
 # TODO(beta): pin to a verified SHA during the first live verification run.
+# Upstream status (checked 2026-06-11): dormant since 2025-12-29, no releases or
+# tags, so "main" is currently stable in practice. Caveat: the final upstream
+# commit points chat completions at lm.chutes.ai; the canonical inference base
+# is llm.chutes.ai (lm.chutes.ai returned 401 on /v1/models when probed
+# 2026-06-11). After vendoring, grep the copied files for "lm.chutes.ai".
 SIWC_REPO = "https://github.com/chutesai/Sign-in-with-Chutes.git"
 SIWC_PINNED_REF = "main"
 CACHE_DIR = Path.home() / ".chutes" / "cache" / "siwc"

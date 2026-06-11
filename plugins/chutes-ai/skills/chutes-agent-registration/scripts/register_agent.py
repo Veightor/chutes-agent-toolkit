@@ -20,7 +20,9 @@ implications.
 
 What a live run does:
   1. POST /users/agent_registration with {hotkey, coldkey, signature}.
-  2. Poll GET /users/agent_registration/{hotkey} every 5s until ready.
+  2. Poll GET /users/agent_registration/{hotkey} every 5s until the status
+     is "completed" (live-observed terminal value, 2026-06-11) or a
+     user_id appears.
   3. POST /users/{user_id}/agent_setup to finalize.
   4. Write returned api_key / fingerprint to the keychain under --profile.
   5. Print redacted previews — NEVER raw secret values.
@@ -124,7 +126,9 @@ def main() -> int:
             continue
         state = status.get("status")
         print(f"  poll: {state}")
-        if state == "ready" or status.get("user_id"):
+        # "completed" is the live-observed terminal status (2026-06-11);
+        # "ready" kept for backward compatibility with older API releases.
+        if state in ("completed", "ready") or status.get("user_id"):
             break
         if state == "error":
             print(f"  registration failed: {status.get('detail', '')}", file=sys.stderr)

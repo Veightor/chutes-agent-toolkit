@@ -7,7 +7,9 @@ requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Vincent Bontempo", email = "bontempo.vincent@gmail.com" }]
 dependencies = [
-    "mcp>=1.0.0",
+    # FastMCP import path (`mcp.server.fastmcp`) is the 1.x location; mcp 2.0.0a1
+    # exists on PyPI as of 2026-06-11 and 2.x compatibility is unverified, so cap at <2.
+    "mcp>=1.2,<2",
 ]
 
 [project.scripts]

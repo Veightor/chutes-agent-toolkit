@@ -6,6 +6,12 @@
 
 Start with the smallest scope set that makes your app usable. Add scopes only when a feature actually requires them. Users see the scopes on the consent screen — long lists spook them.
 
+## Live scope list (verified 2026-06-11 via `GET /idp/scopes`)
+
+`profile`/`profile:read`, `balance`/`balance:read`, `billing:read`, `quota`/`quota:read`, `usage`/`usage:read`, `account:read` (full account details incl. quotas, discounts, pricing), `account:write`, `secrets:read`/`secrets:write`, `chutes:read`/`chutes:write`/`chutes:delete`, `chutes:invoke`, `images:read`/`images:write`/`images:delete`, `invocations:read`, `admin` (never request for a relying party).
+
+Caveats: `openid` is not in the live list or the discovery document's `scopes_supported` even though platform docs call it the required base scope — keep sending it (behavior unverified as of 2026-06-11). Platform docs also describe a per-chute `chutes:invoke:{chute_id}` scope for single-model apps (unverified as of 2026-06-11). Full table: the skill-side cookbook below.
+
 ## Recipes
 
 ### 1. Auth-only (minimal)
@@ -33,6 +39,11 @@ Usage / spend / quota dashboards. You're showing the user how much of *their* ba
 
 Your app uses Chutes purely as an identity provider. No `chutes:invoke` means the issued token will be rejected at `llm.chutes.ai`.
 
+### 6. Single-model app (tightest delegation)
+**Scopes:** `openid profile chutes:invoke:{chute_id}`
+
+Limits the token to invoking one specific chute. Documented by the platform but unverified as of 2026-06-11 — fall back to plain `chutes:invoke` if rejected.
+
 ## Anti-patterns
 
 - **Requesting `billing:read` by default.** Only add when the feature exists in the UI.
@@ -42,7 +53,7 @@ Your app uses Chutes purely as an identity provider. No `chutes:invoke` means th
 
 ## Listing live scopes
 
-The authoritative scope list lives at `GET /idp/scopes`. If you need a dynamic self-service integrations page, fetch the list live.
+The authoritative scope list lives at `GET /idp/scopes` (Bearer `cpk_` auth; verified live 2026-06-11). If you need a dynamic self-service integrations page, fetch the list live.
 
 ## Related
 

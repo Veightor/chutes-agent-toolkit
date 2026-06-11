@@ -5,9 +5,15 @@ Usage:
   python agent_status.py --hotkey <ss58_hotkey>
 
 Read-only. GET /users/agent_registration/{hotkey}. Returns:
-  - status: registered (plus user_id and profile data) on 200
+  - status: registered (plus registration data) on 200
   - status: not_registered on 404
   - error + exit != 0 on any other code
+
+200 response shape (live-verified 2026-06-11): {status ("completed"),
+registration_id, user_id, hotkey, coldkey, payment_address,
+received_amount, required_amount (TAO), message}. In --json mode the
+API's own status value (e.g. "completed") overrides the script's
+"registered" label.
 
 Exit codes:
   0 registered
@@ -55,7 +61,10 @@ def main() -> int:
     else:
         print(f"status:  registered")
         print(f"hotkey:  {args.hotkey}")
-        for k in ("user_id", "username", "payment_address", "balance", "created_at"):
+        # Field list matches the live-verified 200 response shape (2026-06-11);
+        # the API's own "status" field (e.g. "completed") is skipped here because
+        # the script prints its registered/not_registered label above.
+        for k in ("user_id", "coldkey", "payment_address", "received_amount", "required_amount", "message"):
             if k in (resp or {}):
                 print(f"{k:<16}: {resp[k]}")
     return 0

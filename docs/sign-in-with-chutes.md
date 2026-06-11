@@ -1,6 +1,6 @@
 # Sign in with Chutes — Overview
 
-> **Status: BETA** — this doc reflects the BETA state of the `chutes-sign-in` skill. It graduates only alongside a verified end-to-end run.
+> **Status: BETA** — this doc reflects the BETA state of the `chutes-sign-in` skill. It graduates only alongside a verified end-to-end run. Endpoint inventory and scope list refreshed 2026-06-11 against the live `openapi.json`, `GET /idp/scopes`, and `GET /.well-known/openid-configuration` (read-only). Upstream `chutesai/Sign-in-with-Chutes` is dormant: no commits since 2025-12-29, no breaking changes.
 
 ## What it is
 
@@ -36,21 +36,24 @@ Full PKCE flow diagram: `plugins/chutes-ai/skills/chutes-sign-in/references/oaut
 
 | Endpoint | Purpose |
 |---|---|
+| `GET /.well-known/openid-configuration` | OIDC discovery (public; verified live 2026-06-11) |
 | `POST /idp/apps` | Create an OAuth app |
-| `GET /idp/apps` / `GET /idp/apps/{id}` | List / read app |
+| `GET /idp/apps` / `GET /idp/apps/{id}` | List / read apps — listing includes public and shared apps by default (`include_public=false&include_shared=false` for own only) |
 | `PATCH /idp/apps/{id}` | Update metadata (redirect URIs, scopes, …) |
 | `POST /idp/apps/{id}/regenerate-secret` | Rotate the client secret |
+| `POST /idp/apps/{id}/share` / `GET .../shares` / `DELETE .../share/{user_id}` | Share an app with another user (new since April snapshot) |
 | `DELETE /idp/apps/{id}` | Delete the app |
 | `GET /idp/scopes` | List available OAuth scopes |
 | `GET /idp/authorizations` / `DELETE /idp/authorizations/{id}` | Inspect / revoke authorizations |
-| `POST /idp/token/introspect` | RFC 7662 token introspection |
+| `POST /idp/token/introspect` | RFC 7662 token introspection (form-encoded only) |
 | `POST /idp/token/revoke` | Revoke a token |
-| `GET /idp/userinfo` | Standard OIDC userinfo |
-| `POST /idp/authorize` / `POST /idp/token` | The OAuth + PKCE dance itself |
+| `GET /idp/userinfo` | Standard OIDC userinfo (access token, not `cpk_`) |
+| `GET /idp/authorize` / `POST /idp/token` | The OAuth + PKCE dance itself |
+| `GET /idp/cli_login` / `GET /idp/cli_login/nonce` | CLI login via Bittensor hotkey signature |
 
 ## Scopes
 
-Default: `openid profile chutes:invoke`. Opt-in: `account:read`, `billing:read`. Least-privilege recipes: `plugins/chutes-ai/skills/chutes-sign-in/references/scope-cookbook.md`.
+Default: `openid profile chutes:invoke`. Opt-in: `account:read`, `billing:read`, plus a much larger live set verified 2026-06-11 (`balance:read`, `quota:read`, `usage:read`, `invocations:read`, `chutes:read/write/delete`, `images:*`, `secrets:*`, `account:write`) and a documented per-chute `chutes:invoke:{chute_id}` scope (unverified as of 2026-06-11). Least-privilege recipes: `plugins/chutes-ai/skills/chutes-sign-in/references/scope-cookbook.md`.
 
 ## Supported frameworks
 

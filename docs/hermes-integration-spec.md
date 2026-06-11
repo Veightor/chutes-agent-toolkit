@@ -1,103 +1,140 @@
 # Hermes Integration Spec for Chutes Agent Toolkit
 
-This document defines the target state for integrating Chutes cleanly with Hermes.
+This document defines the current Hermes-facing Chutes assets in this repo and the target state for cleaner Chutes support in Hermes.
+
+## Current state checked against Hermes v0.16.0
+
+As of Hermes Agent v0.16.0, the installed upstream provider registry does not expose a first-class `chutes` provider. Chutes works through:
+
+1. Hermes named-provider configuration for OpenAI-compatible model backends (`providers:` preferred; `custom_providers:` legacy-compatible).
+2. Hermes `mcp_servers` / `hermes mcp add` for tool-level Chutes access through the local stdio MCP server.
+3. The Hermes skill mirror under `other-agents/hermes/skills/`, with shared scripts still single-sourced under `plugins/chutes-ai/skills/`.
+
+Do not describe first-class Chutes provider support as upstream-shipped unless the target Hermes install actually shows it in `hermes model` / the provider registry.
 
 ## Goal
 
-Make Chutes feel like a first-class Hermes provider while keeping this toolkit repo as the canonical source for Chutes-specific docs, skill content, examples, and integration guidance.
+Make Chutes feel natural in Hermes while keeping this toolkit repo as the canonical source for Chutes-specific docs, skill content, examples, MCP tooling, and integration guidance.
 
 ## Principles
 
-1. Chutes should work in Hermes immediately via named custom provider config.
-2. A future Hermes fork/PR should add first-class provider UX without duplicating all Chutes docs into Hermes core.
+1. Chutes should work in Hermes immediately via named custom provider config and/or MCP.
+2. A future first-class provider should be a narrow Hermes change; Chutes-specific operational docs stay here.
 3. Live model inventory and metadata must come from:
 
 `https://llm.chutes.ai/v1/models`
 
 Static lists in this repo are convenience references only.
 
-4. The first upstream Hermes PR should be narrow, mergeable, and low-risk.
+4. Hermes docs should distinguish model-provider setup from MCP/tool setup.
 
-## Integration paths (updated 2026-04-13, wave 2)
+## Integration paths
 
-There are now **four** integration paths for Hermes, and the fourth has already been delivered in a sibling repo (out of scope for this toolkit):
+1. **Custom provider YAML** — works today. See `other-agents/hermes/config-examples/`. Generated/refreshed by:
 
-1. **Custom provider YAML** (layer 1 — works today). See `other-agents/hermes/config-examples/`. Generated/refreshed by `plugins/chutes-ai/skills/chutes-mcp-portability/scripts/generate_agent_config.py --target hermes`.
-2. **Symmetric skill tree** (wave 1). `other-agents/hermes/skills/{chutes-ai,chutes-sign-in,chutes-deploy,chutes-mcp-portability}/` mirrors the Claude plugin tree so Hermes loads the same four-lane skill set. Scripts live once in the Claude plugin tree and are invoked from the repo root by either agent.
-3. **MCP server** (wave 1). `chutes-mcp-server` (stdio, from `plugins/chutes-ai/skills/chutes-mcp-portability/mcp-server/`) gives any MCP-aware Hermes build tool-level access to Chutes without touching the provider config. Use it alongside the custom-provider YAML, not instead of it. Wave-2 Track C.2 verified the server end-to-end with `--self-check` + 7 read tools.
-4. **Native Hermes provider** — **DELIVERED IN A SIBLING REPO.** The first-class Chutes provider PR for Hermes / Nous has already shipped from a separate repository (not this toolkit). This toolkit no longer tracks phase-6 Hermes fork work as a pending goal. See the legacy "Layer 2" section below for the original spec (retained as historical context; the implementation is elsewhere).
+```bash
+python plugins/chutes-ai/skills/chutes-mcp-portability/scripts/generate_agent_config.py --target hermes
+```
 
-## Integration layers
+2. **Hermes skill mirror** — `other-agents/hermes/skills/` has thin Hermes entry points for the full Chutes skill suite:
+   - `chutes-ai`
+   - `chutes-sign-in`
+   - `chutes-routing`
+   - `chutes-usage-and-billing`
+   - `chutes-platform-ops`
+   - `chutes-deploy`
+   - `chutes-mcp-portability`
+   - `chutes-agent-registration`
+   - `chutes-tee`
 
-### Layer 1: Works today in Hermes via custom provider
+3. **MCP server** — `chutes-mcp-server` (stdio, from `plugins/chutes-ai/skills/chutes-mcp-portability/mcp-server/`) gives any MCP-aware Hermes build tool-level access to Chutes without touching provider config. Use it alongside custom-provider YAML, not instead of it, when you want management/read tools.
 
-Users should be able to configure Chutes in Hermes today with a named custom provider.
+4. **Local toolkit guide** — `docs/hermes-chutes-toolkit-guide.md` is the repo-owned handoff guide for beginners and agents. It includes install notes, env handling, live model discovery, one-key/many-model provider patterns, normal vs research endpoint separation, MCP setup, delegation examples, Windows notes, and maintainer verification commands.
+
+## Layer 1: Works today in Hermes via custom provider
 
 Recommended user-facing config pattern:
 
 ```yaml
-custom_providers:
-  - name: Chutes
+providers:
+  chutes:
+    name: Chutes
     base_url: https://llm.chutes.ai/v1
     key_env: CHUTES_API_KEY
-    api_mode: chat_completions
-    model: default
+    transport: chat_completions
+    default_model: default:latency
+    discover_models: true
+    models:
+      default: {}
+      "default:latency": {}
+      "default:throughput": {}
 
-  - name: Chutes Research
-    base_url: https://research-data-opt-in-proxy.chutes.ai/v1
-    key_env: CHUTES_API_KEY
-    api_mode: chat_completions
-    model: default:latency
+model:
+  provider: custom:chutes
+  default: default:latency
 ```
 
-Recommended environment variable:
+Legacy Hermes configs can use `custom_providers:` with equivalent `name`, `base_url`, `key_env`, `api_mode`, and `model` fields.
+
+Recommended environment variable in `~/.hermes/.env`:
 
 ```bash
 CHUTES_API_KEY=cpk_...
 ```
 
-### Layer 2: First-class Hermes provider (historical — now delivered elsewhere)
+Optional research endpoint:
 
-> **Update 2026-04-13:** The native Hermes provider described in this section has already been delivered in a separate repository. This toolkit does not track the phase-6 fork work anymore. Everything below is retained for historical reference and to document what the native provider looks like.
+```yaml
+providers:
+  chutes-research:
+    name: Chutes Research Opt-In
+    base_url: https://research-data-opt-in-proxy.chutes.ai/v1
+    key_env: CHUTES_API_KEY
+    transport: chat_completions
+    default_model: default:latency
+```
 
-A Hermes fork/PR makes Chutes appear in the provider picker and runtime provider logic as a built-in provider.
+Research endpoint caveat: prompts and responses may be recorded for research; use only with explicit user consent.
 
-Expected user experience:
-- Chutes appears in `hermes model`
-- Hermes status/doctor can identify whether Chutes auth is configured
-- docs/setup flow mention Chutes explicitly
-- Chutes remains OpenAI-compatible under the hood using chat completions
+### Auth note
 
-## Provider design target
+Chutes auth was re-verified in the shared Chutes skills on 2026-06-11. Use standard bearer authorization semantics (`Authorization: Bearer` plus the `cpk_...` value) for configured providers. `GET /v1/models` is public and should not be used as proof that a specific auth header works. Older April notes about `X-API-Key` are superseded for Hermes-facing setup.
 
-### Provider identity
+## Layer 2: Works today in Hermes via MCP
 
-Proposed provider slug:
-- `chutes`
+Install the MCP server:
 
-Optional future variants:
-- keep research endpoint as documentation-only at first
-- or later consider `chutes-research` only if UX justifies it
+```bash
+uv tool install chutes-mcp-server \
+  --from plugins/chutes-ai/skills/chutes-mcp-portability/mcp-server
+```
 
-Recommendation:
-- first PR should add only `chutes`
-- research endpoint should initially remain a documented alternate base URL / custom-provider pattern
+Register and test it in Hermes:
 
-### Runtime behavior
+```bash
+hermes mcp add chutes --command chutes-mcp-server --env CHUTES_API_KEY=${CHUTES_API_KEY}
+hermes mcp test chutes
+hermes mcp list
+```
 
-Expected defaults:
-- base URL: `https://llm.chutes.ai/v1`
-- auth env var: `CHUTES_API_KEY`
-- api mode: `chat_completions`
-- model: configurable by user
+Run the server self-check too:
 
-Reasoning:
-- Chutes is OpenAI-compatible
-- the simpler the implementation, the easier to upstream
+```bash
+chutes-mcp-server --self-check
+```
+
+MCP read tools verified live 2026-04-13:
+- `chutes_list_models`
+- `chutes_get_quota`
+- `chutes_list_aliases`
+- `chutes_list_chutes`
+- `chutes_get_usage`
+- `chutes_get_discounts`
+- `chutes_list_api_keys`
+
+Unexercised read tools and all write/deploy tools retain BETA labels according to the deploy-features policy.
 
 ## Chutes-specific ergonomics to document
-
-These should be documented even if not encoded as special Hermes logic initially:
 
 1. Model routing aliases:
 - `default`
@@ -112,14 +149,15 @@ These should be documented even if not encoded as special Hermes logic initially
 3. Privacy-sensitive routing:
 - users should filter for `confidential_compute: true`
 - canonical live discovery source is `https://llm.chutes.ai/v1/models`
+- stronger claims require evidence inspection via `chutes-tee`
 
 4. Research endpoint tradeoff:
 - `https://research-data-opt-in-proxy.chutes.ai/v1`
-- same auth, lower cost, but prompt/response data is recorded for research
+- same API key, lower cost, but prompt/response data may be recorded for research
 
-## Hermes fork scope: phase 1
+## Future native Hermes provider scope
 
-Files likely to change in Hermes fork:
+Files likely to change in a Hermes fork:
 - `hermes_cli/auth.py`
 - `hermes_cli/models.py`
 - `hermes_cli/main.py`
@@ -128,53 +166,30 @@ Files likely to change in Hermes fork:
 - docs and tests relevant to provider selection and auth resolution
 
 Minimum acceptable implementation:
-1. Add Chutes to provider registry
-2. Wire `CHUTES_API_KEY`
-3. Set base URL and API mode defaults
-4. Make it selectable in CLI provider picker
-5. Add tests for provider resolution and runtime config
-6. Add user docs
+1. Add Chutes to provider registry.
+2. Wire `CHUTES_API_KEY`.
+3. Set base URL and `chat_completions` API mode defaults.
+4. Make it selectable in `hermes model`.
+5. Add tests for provider resolution and runtime config.
+6. Add user docs that keep live model inventory tied to `/v1/models`.
 
-Non-goals for first PR:
-- custom Chutes MCP server support
+Non-goals for first provider PR:
+- custom Chutes MCP server support in Hermes core
 - Chutes-specific model browser UX
 - Chutes-specific smart-routing logic in Hermes core
-- over-optimizing the setup wizard before provider basics land
+- duplicating this repo's operational skills into Hermes core
 
-## Hermes fork scope: phase 2
+## Testing requirements in this toolkit repo
 
-After first-class provider support lands or stabilizes:
-1. add stronger docs/examples for routing presets
-2. bundle or recommend a Hermes-ready Chutes skill
-3. improve setup wizard copy
-4. optionally improve doctor/status output for Chutes-specific hints
-
-## Testing requirements
-
-### In this toolkit repo
-- docs examples for Hermes custom provider config must be coherent
-- Chutes skill guidance should reflect Hermes-specific usage where relevant
-- evals should include Hermes setup scenarios
-
-### In Hermes fork
-- provider selection works from CLI
-- env var auth loads correctly
-- runtime provider resolution yields Chutes base URL and chat-completions mode
-- no regressions to generic custom provider support
+- YAML examples parse and use current Hermes keys.
+- `generate_agent_config.py --target hermes` refreshes `other-agents/hermes/config-examples/*.yaml`.
+- Hermes skill mirror includes all current Chutes skills and points to single-sourced scripts.
+- MCP docs use current `hermes mcp add/test/list` commands.
+- Static docs continue to state that live model metadata comes from `/v1/models`.
 
 ## Open questions
 
-1. Should Hermes ship a built-in Chutes skill, or should it reference this repo as the install source?
-2. Is `default` the right starter model alias, or should docs prefer `default:latency` for interactive use?
+1. Should Hermes eventually ship a bundled Chutes skill, or should it reference this repo as the install source?
+2. Is `default:latency` the right starter model alias for interactive Hermes use?
 3. Does Hermes need a separate first-class research endpoint, or is documented custom-provider config enough?
-4. Should Chutes provider docs include explicit TEE selection recipes from day one?
-
-## Recommended next step
-
-Before touching a Hermes fork, finish the toolkit-side work here:
-- roadmap/docs cleanup
-- credential-tooling hardening
-- eval expansion
-- Hermes quickstart examples
-
-That will make the eventual Hermes PR far easier to write, test, and justify.
+4. Should native provider support expose any Chutes-specific auth or model-discovery ergonomics beyond the generic OpenAI-compatible provider path?

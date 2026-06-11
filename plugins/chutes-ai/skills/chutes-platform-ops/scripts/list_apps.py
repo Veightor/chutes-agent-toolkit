@@ -7,8 +7,14 @@ Usage:
   python list_apps.py --with-authorizations
   python list_apps.py --json
 
-Wave-2 finding: /idp/apps?mine=true and ?user_id= are IGNORED server-side;
-client-side filter on user_id is the only way.
+Filtering behavior (re-verified live 2026-06-11):
+  - /idp/apps?mine=true is still IGNORED server-side (not in openapi).
+  - ?user_id=<other-uuid> returns 403 (billing-admin-only); your own uuid
+    has no visible effect (still platform-wide).
+  - NEW: ?include_public=false now scopes the listing to YOUR apps
+    server-side, and ?search=<substring> filters by name. This script
+    still paginates platform-wide and filters by user_id client-side,
+    which works and also covers --all.
 
 Exit codes:
   0 ok

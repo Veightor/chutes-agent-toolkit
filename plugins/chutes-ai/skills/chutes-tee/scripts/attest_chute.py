@@ -154,7 +154,7 @@ def main() -> int:
             print(f"  GPU cert:           not parsed ({gpu_cert.get('reason') or gpu_cert.get('error', '?')})")
         print()
         print(f"  verdict:            {verdict}")
-        print(f"  cryptographic validation: {'DCAP available (run --full to enable)' if crypto_available else 'not run — install Intel DCAP for verified mode'}")
+        print(f"  cryptographic validation: {'DCAP detected but not run — full validation is not wired into this script yet; run DCAP manually against the saved envelope' if crypto_available else 'not run — install Intel DCAP and run it manually against the saved envelope'}")
     return 0
 
 

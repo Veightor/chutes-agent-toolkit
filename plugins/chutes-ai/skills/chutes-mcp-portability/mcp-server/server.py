@@ -9,11 +9,19 @@ Auth:
   Inference (`llm.chutes.ai/v1`):
     CHUTES_API_KEY env var — primary
     falls back to `manage_credentials.py get --field api_key` subprocess
+    Sent as `Authorization: Bearer cpk_...` — the platform-recommended header
+    (per chutes.ai's ai-plugin.json and llms.txt). Verified live 2026-06-11:
+    Bearer cpk_ returns 200 on GET /v1/models. Official docs say X-API-Key is
+    silently ignored on the inference surface, so it is no longer used here.
 
   Management (`api.chutes.ai`):
     CHUTES_FINGERPRINT env var — primary
     falls back to `manage_credentials.py get --field fingerprint`
     then exchanges the fingerprint for a short-lived JWT via `POST /users/login`
+    Note (verified 2026-06-11): plain `Authorization: Bearer cpk_...` now also
+    works on management GETs like /users/me (X-API-Key returns 401 there). The
+    fingerprint→JWT path is retained for write endpoints (Bearer-cpk behavior
+    on management writes unverified as of 2026-06-11).
 
 Write/deploy tools are marked [BETA] in their description and stay that
 way until an explicit verification pass exercises each one.
@@ -164,10 +172,14 @@ def _mgmt(method: str, path: str, *, body: Any = None) -> Any:
 
 
 def _infer(method: str, path: str, *, body: Any = None) -> Any:
+    # Bearer cpk_ is the platform-recommended inference header (ai-plugin.json /
+    # llms.txt). Verified live 2026-06-11 on GET /v1/models. Previously this used
+    # X-API-Key, which official docs now say is silently ignored on the inference
+    # surface (POST /chat/completions auth unverified as of 2026-06-11).
     return _request(
         method,
         CHUTES_INFER_BASE.rstrip("/") + path,
-        headers={"X-API-Key": _get_api_key()},
+        headers={"Authorization": f"Bearer {_get_api_key()}"},
         body=body,
     )
 
@@ -211,9 +223,12 @@ def chutes_get_discounts() -> dict:
     return _mgmt("GET", "/users/me/discounts")
 
 
-@app.tool(description="Fetch TEE attestation evidence for a specific chute.")
-def chutes_get_evidence(chute_id: str) -> dict:
-    return _mgmt("GET", f"/chutes/{chute_id}/evidence")
+@app.tool(description="Fetch TEE attestation evidence for a specific chute. Requires a 64-hex-char nonce (auto-generated if omitted).")
+def chutes_get_evidence(chute_id: str, nonce: Optional[str] = None) -> dict:
+    # The endpoint requires `nonce` as a query param of exactly 64 hex chars
+    # (32 bytes) — confirmed in the live openapi spec 2026-06-11.
+    nonce = nonce or os.urandom(32).hex()
+    return _mgmt("GET", f"/chutes/{chute_id}/evidence?nonce={nonce}")
 
 
 @app.tool(description="Introspect an OAuth access token issued by Chutes (RFC 7662).")
@@ -260,8 +275,11 @@ def chutes_deploy_diffusion(model: str, gpu: str = "a100_40gb", gpu_count: int =
     return _mgmt("POST", "/chutes/diffusion", body=body)
 
 
-@app.tool(description=BETA_PREFIX + "Create a TEE variant of an existing affine chute. WRITES: PUT /chutes/{id}/teeify.")
+@app.tool(description=BETA_PREFIX + "REMOVED UPSTREAM: PUT /chutes/{id}/teeify is no longer in the Chutes openapi spec (checked 2026-06-11) — this call will fail. Use `tee=True` on the SDK chute templates at deploy time instead.")
 def chutes_teeify(chute_id: str) -> dict:
+    # NOTE (2026-06-11): the teeify endpoint is GONE from api.chutes.ai/openapi.json.
+    # TEE is now a deploy-time switch (`tee=True` on build_vllm_chute / build_sglang_chute /
+    # build_diffusion_chute in the chutes SDK). Kept registered so callers get a clear error.
     return _mgmt("PUT", f"/chutes/{chute_id}/teeify", body={})
 
 
