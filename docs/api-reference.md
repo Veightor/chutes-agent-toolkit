@@ -26,9 +26,9 @@ Inference (`https://llm.chutes.ai/v1`):
 ```
 Authorization: Bearer cpk_...
 ```
-- Bearer `cpk_...` returned 200 on `GET /v1/models` (verified 2026-06-11), and is the header the platform documents in its `ai-plugin.json` and `llms.txt` for all of `llm.chutes.ai/v1`. (Bearer on `POST /v1/chat/completions` was not re-exercised in the read-only 2026-06-11 run.)
+- Bearer `cpk_...` returned 200 on `GET /v1/models` **and** on a live `POST /v1/chat/completions` (real completion returned, model `unsloth/Mistral-Nemo-Instruct-2407-TEE`) — both verified 2026-06-11. It is also the header the platform documents in its `ai-plugin.json` and `llms.txt` for all of `llm.chutes.ai/v1`.
 - `GET /v1/models` is now **public** — 200 with no auth headers at all (verified 2026-06-11).
-- Do **not** use `X-API-Key` on the inference surface: per the platform's llms.txt it is silently ignored and the request falls through to the anonymous path (a 200 on the public `/v1/models` proves nothing about authentication).
+- Do **not** use `X-API-Key` on the inference surface: it is silently ignored and the request falls through to the anonymous path — confirmed live 2026-06-11, when a `POST /v1/chat/completions` sent with `X-API-Key: cpk_...` returned the anonymous nginx 429 rate-limit response, byte-identical to a fully unauthenticated POST, while Bearer succeeded in the same minute. (A 200 on the public `/v1/models` proves nothing about authentication.)
 
 Management API (`https://api.chutes.ai`):
 - Bearer `cpk_...` now works directly — verified 200 on `GET /users/me` and `GET /model_aliases/` (2026-06-11). The fingerprint-login JWT is no longer required for these reads.
@@ -244,10 +244,16 @@ tee_models = [m for m in models if m["confidential_compute"]]  # currently: all 
 Base URL: `https://llm.chutes.ai/v1`
 
 OpenAI-like request/response shape with standard OpenAI-style auth:
-- `Authorization: Bearer cpk_...` — verified 200 on `/v1/models` 2026-06-11 and platform-documented for the whole surface (the April 2026 Bearer-401 finding is obsolete)
-- `X-API-Key` is silently ignored on this surface (per platform llms.txt) — do not use it
+- `Authorization: Bearer cpk_...` — verified live 2026-06-11 with a real `POST /v1/chat/completions` round-trip (HTTP 200, completion returned) as well as on `/v1/models`; the April 2026 Bearer-401 finding is obsolete
+- `X-API-Key` is silently ignored on this surface — confirmed live 2026-06-11: a completion POST with it was treated as anonymous (hit the anonymous 429 rate-limit bucket, byte-identical to no auth at all). Do not use it.
 
 Always check `supported_features` and `supported_sampling_parameters` from the models endpoint before using advanced features. Behavior differs between `sglang` and `vllm` engines.
+
+### Completion Response Headers
+Verified on a successful direct-model-id completion (2026-06-11): `x-chutes-invocationid`, `x-chutes-quota-total`, `x-chutes-quota-used`, `x-chutes-quota-remaining`, `x-chutes-rl-user`. The routing extras (`x-chutes-chosen-model`, `x-chutes-strategy`, `x-chutes-fallback-count`) were **not** present on this direct-model-id call — calls using routing strings/aliases remain unverified.
+
+### Prompt Caching
+The completion `usage` block includes `prompt_tokens_details.cached_tokens` (verified 2026-06-11) — prompt caching is active on inference. Cache hits bill at the discounted `pricing.input_cache_read` rate from the models endpoint.
 
 ### Harvard Research Endpoint (25% discount)
 Drop-in replacement: `https://research-data-opt-in-proxy.chutes.ai/v1`

@@ -4,7 +4,7 @@
 >
 > **Live verification status (2026-04-13):** 7 read tools verified live; see `docs/chutes-maxi-wave-2.md` Track C.2 + C.6 for the exercise records. Write tools stay permanent BETA under the deploy-features policy.
 >
-> **Refresh 2026-06-11:** inference auth switched from `X-API-Key` to `Authorization: Bearer cpk_...` (verified live on `GET /v1/models`; Bearer is now the platform-recommended header). `chutes_get_evidence` gained a required `nonce` (64 hex chars, auto-generated). `PUT /chutes/{id}/teeify` is **gone from the live openapi spec** — `chutes_teeify` is deprecated in place.
+> **Refresh 2026-06-11:** inference auth switched from `X-API-Key` to `Authorization: Bearer cpk_...` (verified live on `GET /v1/models` and on a real paid `POST /v1/chat/completions`; X-API-Key on inference is confirmed silently ignored — it hits the anonymous 429 path. Bearer is the platform-recommended header). `chutes_get_evidence` gained a required `nonce` (64 hex chars, auto-generated). `PUT /chutes/{id}/teeify` is **gone from the live openapi spec** — `chutes_teeify` is deprecated in place. `chutes-mcp-server --self-check` passed live 2026-06-11; a packaging bug (declared `readme = "README.md"` with no README, breaking `uv tool install --from` builds) was fixed by adding `mcp-server/README.md`.
 
 ## Why this map exists
 
@@ -15,7 +15,7 @@ MCP clients discover tools dynamically, but agents benefit from a flat human-rea
 | Tool | Endpoint | Status | Typical use |
 |---|---|---|---|
 | `chutes_list_models` | `GET https://llm.chutes.ai/v1/models` | VERIFIED | "What models are available?" |
-| `chutes_chat_complete` | `POST https://llm.chutes.ai/v1/chat/completions` | **[BETA]** (paid; unverified) | Single-shot chat call |
+| `chutes_chat_complete` | `POST https://llm.chutes.ai/v1/chat/completions` | **[BETA]** (paid; underlying endpoint + Bearer auth live-verified 2026-06-11 via direct curl, but the tool has not been exercised through the MCP path) | Single-shot chat call |
 | `chutes_list_chutes` | `GET /chutes/` | VERIFIED | "What have I deployed?" |
 | `chutes_list_aliases` | `GET /model_aliases/` | VERIFIED | "What stable handles exist?" |
 | `chutes_get_usage` | `GET /invocations/usage` | VERIFIED | "How much has the network spent?" |

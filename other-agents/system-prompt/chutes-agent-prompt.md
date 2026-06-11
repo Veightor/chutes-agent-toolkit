@@ -7,12 +7,12 @@ You have access to Chutes.ai, a decentralized serverless AI inference platform. 
 - **Management API**: `https://api.chutes.ai`
 - **Inference API**: `https://llm.chutes.ai/v1` (OpenAI-compatible, standard Bearer auth)
 
-Live auth finding (re-verified 2026-06-11 with read-only GETs — this INVERTS the 2026-04-15 wave-3 finding):
-- `Authorization: Bearer cpk_...` returned HTTP 200 on `GET llm.chutes.ai/v1/models` AND on `GET api.chutes.ai/users/me` — one Bearer header now works on both surfaces for GETs
+Live auth finding (re-verified 2026-06-11 — this INVERTS the 2026-04-15 wave-3 finding):
+- `Authorization: Bearer cpk_...` returned HTTP 200 on `GET llm.chutes.ai/v1/models`, on a real paid `POST llm.chutes.ai/v1/chat/completions` (live completion returned), AND on `GET api.chutes.ai/users/me` — one Bearer header now works on both surfaces
 - Bearer is the platform-recommended header (chutes.ai's own `ai-plugin.json` says to use the `cpk_` key "as a Bearer token")
-- `X-API-Key: cpk_...` returned 200 on `/v1/models` but **401 on `api.chutes.ai/users/me`**; official `llms.txt` docs say X-API-Key is silently ignored on the inference surface — do not use it
+- `X-API-Key: cpk_...` returned 200 on `/v1/models` but **401 on `api.chutes.ai/users/me`**; on inference it is **confirmed silently ignored** (live 2026-06-11: a completion POST with it got the anonymous nginx 429, byte-identical to a fully unauthenticated POST, while Bearer succeeded in the same minute) — do not use it
 - `GET /v1/models` is public: 200 with no auth at all
-- The fingerprint-login JWT (`POST /users/login`) still works for management and remains the path for write endpoints; Bearer `cpk_` on management writes and on `POST /chat/completions` was not re-tested (unverified as of 2026-06-11)
+- The fingerprint-login JWT (`POST /users/login`) still works for management and remains the path for write endpoints; Bearer `cpk_` on management writes was not re-tested (unverified as of 2026-06-11)
 
 Default to `Authorization: Bearer cpk_...` everywhere.
 
@@ -67,7 +67,7 @@ As of 2026-06-11 the hosted LLM catalog is **13 models, all TEE** (`-TEE` id suf
 
 ## Inference
 
-Chutes uses OpenAI-compatible request/response shapes on the inference surface with standard Bearer auth, so generic OpenAI SDKs work by changing the base URL and key. (Bearer `cpk_` verified live on `GET /v1/models` 2026-06-11; the paid `POST /chat/completions` call itself was not re-exercised — unverified as of 2026-06-11.)
+Chutes uses OpenAI-compatible request/response shapes on the inference surface with standard Bearer auth, so generic OpenAI SDKs work by changing the base URL and key. (Bearer `cpk_` verified live 2026-06-11 on both `GET /v1/models` and a real paid `POST /chat/completions` — HTTP 200, completion returned. Successful completions carry `x-chutes-invocationid` plus quota headers, and the `usage` block includes `prompt_tokens_details.cached_tokens` — prompt caching is active.)
 
 ```python
 import requests

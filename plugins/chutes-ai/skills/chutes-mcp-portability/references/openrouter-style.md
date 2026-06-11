@@ -1,6 +1,6 @@
 # Chutes as a Generic OpenAI-Like Endpoint **[BETA]**
 
-For any tool that expects OpenAI-style request/response payloads, Chutes now matches the standard pattern: `Authorization: Bearer cpk_...` is the platform-recommended header (re-verified live 2026-06-11 on `GET /v1/models`, which is itself now public). The label stays **[BETA]** because a paid `POST /chat/completions` round-trip was not re-exercised (unverified as of 2026-06-11).
+For any tool that expects OpenAI-style request/response payloads, Chutes now matches the standard pattern: `Authorization: Bearer cpk_...` is the platform-recommended header — live-verified 2026-06-11 on both `GET /v1/models` (itself now public) and a real paid `POST /chat/completions` (HTTP 200, completion returned). The label stays **[BETA]** only because the round-trip has not been exercised through an actual OpenAI-style client using these env blocks (the direct-curl path is verified).
 
 ## Generate the env block
 
@@ -18,7 +18,7 @@ OPENAI_BASE_URL=https://llm.chutes.ai/v1
 OPENAI_API_KEY=cpk_...
 ```
 
-OpenAI-style clients send `Authorization: Bearer $OPENAI_API_KEY` — and that is exactly right for Chutes now. The April 2026 finding (Bearer → 401) is inverted: re-verified 2026-06-11, Bearer `cpk_...` returns 200 on `GET llm.chutes.ai/v1/models` and even on management GETs like `api.chutes.ai/users/me`. Official Chutes docs (`llms.txt`) say the old `X-API-Key` header is silently ignored on the inference surface — do not rely on it.
+OpenAI-style clients send `Authorization: Bearer $OPENAI_API_KEY` — and that is exactly right for Chutes now. The April 2026 finding (Bearer → 401) is inverted: re-verified 2026-06-11, Bearer `cpk_...` returns 200 on `GET llm.chutes.ai/v1/models`, on a real paid `POST llm.chutes.ai/v1/chat/completions`, and even on management GETs like `api.chutes.ai/users/me`. The old `X-API-Key` header is confirmed silently ignored on the inference surface (live 2026-06-11: a completion POST with it got the anonymous 429, byte-identical to no auth at all) — do not rely on it.
 
 Source it in your shell:
 
@@ -37,7 +37,7 @@ export CHUTES_API_KEY=$(python plugins/chutes-ai/skills/chutes-ai/scripts/manage
 
 ## Caveats
 
-- **Completions auth not re-exercised.** Bearer `cpk_...` is verified on `GET /v1/models` (2026-06-11) and platform-recommended for everything; `POST /chat/completions` is a paid call and was not re-verified this pass (unverified as of 2026-06-11).
+- **Completions auth is live-verified, client round-trips are not.** Bearer `cpk_...` returned a real completion on `POST /chat/completions` (verified 2026-06-11, direct curl); what remains unexercised is the same call made through each OpenAI-style client consuming these env blocks.
 - **Different engines accept different sampling params.** `temperature`, `top_p`, `top_k`, `max_tokens` are safe. `n > 1` is usually fine but test.
 - **Tool calling works** on models whose `supported_features` includes `tools`. Not every model does.
 - **Embeddings and TTS/STT endpoints** are not OpenAI-compatible on Chutes today; use the Chutes-native endpoints instead.

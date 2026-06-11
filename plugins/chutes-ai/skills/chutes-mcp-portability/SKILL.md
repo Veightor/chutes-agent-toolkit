@@ -7,11 +7,11 @@ description: "Make Chutes.ai available to any agent via MCP or OpenAI-compatible
 
 > **Status: VERIFIED LIVE 2026-04-13** via `docs/chutes-maxi-wave-2.md` Track C.2 + C.6. `chutes-mcp-server --self-check` passed, and 7 read tools were exercised against a real `cpk_` with non-empty responses.
 >
-> **Refresh 2026-06-11 (read-only GETs):** auth headers re-verified live — `Authorization: Bearer cpk_...` now returns 200 on both `llm.chutes.ai/v1/models` and `api.chutes.ai/users/me` (the April finding is inverted; see auth note below). The server's inference calls now send Bearer. Catalog re-verified: 13 models, all `-TEE` / `confidential_compute: true`. The MCP server itself was not re-run this pass, so the 2026-04-13 tool-exercise record stands as the last full server run.
+> **Refresh 2026-06-11:** auth headers re-verified live — `Authorization: Bearer cpk_...` now returns 200 on `llm.chutes.ai/v1/models`, on a real paid `POST /v1/chat/completions` (live completion returned), and on `api.chutes.ai/users/me` (the April finding is inverted; see auth note below). The server's inference calls now send Bearer. Catalog re-verified: 13 models, all `-TEE` / `confidential_compute: true`. `chutes-mcp-server --self-check` passed live on 2026-06-11 (run via `uvx` from the local path). That run also caught and fixed a pre-existing packaging bug: `pyproject.toml` declared `readme = "README.md"` which didn't exist, so every `uv tool install --from` build failed with "Readme file does not exist" — `mcp-server/README.md` now exists and the install builds.
 >
 > **Read tools graduated out of BETA (verified):** `chutes_list_models`, `chutes_get_quota`, `chutes_list_aliases`, `chutes_list_chutes`, `chutes_get_usage`, `chutes_get_discounts`, `chutes_list_api_keys`.
 >
-> **Read tools still BETA (not exercised this pass):** `chutes_chat_complete` (paid), `chutes_get_evidence` (needs a specific chute_id), `chutes_oauth_introspect` (needs a live OAuth token).
+> **Read tools still BETA (not exercised through the MCP path):** `chutes_chat_complete` (paid — the underlying `POST /v1/chat/completions` + Bearer auth were live-verified 2026-06-11 via direct curl, but the tool itself has not been exercised through MCP, so the label stays), `chutes_get_evidence` (needs a specific chute_id), `chutes_oauth_introspect` (needs a live OAuth token).
 >
 > **Write tools — permanent BETA** under the deploy-features policy: `chutes_deploy_vllm`, `chutes_deploy_diffusion`, `chutes_teeify`, `chutes_set_alias`, `chutes_delete_alias`, `chutes_create_api_key`. The `set`/`delete` alias pair was functionally exercised live during wave 2 (round-trip passed) but stays BETA per policy — deploy-side writes always keep the label. MCP tool descriptions prepend `[BETA] ` so clients display it.
 
@@ -20,15 +20,15 @@ description: "Make Chutes.ai available to any agent via MCP or OpenAI-compatible
 Makes Chutes usable from **any** agent environment with one of two mechanisms:
 
 1. **MCP server** (`mcp-server/server.py`). Stdio transport. Exposes Chutes management + inference as MCP tools. Any MCP-aware client (Claude Desktop, Cursor, Cline, Claude Code itself) can load it.
-2. **Config snippets** (`scripts/generate_agent_config.py`). For clients that don't speak MCP but do speak OpenAI-like HTTP. These are much closer to drop-in now that the platform recommends standard Bearer auth (see below), but stay [BETA] until a paid completion round-trip is re-verified.
+2. **Config snippets** (`scripts/generate_agent_config.py`). For clients that don't speak MCP but do speak OpenAI-like HTTP. These are now true drop-ins auth-wise — Bearer on a paid `POST /chat/completions` was live-verified 2026-06-11 — but each snippet stays [BETA] until a completion round-trip is exercised through that specific client.
 
 Both paths read secrets from the keychain via `manage_credentials.py` and never echo `cpk_` into transcripts.
 
-Live auth finding (re-verified 2026-06-11, read-only GETs — this **inverts** the wave-3 2026-04-15 finding):
-- `Authorization: Bearer cpk_...` → 200 on `GET llm.chutes.ai/v1/models` AND on `GET api.chutes.ai/users/me`. Bearer is the platform-recommended header per chutes.ai's own `ai-plugin.json` and `llms.txt`.
-- `X-API-Key: cpk_...` → 200 on `GET /v1/models` (which is now public, so this proves little) but **401 on `api.chutes.ai/users/me`**. Official llms.txt says X-API-Key is silently ignored on the inference surface. Do not use it.
+Live auth finding (re-verified 2026-06-11 — this **inverts** the wave-3 2026-04-15 finding):
+- `Authorization: Bearer cpk_...` → 200 on `GET llm.chutes.ai/v1/models`, on a real paid `POST llm.chutes.ai/v1/chat/completions` (live completion returned), AND on `GET api.chutes.ai/users/me`. Bearer is the platform-recommended header per chutes.ai's own `ai-plugin.json` and `llms.txt`.
+- `X-API-Key: cpk_...` → 200 on `GET /v1/models` (which is now public, so this proves little) but **401 on `api.chutes.ai/users/me`**. On the inference surface it is **confirmed silently ignored** (live 2026-06-11): a completion POST with it got the anonymous nginx 429, byte-identical to a fully unauthenticated POST, while Bearer succeeded in the same minute. Do not use it.
 - `GET /v1/models` requires no auth at all.
-- The fingerprint→JWT flow (`POST /users/login`) is still what the MCP server uses for management writes; Bearer-cpk behavior on management writes and on `POST /chat/completions` is unverified as of 2026-06-11 (read-only constraint).
+- The fingerprint→JWT flow (`POST /users/login`) is still what the MCP server uses for management writes; Bearer-cpk behavior on management writes is unverified as of 2026-06-11.
 
 The MCP server in this repo now sends Bearer on the inference surface and keeps the fingerprint→JWT path for management tools.
 
@@ -59,7 +59,7 @@ uv tool install chutes-mcp-server --from plugins/chutes-ai/skills/chutes-mcp-por
 pipx install plugins/chutes-ai/skills/chutes-mcp-portability/mcp-server
 ```
 
-This gives the user a `chutes-mcp-server` command on PATH. **Local-path install only:** `chutes-mcp-server` is NOT published on PyPI (404 verified 2026-06-11), so the `--from <local path>` form is required — a bare `uv tool install chutes-mcp-server` will fail. The command reads `CHUTES_API_KEY` from env or falls back to `manage_credentials.py get --field api_key` for inference (sent as `Authorization: Bearer`). For management tools, it uses `CHUTES_FINGERPRINT` or the stored fingerprint to mint a short-lived JWT via `POST /users/login`.
+This gives the user a `chutes-mcp-server` command on PATH. **Local-path install only:** `chutes-mcp-server` is NOT published on PyPI (404 verified 2026-06-11), so the `--from <local path>` form is required — a bare `uv tool install chutes-mcp-server` will fail. (Fixed 2026-06-11: the `--from` build itself used to fail with "Readme file does not exist" because `pyproject.toml` declared a `README.md` that wasn't checked in; the README now exists.) The command reads `CHUTES_API_KEY` from env or falls back to `manage_credentials.py get --field api_key` for inference (sent as `Authorization: Bearer`). For management tools, it uses `CHUTES_FINGERPRINT` or the stored fingerprint to mint a short-lived JWT via `POST /users/login`.
 
 ### Step 3 — generate configs
 
@@ -81,7 +81,7 @@ For MCP targets:
 chutes-mcp-server --self-check
 ```
 
-Runs `chutes_list_models` with `limit=1` against the live Chutes API over stdio transport. Prints OK + the first model id on success. This is the verification step that graduates read-only MCP tools out of BETA.
+Runs `chutes_list_models` with `limit=1` against the live Chutes API over stdio transport. Prints OK + the first model id on success. This is the verification step that graduates read-only MCP tools out of BETA. Last passed live 2026-06-11 (via `uvx` from the local path).
 
 For OpenAI-compat targets, the script prints a one-liner `curl https://llm.chutes.ai/v1/models` that the user can run themselves.
 

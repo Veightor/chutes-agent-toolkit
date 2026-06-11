@@ -1,6 +1,6 @@
 # Chutes Routing Strings — Spec
 
-> What the inference router actually accepts as the `model` parameter on `POST https://llm.chutes.ai/v1/chat/completions`. Behavior confirmed via live models, routing string suffixes confirmed via Chutes' dashboard UI. As of 2026-06-11 the `default` / `default:latency` / `default:throughput` / inline-list forms are also documented in Chutes' own `https://chutes.ai/llms.txt` (routing behavior on completions not re-exercised this run — paid endpoint).
+> What the inference router actually accepts as the `model` parameter on `POST https://llm.chutes.ai/v1/chat/completions`. Behavior confirmed via live models, routing string suffixes confirmed via Chutes' dashboard UI. As of 2026-06-11 the `default` / `default:latency` / `default:throughput` / inline-list forms are also documented in Chutes' own `https://chutes.ai/llms.txt`. The completions endpoint itself is live-verified 2026-06-11 with a **direct model id** + Bearer (HTTP 200, real completion); calls using routing strings/aliases were not exercised and remain unverified.
 
 ## Grammar (summary)
 
@@ -84,4 +84,4 @@ Chutes adds non-standard OpenAI response fields when routing kicks in. Common ex
 - `x-chutes-strategy` — which strategy resolved.
 - `x-chutes-fallback-count` — how many members were tried before success.
 
-These may appear as headers or inside the response body depending on endpoint. Treat them as observability, not as something to depend on in production logic.
+These may appear as headers or inside the response body depending on endpoint. Treat them as observability, not as something to depend on in production logic. Live data point (2026-06-11): a verified **direct-model-id** completion did **not** carry any of these three — its headers were `x-chutes-invocationid`, `x-chutes-quota-total` / `-used` / `-remaining`, and `x-chutes-rl-user`. The routing extras remain unverified because no routing-string/alias call has been exercised.

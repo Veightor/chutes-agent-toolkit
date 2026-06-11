@@ -11,8 +11,10 @@ Auth:
     falls back to `manage_credentials.py get --field api_key` subprocess
     Sent as `Authorization: Bearer cpk_...` — the platform-recommended header
     (per chutes.ai's ai-plugin.json and llms.txt). Verified live 2026-06-11:
-    Bearer cpk_ returns 200 on GET /v1/models. Official docs say X-API-Key is
-    silently ignored on the inference surface, so it is no longer used here.
+    Bearer cpk_ returns 200 on GET /v1/models and on a real paid
+    POST /v1/chat/completions. X-API-Key is confirmed silently ignored on the
+    inference surface (a completion POST with it is treated as anonymous and
+    hits the anonymous 429 path), so it is no longer used here.
 
   Management (`api.chutes.ai`):
     CHUTES_FINGERPRINT env var — primary
@@ -173,9 +175,10 @@ def _mgmt(method: str, path: str, *, body: Any = None) -> Any:
 
 def _infer(method: str, path: str, *, body: Any = None) -> Any:
     # Bearer cpk_ is the platform-recommended inference header (ai-plugin.json /
-    # llms.txt). Verified live 2026-06-11 on GET /v1/models. Previously this used
-    # X-API-Key, which official docs now say is silently ignored on the inference
-    # surface (POST /chat/completions auth unverified as of 2026-06-11).
+    # llms.txt). Verified live 2026-06-11 on GET /v1/models AND on a real paid
+    # POST /v1/chat/completions. Previously this used X-API-Key, which is
+    # confirmed silently ignored on the inference surface (requests with it are
+    # treated as anonymous).
     return _request(
         method,
         CHUTES_INFER_BASE.rstrip("/") + path,

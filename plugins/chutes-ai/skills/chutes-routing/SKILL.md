@@ -74,7 +74,7 @@ The output inline string is pure failover by default. Append one of the strategy
 - `:throughput` — Chutes picks the highest-TPS member right now.
 - `:premium` — (if documented on your account) prefer premium chutes.
 
-The `default` / `default:latency` / `default:throughput` / inline-list forms are now documented in Chutes' own agent-facing doc at `https://chutes.ai/llms.txt` (routing behavior on `chat/completions` itself not re-exercised 2026-06-11 — paid endpoint). See `references/routing-strings-spec.md` for the full grammar.
+The `default` / `default:latency` / `default:throughput` / inline-list forms are now documented in Chutes' own agent-facing doc at `https://chutes.ai/llms.txt`. The `chat/completions` endpoint itself is live-verified (2026-06-11, direct model id + Bearer, HTTP 200 — notably **without** the `x-chutes-chosen-model` / `x-chutes-strategy` / `x-chutes-fallback-count` extras); routing-string/alias calls were not exercised and stay unverified. See `references/routing-strings-spec.md` for the full grammar.
 
 ### Step 4 — audit an existing pool periodically
 

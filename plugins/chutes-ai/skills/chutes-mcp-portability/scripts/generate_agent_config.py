@@ -221,7 +221,7 @@ def system_prompt(out: Path) -> Path:
         "---\n\n"
         "You have access to Chutes.ai, a decentralized inference network serving open-source models via an OpenAI-compatible inference API. As of 2026-06-11 every hosted LLM runs in a TEE (`confidential_compute: true`, `-TEE` id suffix).\n\n"
         "Base URL: `https://llm.chutes.ai/v1`\n"
-        "Auth for direct HTTP calls: `Authorization: Bearer cpk_...` (never log or echo the key). Verified live 2026-06-11 on GET /v1/models; Bearer is the platform-recommended header. X-API-Key is no longer recommended on the inference surface.\n"
+        "Auth for direct HTTP calls: `Authorization: Bearer cpk_...` (never log or echo the key). Verified live 2026-06-11 on GET /v1/models and on a real POST /chat/completions; Bearer is the platform-recommended header. X-API-Key is silently ignored on the inference surface (confirmed live — the request is treated as anonymous); do not use it.\n"
         "List models: `GET /models` (public, no auth required; always treat this as source of truth; do not hardcode ids).\n"
         "Chat: `POST /chat/completions` with `{model, messages, max_tokens, temperature}`.\n"
         "Routing: pass `default:latency` or `default:throughput` as the model for smart pools.\n"

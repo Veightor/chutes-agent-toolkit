@@ -7,7 +7,7 @@ uv tool install chutes-mcp-server \
   --from plugins/chutes-ai/skills/chutes-mcp-portability/mcp-server
 ```
 
-`uv tool install` puts `chutes-mcp-server` on your PATH. The `--from <local path>` form is required — the package is not published on PyPI (404 verified 2026-06-11).
+`uv tool install` puts `chutes-mcp-server` on your PATH. The `--from <local path>` form is required — the package is not published on PyPI (404 verified 2026-06-11). If you hit "Readme file does not exist" on an older checkout, update: a 2026-06-11 fix added the `mcp-server/README.md` that `pyproject.toml` declares, which had broken every `--from` build.
 
 ## Generate the config
 

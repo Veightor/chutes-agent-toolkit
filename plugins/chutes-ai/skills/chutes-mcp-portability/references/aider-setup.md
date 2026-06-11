@@ -1,6 +1,6 @@
 # Chutes in Aider (OpenAI-like payloads, no MCP) **[BETA]**
 
-Aider does not speak MCP — it speaks the OpenAI HTTP API, sending `Authorization: Bearer $OPENAI_API_KEY`. Good news: the April 2026 auth mismatch is gone. Re-verified 2026-06-11, `Authorization: Bearer cpk_...` returns 200 on `GET llm.chutes.ai/v1/models`, and Bearer is now the platform-recommended header (per chutes.ai's own `ai-plugin.json` / `llms.txt`; official docs say `X-API-Key` is silently ignored on the inference surface). This setup stays **[BETA]** only because a paid `POST /chat/completions` round-trip through Aider has not been re-exercised (unverified as of 2026-06-11).
+Aider does not speak MCP — it speaks the OpenAI HTTP API, sending `Authorization: Bearer $OPENAI_API_KEY`. Good news: the April 2026 auth mismatch is gone. Re-verified 2026-06-11, `Authorization: Bearer cpk_...` returns 200 on `GET llm.chutes.ai/v1/models` **and on a real paid `POST /chat/completions`** (live completion returned), and Bearer is now the platform-recommended header (per chutes.ai's own `ai-plugin.json` / `llms.txt`; `X-API-Key` is confirmed silently ignored on inference — a completion POST with it hit the anonymous 429 path). This setup stays **[BETA]** only because the round-trip has not been exercised through Aider itself; the underlying endpoint + auth are verified.
 
 ## Generate the config
 
@@ -59,6 +59,6 @@ The first line of Aider output should show the Chutes model id. A simple test ed
 
 ## Troubleshooting
 
-- **401 Unauthorized** — `CHUTES_API_KEY` is empty or wrong. Bearer `cpk_...` itself is accepted on the inference surface (re-verified 2026-06-11 on `/v1/models`), so a 401 now points at the key value, not the header.
+- **401 Unauthorized** — `CHUTES_API_KEY` is empty or wrong. Bearer `cpk_...` itself is accepted on the inference surface (re-verified 2026-06-11 on a real `POST /chat/completions`), so a 401 now points at the key value, not the header.
 - **"Unknown model"** — Aider has a hardcoded list of known models; if yours isn't on it, add `--no-verify-ssl` / `--no-model-check` and trust `/v1/models`.
 - **Edits not applying** — `edit-format: diff` is the most forgiving format for Chutes models. `whole` is next. `udiff` is strict and sometimes misses.

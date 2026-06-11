@@ -154,7 +154,7 @@ Hermes native provider — delivered in a sibling repo; phase 6/7 marked complet
 
 A swarm pass re-verified the toolkit against the live API (real GETs only; no writes, no paid calls). Wave-2 records above stand as history; current facts:
 
-- **Auth inverted since April**: `Authorization: Bearer cpk_...` now works on both `llm.chutes.ai` and `api.chutes.ai` (verified live); `X-API-Key` 401s on the management API and is silently ignored on inference per `chutes.ai/llms.txt`. All auth guidance rewritten to Bearer-everywhere. `GET /v1/models` is now public.
+- **Auth inverted since April**: `Authorization: Bearer cpk_...` now works on both `llm.chutes.ai` and `api.chutes.ai` (verified live, including a real paid `POST /v1/chat/completions` later on 2026-06-11 — HTTP 200, completion returned); `X-API-Key` 401s on the management API and is **confirmed silently ignored on inference** (live: a completion POST with it got the anonymous 429, byte-identical to no auth, while Bearer succeeded in the same minute). All auth guidance rewritten to Bearer-everywhere. `GET /v1/models` is now public.
 - **Catalog is TEE-only**: 13 models, all `confidential_compute: true`; the entire non-TEE tier (including all Llama models) is gone. Model docs, routing examples, and alias targets rewritten around the live catalog (Kimi-K2.5/K2.6, GLM-5/5.1, Qwen3.5/3.6, MiniMax-M2.5, DeepSeek-V3.2, Gemma-4, Nemotron-3-Ultra, Qwen3-32B, Mistral-Nemo).
 - **`PUT /chutes/{id}/teeify` removed upstream** (verified absent from openapi.json). `teeify_chute.py` and MCP `chutes_teeify` marked defunct; the SDK-native switch is the `tee=True` template kwarg. `revision` pinning confirmed server-enforced as full 40-hex SHA.
 - **TEE attestation re-run end-to-end**: 14 instances on Blackwell GPUs (was 7 / Hopper); 64-hex `nonce` contract verified; new public `GET /servers/tee/measurements` golden-measurement endpoint documented.
@@ -162,7 +162,7 @@ A swarm pass re-verified the toolkit against the live API (real GETs only; no wr
 - **Agent registration** terminal status is `"completed"` (live-verified), not `"ready"`.
 - **New platform surface documented**: public `GET /pricing` (live TAO/USD rate + per-GPU rates), Plus $10 / Pro $20 / Enterprise plans with dollar-denominated caps (Pro `subscription_usage` shape API-verified), research data-opt-in 25% discount proxy [BETA], self-serve private TEE deploys on RTX Pro 6000 [BETA], `/idp/apps` server-side `include_public=false` / `search` filters, 22-scope live `/idp/scopes` list.
 - **SDK facts refreshed**: PyPI `chutes` 0.6.9 stable (0.6.11rc in flight with a `bittensor-wallet`/`async-substrate-interface` dependency swap); no GitHub releases/tags.
-- Not re-exercised (kept at April stamps or hedged): `POST /v1/chat/completions` auth, all write/deploy/registration POST flows, the easy-deploy 403 gate.
+- Not re-exercised (kept at April stamps or hedged): all write/deploy/registration POST flows, the easy-deploy 403 gate. (`POST /v1/chat/completions` Bearer auth, originally on this list, was live-verified later on 2026-06-11.)
 
 ### Phase 10: wave 3 brainstorm (not yet scoped)
 
