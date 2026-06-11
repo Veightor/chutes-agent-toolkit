@@ -165,7 +165,7 @@ Standard machine-readable interfaces:
 - **Create accounts** — register on Chutes.ai with proper credential handling and backup
 - **Manage API keys** — create, list, and delete `cpk_` prefixed keys
 - **Secure credential store** — save keys to the OS keychain and read them back in future sessions
-- **Discover models** — browse the live catalog (13 TEE models as of 2026-06-11) with real-time pricing from `/v1/models`; TTFT/TPS comes from `/invocations/stats/llm`, not the models list
+- **Discover models** — browse the live catalog with real-time pricing from `/v1/models`; `docs/known-models.md` and `data/chutes-models.json` are auto-refreshed daily by GitHub Actions from that public endpoint. TTFT/TPS comes from `/invocations/stats/llm`, not the models list
 - **Make inference calls** — OpenAI-compatible request/response API; authenticate with `Authorization: Bearer cpk_...` everywhere
 - **Model routing** — failover, latency-optimized, or throughput-optimized multi-model pools
 - **Model aliases** — stable semantic handles like `interactive-fast` that survive model churn
@@ -318,6 +318,7 @@ chutes-agent-toolkit/
 ├── docs/
 │   ├── api-reference.md
 │   ├── known-models.md
+│   ├── hermes-chutes-toolkit-guide.md
 │   ├── roadmap.md
 │   ├── hermes-integration-spec.md
 │   ├── chutes-maxi-proposal.md                # Hermes-generated proposal
@@ -348,6 +349,12 @@ chutes-agent-toolkit/
 | Sign in with Chutes (upstream) | https://github.com/chutesai/Sign-in-with-Chutes |
 | GitHub (SDK, PyPI `chutes` 0.6.9 stable) | https://github.com/chutesai/chutes |
 | Vercel AI SDK provider | https://www.npmjs.com/package/@chutes-ai/ai-sdk-provider |
+
+Model snapshot automation:
+
+- `scripts/update_chutes_models.py` fetches `https://llm.chutes.ai/v1/models` with no auth headers.
+- `.github/workflows/refresh-chutes-models.yml` runs it once per day and on manual dispatch.
+- Generated outputs: `data/chutes-models.json`, `docs/known-models.md`, and `plugins/chutes-ai/skills/chutes-ai/references/known-models.md`.
 
 ## Contributing
 

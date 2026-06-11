@@ -1,0 +1,42 @@
+name: Refresh Chutes models
+
+on:
+  schedule:
+    # Daily at 09:17 UTC. The endpoint is public; no Chutes secrets are needed.
+    - cron: "17 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-models:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Refresh model snapshot
+        run: python3 scripts/update_chutes_models.py
+
+      - name: Validate generated JSON
+        run: python3 -m json.tool data/chutes-models.json >/dev/null
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet -- data/chutes-models.json docs/known-models.md plugins/chutes-ai/skills/chutes-ai/references/known-models.md; then
+            echo "No model snapshot changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/chutes-models.json docs/known-models.md plugins/chutes-ai/skills/chutes-ai/references/known-models.md
+          git commit -m "chore: refresh Chutes model snapshot"
+          git push
