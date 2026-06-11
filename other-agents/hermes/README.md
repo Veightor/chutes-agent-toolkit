@@ -1,5 +1,7 @@
 # Hermes + Chutes Quickstart
 
+> New to the Chutes API itself? Read the one-page [**Chutes Endpoint Guide**](../../docs/endpoint-guide.md) first — base URLs, `Bearer cpk_` auth, routing, the live model list, and the 25% research endpoint all live there. This page is the Hermes-specific wiring on top of it.
+
 This guide shows the current Hermes-facing Chutes setup in this repo.
 
 Important distinction:

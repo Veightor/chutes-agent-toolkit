@@ -1,0 +1,34 @@
+{
+  // Minimal OpenClaw + Chutes setup (JSON5 — comments allowed).
+  // Save as ~/.openclaw/openclaw.json (or your OpenClaw config path).
+  // Requires: export CHUTES_API_KEY="cpk_..."
+  // Verify the model id against the live list: curl https://llm.chutes.ai/v1/models
+  agents: {
+    defaults: {
+      model: { primary: "chutes/deepseek-ai/DeepSeek-V3.2-TEE" },
+    },
+  },
+
+  models: {
+    providers: {
+      chutes: {
+        baseUrl: "https://llm.chutes.ai/v1",
+        apiKey: "${CHUTES_API_KEY}",
+        api: "openai-completions",
+        timeoutSeconds: 300,
+        models: [
+          {
+            id: "deepseek-ai/DeepSeek-V3.2-TEE",
+            name: "DeepSeek V3.2 (TEE)",
+            reasoning: true,
+            input: ["text"],
+            contextWindow: 131072,
+            maxTokens: 65536,
+            // USD per 1M tokens (snapshot — see /v1/models for live pricing)
+            cost: { input: 1.0, output: 1.0, cacheRead: 0.5, cacheWrite: 0 },
+          },
+        ],
+      },
+    },
+  },
+}

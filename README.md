@@ -1,10 +1,41 @@
 # Chutes Agent Toolkit
 
-Give any AI agent access to [Chutes.ai](https://chutes.ai) — decentralized serverless inference for open-source AI models (Kimi, GLM, Qwen, DeepSeek, MiniMax, Gemma, Nemotron, Mistral), powered by Bittensor. As of 2026-06-11 the hosted catalog is **13 models, all TEE-backed** (`confidential_compute: true`) — the live list at `https://llm.chutes.ai/v1/models` is the source of truth.
+> **Give any AI agent access to [Chutes.ai](https://chutes.ai)** — decentralized, serverless, 100%-TEE inference for open-source models, through the OpenAI API.
 
-This repo is both a **Claude plugin marketplace** and a **multi-agent toolkit**. The same skills, scripts, and docs work for Claude, Hermes, and any generic OpenAI-compatible client.
+[![Refresh Chutes models](https://github.com/Veightor/chutes-agent-toolkit/actions/workflows/refresh-chutes-models.yml/badge.svg)](https://github.com/Veightor/chutes-agent-toolkit/actions/workflows/refresh-chutes-models.yml)
+[![Models](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FVeightor%2Fchutes-agent-toolkit%2Fmain%2Fdata%2Fchutes-models.json&query=%24.count&label=models&color=brightgreen&logo=huggingface&logoColor=white)](https://llm.chutes.ai/v1/models)
+[![Models updated](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FVeightor%2Fchutes-agent-toolkit%2Fmain%2Fdata%2Fchutes-models.json&query=%24.fetched_at&label=models%20updated&color=2496ED&logo=githubactions&logoColor=white)](data/chutes-models.json)
+[![Plugin version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FVeightor%2Fchutes-agent-toolkit%2Fmain%2Fplugins%2Fchutes-ai%2F.claude-plugin%2Fplugin.json&query=%24.version&label=plugin&prefix=v&color=blueviolet)](plugins/chutes-ai/.claude-plugin/plugin.json)
+[![API: OpenAI-compatible](https://img.shields.io/badge/API-OpenAI--compatible-412991?logo=openai&logoColor=white)](docs/endpoint-guide.md)
+[![Inference: 100% TEE](https://img.shields.io/badge/inference-100%25%20TEE--backed-success?logo=intel&logoColor=white)](docs/endpoint-guide.md#8-privacy-every-model-is-a-tee)
+[![Powered by Bittensor](https://img.shields.io/badge/powered%20by-Bittensor-FF6B00)](https://bittensor.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-It is also the staging ground for Hermes integration assets: custom-provider configuration, a Hermes skill mirror, and MCP setup guidance that track current Hermes CLI behavior.
+One toolkit, every agent. Drop Chutes into **Claude**, **Hermes**, **OpenClaw**, or any OpenAI-compatible client — decentralized serverless inference for open-source models (Kimi, GLM, Qwen, DeepSeek, MiniMax, Gemma, Nemotron, Mistral), powered by Bittensor. The hosted catalog is currently **all TEE-backed** (`confidential_compute: true`); the live list at [`https://llm.chutes.ai/v1/models`](https://llm.chutes.ai/v1/models) is always the source of truth (and the badges above read straight from the daily-refreshed snapshot).
+
+### 🚀 Start here
+
+| You want to… | Go to |
+|---|---|
+| **Call the endpoint from anything** (the one-page universal guide) | 📘 [**`docs/endpoint-guide.md`**](docs/endpoint-guide.md) |
+| Use it inside **Claude** (Code / Cowork) | [Install for Claude](#install-for-claude-code--cowork) |
+| Use it inside **Hermes** | [`other-agents/hermes/`](other-agents/hermes/README.md) |
+| Use it inside **OpenClaw** 🦞 | [`other-agents/openclaw/`](other-agents/openclaw/README.md) |
+| Use it in **Aider / Cursor / Cline / LangChain / LiteLLM** | [`other-agents/openai-compatible/`](other-agents/openai-compatible/README.md) |
+| Drop it into **any agent's system prompt** | [`other-agents/system-prompt/`](other-agents/system-prompt/chutes-agent-prompt.md) |
+
+This repo is both a **Claude plugin marketplace** and a **multi-agent toolkit** — the same skills, scripts, and docs work everywhere. It also stages Hermes integration assets: custom-provider configuration, a Hermes skill mirror, and MCP setup guidance that track current Hermes CLI behavior.
+
+### Versions
+
+| Component | Version | Notes |
+|---|---|---|
+| Toolkit / `chutes-ai` plugin | **v1.3.0** | see [`plugin.json`](plugins/chutes-ai/.claude-plugin/plugin.json) |
+| Model snapshot | _auto_ | daily-refreshed → badges above + [`data/chutes-models.json`](data/chutes-models.json) |
+| Chutes SDK (PyPI `chutes`) | 0.6.9 (stable) | for `chutes deploy` / TEE `tee=True` |
+| Hermes (verified against) | v0.16.0 | named OpenAI-compatible provider |
+| OpenClaw (verified against) | `openclaw@latest` | `models.providers` JSON5 config |
+| Last live API re-verification | 2026-06-11 | auth + catalog + TEE, see below |
 
 ---
 
@@ -114,6 +145,25 @@ See also:
 - [`other-agents/hermes/config-examples/`](other-agents/hermes/config-examples/)
 
 Hermes users can either copy those skills into `~/.hermes/skills/` or mount the directory with `skills.external_dirs` in `~/.hermes/config.yaml`. Scripts live in the Claude plugin tree; Hermes users invoke them from the repo root. There is one implementation, two skill trees.
+
+### OpenClaw 🦞
+
+[OpenClaw](https://openclaw.ai) is a self-hosted gateway that wires your chat apps (Discord, Slack, Telegram, iMessage, WhatsApp, Teams, Signal, Matrix, …) to AI coding agents. Chutes plugs in as an OpenAI-compatible provider in `openclaw.json` (JSON5), so your channel agents run on open-source TEE models:
+
+```json5
+models: {
+  providers: {
+    chutes: {
+      baseUrl: "https://llm.chutes.ai/v1",
+      apiKey: "${CHUTES_API_KEY}",
+      api: "openai-completions",
+      models: [{ id: "deepseek-ai/DeepSeek-V3.2-TEE", name: "DeepSeek V3.2 (TEE)" }],
+    },
+  },
+}
+```
+
+Full guide + routing/vision config examples: [`other-agents/openclaw/README.md`](other-agents/openclaw/README.md) · [`config-examples/`](other-agents/openclaw/config-examples/).
 
 ### Any OpenAI-compatible client (Aider, Cursor, Cline, LangChain, LiteLLM, …)
 
@@ -311,11 +361,15 @@ chutes-agent-toolkit/
 │   │       ├── chutes-mcp-portability/        # read tools verified; writes BETA
 │   │       ├── chutes-agent-registration/     # [BETA]
 │   │       └── chutes-tee/                    # shape-valid attestation
+│   ├── openclaw/                            # OpenClaw gateway integration
+│   │   ├── README.md
+│   │   └── config-examples/                 # openclaw.json, openclaw-routing.json
 │   ├── system-prompt/
 │   │   └── chutes-agent-prompt.md
 │   └── openai-compatible/
 │       └── README.md
 ├── docs/
+│   ├── endpoint-guide.md                    # ⭐ universal one-page endpoint guide
 │   ├── api-reference.md
 │   ├── known-models.md
 │   ├── hermes-chutes-toolkit-guide.md

@@ -1,0 +1,50 @@
+{
+  // OpenClaw + Chutes with latency-optimized routing and a vision model.
+  // JSON5 — comments allowed. Requires: export CHUTES_API_KEY="cpk_..."
+  //
+  // The "latency pool" id is a comma-separated Chutes routing string with a
+  // :latency suffix — Chutes picks the fastest-responding model in the pool
+  // per request, with sequential failover. Drop the suffix for plain failover,
+  // or use :throughput for max tokens/sec.
+  //
+  // Reconcile model ids/pricing with: curl https://llm.chutes.ai/v1/models
+  agents: {
+    defaults: {
+      model: {
+        primary: "chutes/zai-org/GLM-5-TEE,deepseek-ai/DeepSeek-V3.2-TEE,Qwen/Qwen3.5-397B-A17B-TEE:latency",
+        // Vision-capable fallback for image-bearing messages
+        vision: "chutes/google/gemma-4-31B-turbo-TEE",
+      },
+    },
+  },
+
+  models: {
+    providers: {
+      chutes: {
+        baseUrl: "https://llm.chutes.ai/v1",
+        apiKey: "${CHUTES_API_KEY}",
+        api: "openai-completions",
+        timeoutSeconds: 300,
+        models: [
+          {
+            id: "zai-org/GLM-5-TEE,deepseek-ai/DeepSeek-V3.2-TEE,Qwen/Qwen3.5-397B-A17B-TEE:latency",
+            name: "Chutes (latency pool)",
+            reasoning: true,
+            input: ["text"],
+            contextWindow: 131072,
+            maxTokens: 65536,
+          },
+          {
+            id: "google/gemma-4-31B-turbo-TEE",
+            name: "Gemma 4 31B turbo (TEE, vision)",
+            reasoning: true,
+            input: ["text", "image"],
+            contextWindow: 131072,
+            maxTokens: 65536,
+            cost: { input: 0.15, output: 0.42, cacheRead: 0.075, cacheWrite: 0 },
+          },
+        ],
+      },
+    },
+  },
+}

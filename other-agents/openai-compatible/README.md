@@ -1,5 +1,7 @@
 # OpenAI Plugin / AutoGPT / Tool-Based Agents
 
+> For a full walkthrough — auth, your first call in 5 languages, routing, streaming, tools, and pricing — see the one-page [**Chutes Endpoint Guide**](../../docs/endpoint-guide.md).
+
 Chutes.ai already publishes standard machine-readable interfaces that tool-based agent frameworks can consume directly. You don't need to build anything custom — just point your framework at these URLs.
 
 ## Plugin Manifest (ai-plugin.json)
