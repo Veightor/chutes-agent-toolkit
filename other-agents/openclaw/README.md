@@ -4,6 +4,8 @@ Wire [Chutes.ai](https://chutes.ai) — decentralized, all-TEE, OpenAI-compatibl
 
 From OpenClaw's point of view, Chutes is just another **OpenAI-compatible provider**. You add one provider block to `openclaw.json`, point your agent at a Chutes model, and your messaging-channel agents now run on open-source TEE models for a fraction of frontier-model cost.
 
+> **[BETA]** This integration is written against OpenClaw's official [model-providers docs](https://docs.openclaw.ai/concepts/model-providers) and the verified Chutes endpoint behavior, but has not yet been exercised end-to-end against a live OpenClaw install. The Chutes side (auth, models, routing) is live-verified; the OpenClaw `models.providers` wiring is doc-derived. Confirm field names against `openclaw --version`'s docs and please open an issue if anything drifts.
+
 > New to the Chutes API itself? Read the one-page [**Chutes Endpoint Guide**](../../docs/endpoint-guide.md) first — base URLs, auth, routing, and the model list all live there.
 
 ---

@@ -20,7 +20,7 @@ One toolkit, every agent. Drop Chutes into **Claude**, **Hermes**, **OpenClaw**,
 | **Call the endpoint from anything** (the one-page universal guide) | 📘 [**`docs/endpoint-guide.md`**](docs/endpoint-guide.md) |
 | Use it inside **Claude** (Code / Cowork) | [Install for Claude](#install-for-claude-code--cowork) |
 | Use it inside **Hermes** | [`other-agents/hermes/`](other-agents/hermes/README.md) |
-| Use it inside **OpenClaw** 🦞 | [`other-agents/openclaw/`](other-agents/openclaw/README.md) |
+| Use it inside **OpenClaw** 🦞 **[BETA]** | [`other-agents/openclaw/`](other-agents/openclaw/README.md) |
 | Use it in **Aider / Cursor / Cline / LangChain / LiteLLM** | [`other-agents/openai-compatible/`](other-agents/openai-compatible/README.md) |
 | Drop it into **any agent's system prompt** | [`other-agents/system-prompt/`](other-agents/system-prompt/chutes-agent-prompt.md) |
 
@@ -146,7 +146,9 @@ See also:
 
 Hermes users can either copy those skills into `~/.hermes/skills/` or mount the directory with `skills.external_dirs` in `~/.hermes/config.yaml`. Scripts live in the Claude plugin tree; Hermes users invoke them from the repo root. There is one implementation, two skill trees.
 
-### OpenClaw 🦞
+### OpenClaw 🦞 **[BETA]**
+
+> **[BETA]** Doc-derived from OpenClaw's official model-providers guide; the Chutes side is live-verified, the OpenClaw wiring is not yet exercised end-to-end. Details in [`other-agents/openclaw/README.md`](other-agents/openclaw/README.md).
 
 [OpenClaw](https://openclaw.ai) is a self-hosted gateway that wires your chat apps (Discord, Slack, Telegram, iMessage, WhatsApp, Teams, Signal, Matrix, …) to AI coding agents. Chutes plugs in as an OpenAI-compatible provider in `openclaw.json` (JSON5), so your channel agents run on open-source TEE models:
 
