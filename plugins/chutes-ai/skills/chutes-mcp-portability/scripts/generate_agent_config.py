@@ -139,9 +139,10 @@ def system_prompt(out: Path) -> Path:
         "# Chutes.ai — System Prompt Block\n\n"
         "Paste this into any system prompt to tell a generic agent how to call Chutes:\n\n"
         "---\n\n"
-        "You have access to Chutes.ai, a decentralized inference network serving 40+ open-source models via an OpenAI-compatible API.\n\n"
+        "You have access to Chutes.ai, a decentralized inference network serving 40+ open-source models via an OpenAI-like inference API.\n\n"
         "Base URL: `https://llm.chutes.ai/v1`\n"
-        "Auth: `Authorization: Bearer $CHUTES_API_KEY` (never log or echo the key)\n"
+        "Auth for direct HTTP calls: `X-API-Key: cpk_...` (never log or echo the key)\n"
+        "Live note: direct Bearer use with a `cpk_...` key returned 401 in verification on 2026-04-15.\n"
         "List models: `GET /models` (always treat this as source of truth; do not hardcode ids).\n"
         "Chat: `POST /chat/completions` with `{model, messages, max_tokens, temperature}`.\n"
         "Routing: pass `default:latency` or `default:throughput` as the model for smart pools.\n"
@@ -207,7 +208,7 @@ def main() -> int:
     print("\nSummary:")
     print(json.dumps(results, indent=2))
     print("\nNext:")
-    print("  1. export CHUTES_API_KEY=$(python plugins/chutes-ai/skills/chutes-ai/scripts/manage_credentials.py get --field api_key)")
+    print("  1. load CHUTES_API_KEY from: python plugins/chutes-ai/skills/chutes-ai/scripts/manage_credentials.py get --field api_key")
     print("  2. install the MCP server (uv tool install chutes-mcp-server) for MCP targets")
     print("  3. restart the target client so it picks up the new config")
     return 0

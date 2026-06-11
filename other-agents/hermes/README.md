@@ -31,6 +31,8 @@ hermes status --all
 
 Add Chutes as a named custom provider in `~/.hermes/config.yaml`.
 
+Important live-auth caveat (verified 2026-04-15): Hermes custom providers usually send an Authorization Bearer header. Chutes inference succeeded in live tests with X-API-Key using a `cpk_...` key, while Bearer `cpk_...` returned 401. So this config shape is structurally correct, but may not work end-to-end until Chutes accepts Bearer `cpk_...` on the inference surface or Hermes supports overriding the auth header.
+
 Example:
 
 ```yaml
@@ -61,6 +63,8 @@ hermes model
 ```
 
 and select the saved custom provider.
+
+If requests fail with 401, the issue is likely the current auth-header mismatch rather than the provider YAML itself.
 
 ## Why use two named providers?
 

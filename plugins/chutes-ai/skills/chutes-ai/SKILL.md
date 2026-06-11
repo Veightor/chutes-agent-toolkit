@@ -64,9 +64,15 @@ Two base URLs:
 | Purpose | URL |
 |---|---|
 | Account management (keys, billing, chutes, `/idp/*`) | `https://api.chutes.ai` |
-| Inference (OpenAI-compatible) | `https://llm.chutes.ai/v1` |
+| Inference (OpenAI-like request/response shape) | `https://llm.chutes.ai/v1` |
 
-Every request: `Authorization: Bearer cpk_...`. POST/PATCH: `Content-Type: application/json`. List endpoints return `{ "total", "page", "limit", "items": [...] }` (0-indexed pages, default limit 25). Errors: `{ "detail": "..." }`.
+Wave-3 live auth finding (verified 2026-04-15): auth differs by surface.
+- Inference worked with `X-API-Key: cpk_...`
+- Bearer auth with a `cpk_...` key returned 401 on live `/v1/models` and `/v1/chat/completions` tests
+- Management endpoints like `/users/me` worked with the JWT returned by `POST /users/login` (fingerprint)
+- CLI CRUD endpoints like `GET /api_keys/` worked with hotkey-signed headers, not `cpk_...`
+
+Do not assume one auth header works everywhere.
 
 ---
 
@@ -80,6 +86,15 @@ POST https://api.chutes.ai/users/register
 Body: { "username": "desired-username" }
 ```
 Usernames: 3–20 characters, alphanumeric.
+
+Wave-3 live registration finding (verified 2026-04-15): the practical agent flow has extra prerequisites not captured in the bare endpoint sketch above.
+
+- Registration requires a human-obtained one-time token from `https://rtok.chutes.ai/users/registration_token`.
+- That token is protected by Cloudflare / browser verification and may be IP-bound, so a headless agent may need the user to fetch and paste it.
+- The registering coldkey must have at least `0.25 TAO`, otherwise the API returns: `You must have at least 0.25 tao on your coldkey to register an account.`
+- The token can expire or mismatch the caller IP; if registration starts failing with `Invalid registration token, or registration token does not match expected IP address`, fetch a fresh token and retry immediately.
+
+For agent-led onboarding, treat this as a human-in-the-loop step rather than a fully autonomous one.
 
 **Via web browser:** direct users to `https://chutes.ai/auth/start` (the "Create Account" button on `https://chutes.ai/auth` opens a support widget, not the form).
 
@@ -153,7 +168,7 @@ Security details live in `references/api-reference.md` and `docs/credential-stor
 
 ```
 GET https://llm.chutes.ai/v1/models
-Authorization: Bearer cpk_...
+X-API-Key: cpk_...
 ```
 
 Each model exposes `id`, `root`, `chute_id`, `confidential_compute` (boolean — **use this, not the `-TEE` suffix**, as source of truth), `owned_by` (`sglang` / `vllm`), `pricing.{prompt,completion,input_cache_read}` (USD per 1M tokens), `context_length`, `max_output_length`, `supported_features` (`tools`, `json_mode`, `structured_outputs`, `reasoning`), `supported_sampling_parameters`, `input_modalities`, `output_modalities`, `quantization`.
@@ -173,34 +188,53 @@ When helping users choose:
 
 ## Step 4: Making Inference Calls
 
-Chutes is fully OpenAI-compatible. Point any OpenAI SDK at `https://llm.chutes.ai/v1`.
+Chutes uses OpenAI-like request/response shapes on the inference surface, but live auth currently differs from OpenAI SDK defaults.
 
-**Python (OpenAI SDK):**
+Verified live 2026-04-15:
+- `X-API-Key: cpk_...` worked for inference
+- Bearer auth with a `cpk_...` key returned 401 on `/v1/models` and `/v1/chat/completions`
+
+So for direct HTTP calls, use `X-API-Key`.
+
+For generic OpenAI SDKs that hardcode `Authorization: Bearer`, treat Chutes as **conditionally compatible** until the platform accepts Bearer `cpk_...` on the inference surface.
+
+**Python (raw HTTP until Bearer `cpk_...` is accepted live):**
 ```python
-from openai import OpenAI
-client = OpenAI(base_url="https://llm.chutes.ai/v1", api_key="cpk_...")
-response = client.chat.completions.create(
-    model="deepseek-ai/DeepSeek-V3-0324",
-    messages=[{"role": "user", "content": "Hello!"}],
+import requests
+
+response = requests.post(
+    "https://llm.chutes.ai/v1/chat/completions",
+    headers={"X-API-Key": "cpk_...", "Content-Type": "application/json"},
+    json={
+        "model": "deepseek-ai/DeepSeek-V3-0324",
+        "messages": [{"role": "user", "content": "Hello!"}],
+    },
+    timeout=60,
 )
-print(response.choices[0].message.content)
+response.raise_for_status()
+print(response.json()["choices"][0]["message"]["content"])
 ```
 
 **cURL:**
 ```bash
 curl https://llm.chutes.ai/v1/chat/completions \
-  -H "Authorization: Bearer cpk_..." \
+  -H "X-API-Key: cpk_..." \
   -H "Content-Type: application/json" \
   -d '{"model":"deepseek-ai/DeepSeek-V3-0324","messages":[{"role":"user","content":"Hello!"}]}'
 ```
 
-**Node:**
+**Node (raw fetch until Bearer `cpk_...` is accepted live):**
 ```javascript
-import OpenAI from 'openai';
-const client = new OpenAI({ baseURL: 'https://llm.chutes.ai/v1', apiKey: 'cpk_...' });
-const response = await client.chat.completions.create({
-  model: 'deepseek-ai/DeepSeek-V3-0324',
-  messages: [{ role: 'user', content: 'Hello!' }],
+const response = await fetch('https://llm.chutes.ai/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    'X-API-Key': 'cpk_...',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    model: 'deepseek-ai/DeepSeek-V3-0324',
+    messages: [{ role: 'user', content: 'Hello!' }],
+  }),
 });
 ```
 
@@ -224,6 +258,10 @@ Saved pools via the dashboard use `default`, `default:latency`, `default:through
 ```
 GET https://api.chutes.ai/users/me
 ```
+Use the JWT returned by `POST /users/login` (fingerprint) for this endpoint.
+
+Live finding: `cpk_...` did not work against `/users/me`; Bearer JWT did.
+
 Returns `username`, `user_id`, `balance` (USD), `payment_address` (Bittensor SS58), `hotkey`/`coldkey`, `quotas`, `permissions`.
 
 For anything beyond a balance check — discounts, quotas by chute, subscription usage, invocation stats, payment history — hand off to `chutes-usage-and-billing` (wave 2 stub; use MCP read tools in the meantime).

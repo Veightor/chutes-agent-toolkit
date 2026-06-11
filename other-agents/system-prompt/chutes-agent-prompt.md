@@ -5,9 +5,15 @@ You have access to Chutes.ai, a decentralized serverless AI inference platform. 
 ## Base URLs
 
 - **Management API**: `https://api.chutes.ai`
-- **Inference API**: `https://llm.chutes.ai/v1` (OpenAI-compatible)
+- **Inference API**: `https://llm.chutes.ai/v1` (OpenAI-like response schema, but auth differs in live tests)
 
-Authenticate every request with: `Authorization: Bearer cpk_...`
+Wave-3 live auth finding (verified 2026-04-15):
+- Inference succeeded with `X-API-Key: cpk_...`
+- `Authorization: Bearer cpk_...` returned HTTP 401 on live `/v1/models` and `/v1/chat/completions` tests
+- Management endpoints like `/users/me` worked with the JWT returned by `POST /users/login` using the fingerprint
+- `GET /api_keys/` worked with hotkey-signed headers via the `chutes` CLI flow
+
+Do not tell agents that one Bearer header works for every Chutes surface.
 
 All POST/PATCH requests require `Content-Type: application/json`. List endpoints return paginated responses (0-indexed pages, default limit 25): `{ "total", "page", "limit", "items": [...] }`. Errors return `{ "detail": "..." }`.
 
@@ -21,6 +27,12 @@ POST https://api.chutes.ai/users/register
 Body: { "username": "desired-name" }
 ```
 Usernames: 3-20 chars, alphanumeric only. Web registration: `https://chutes.ai/auth/start` (NOT `/auth` — that opens a support widget).
+
+Wave-3 live registration finding (verified 2026-04-15): practical account creation may require a human-in-the-loop step.
+- A one-time registration token from `https://rtok.chutes.ai/users/registration_token`
+- Browser / Cloudflare verification to obtain that token
+- At least `0.25 TAO` on the registering coldkey
+- A fresh token if the previous one fails with `Invalid registration token, or registration token does not match expected IP address`
 
 **CRITICAL**: Registration returns a 32-character fingerprint shown ONLY ONCE. This is the master credential. If lost without a linked Bittensor wallet, account access is gone. Always offer to save it to a backup file. Recovery IS possible via Bittensor hotkey signature at `https://chutes.ai/auth/reset` or `POST https://api.chutes.ai/users/change_fingerprint`.
 
@@ -54,14 +66,23 @@ Available model types: LLMs (DeepSeek, Llama, Qwen, GLM, Mistral, Gemma), image 
 
 ## Inference
 
-Fully OpenAI-compatible. Use any OpenAI SDK by changing the base URL:
+Chutes uses OpenAI-like request/response shapes on the inference surface, but live auth is not fully drop-in for generic OpenAI SDKs.
+
+Verified live 2026-04-15:
+- direct HTTP inference worked with `X-API-Key: cpk_...`
+- Bearer auth with a `cpk_...` key returned 401 on the inference surface
+
+So only treat generic SDK compatibility as full drop-in if the client can override the auth header or Chutes starts accepting Bearer `cpk_...`.
 
 ```python
-from openai import OpenAI
-client = OpenAI(base_url="https://llm.chutes.ai/v1", api_key="cpk_...")
-response = client.chat.completions.create(
-    model="deepseek-ai/DeepSeek-V3-0324",
-    messages=[{"role": "user", "content": "Hello!"}]
+import requests
+response = requests.post(
+    "https://llm.chutes.ai/v1/chat/completions",
+    headers={"X-API-Key": "cpk_...", "Content-Type": "application/json"},
+    json={
+        "model": "deepseek-ai/DeepSeek-V3-0324",
+        "messages": [{"role": "user", "content": "Hello!"}],
+    },
 )
 ```
 

@@ -1,6 +1,6 @@
-# Chutes in Aider (OpenAI-compatible, no MCP) **[BETA]**
+# Chutes in Aider (OpenAI-like payloads, no MCP) **[BETA]**
 
-Aider does not speak MCP — it speaks the OpenAI HTTP API. Point it at the Chutes base URL and you're done.
+Aider does not speak MCP — it speaks the OpenAI HTTP API. That means the base URL shape fits, but live auth may not: verified 2026-04-15, Chutes inference accepted `X-API-Key: cpk_...` while `Authorization: Bearer cpk_...` returned 401. So treat direct Aider usage as experimental until Aider can send `X-API-Key` or Chutes accepts Bearer `cpk_...`.
 
 ## Generate the config
 
@@ -58,6 +58,6 @@ The first line of Aider output should show the Chutes model id. A simple test ed
 
 ## Troubleshooting
 
-- **401 Unauthorized** — `CHUTES_API_KEY` is missing or the wrong profile.
+- **401 Unauthorized** — Aider is probably sending `Authorization: Bearer $CHUTES_API_KEY`. That is a known live mismatch today; prefer the MCP server path until Chutes accepts Bearer `cpk_...` or Aider can send `X-API-Key`.
 - **"Unknown model"** — Aider has a hardcoded list of known models; if yours isn't on it, add `--no-verify-ssl` / `--no-model-check` and trust `/v1/models`.
 - **Edits not applying** — `edit-format: diff` is the most forgiving format for Chutes models. `whole` is next. `udiff` is strict and sometimes misses.

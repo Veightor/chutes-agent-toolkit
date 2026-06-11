@@ -20,10 +20,18 @@ This file contains detailed endpoint specifications beyond what's in SKILL.md. R
 
 ## Authentication Details
 
-All requests use Bearer token auth:
+Wave-3 live auth finding (verified 2026-04-15): authentication is split by surface.
+
+Inference (`https://llm.chutes.ai/v1`):
 ```
-Authorization: Bearer cpk_...
+X-API-Key: cpk_...
 ```
+`Authorization: Bearer cpk_...` returned HTTP 401 in live tests against both `/v1/models` and `/v1/chat/completions`, while `X-API-Key` succeeded on `/v1/models` and reached the model gateway on `/v1/chat/completions`.
+
+Management API (`https://api.chutes.ai`):
+- fingerprint login returns a short-lived JWT/token for `/users/me` and authenticated management calls
+- hotkey-signed requests are used by the `chutes` CLI for CRUD operations like `GET /api_keys/`
+- `cpk_...` keys did **not** work against `/users/me` in live tests
 
 API keys are prefixed `cpk_`. The key structure is `cpk_<key_id>.<user_id_hex>.<secret>`.
 
@@ -41,6 +49,9 @@ Body: { "username": "desired-name" }
 - Username: 3-20 chars, alphanumeric only
 - Response includes the 32-character fingerprint (SHOWN ONCE)
 - Web registration: `https://chutes.ai/auth/start` (NOT `/auth` — that opens support widget)
+- Live agent-registration caveat (verified 2026-04-15): practical registration also required a one-time token from `https://rtok.chutes.ai/users/registration_token`, which is behind browser/Cloudflare verification and may be IP-bound.
+- Live funding caveat (verified 2026-04-15): the coldkey used for registration needed at least `0.25 TAO`, otherwise the API returned `You must have at least 0.25 tao on your coldkey to register an account.`
+- If the token is stale or used from the wrong IP, the API can return `Invalid registration token, or registration token does not match expected IP address`.
 
 ### Login
 ```
@@ -218,7 +229,7 @@ Full model object fields:
 ### Filtering for TEE Models (Python example)
 ```python
 import requests
-models = requests.get("https://llm.chutes.ai/v1/models", headers={"Authorization": "Bearer cpk_..."}).json()["data"]
+models = requests.get("https://llm.chutes.ai/v1/models", headers={"X-API-Key": "cpk_..."}).json()["data"]
 tee_models = [m for m in models if m["confidential_compute"]]
 ```
 
@@ -228,7 +239,9 @@ tee_models = [m for m in models if m["confidential_compute"]]
 
 Base URL: `https://llm.chutes.ai/v1`
 
-Fully OpenAI-compatible — supports `/chat/completions`, `/completions`, `/embeddings`, etc.
+OpenAI-like request/response shape, but live auth is currently split:
+- direct inference worked with `X-API-Key: cpk_...`
+- Bearer auth with a `cpk_...` key returned 401 in live verification on 2026-04-15
 
 Always check `supported_features` and `supported_sampling_parameters` from the models endpoint before using advanced features. Behavior differs between `sglang` and `vllm` engines.
 

@@ -6,8 +6,14 @@ MCP-aware client (Claude Desktop, Cursor, Cline, Claude Code) can use
 Chutes without hand-rolling integrations.
 
 Auth:
-  CHUTES_API_KEY env var — primary
-  falls back to `manage_credentials.py get --field api_key` subprocess
+  Inference (`llm.chutes.ai/v1`):
+    CHUTES_API_KEY env var — primary
+    falls back to `manage_credentials.py get --field api_key` subprocess
+
+  Management (`api.chutes.ai`):
+    CHUTES_FINGERPRINT env var — primary
+    falls back to `manage_credentials.py get --field fingerprint`
+    then exchanges the fingerprint for a short-lived JWT via `POST /users/login`
 
 Write/deploy tools are marked [BETA] in their description and stay that
 way until an explicit verification pass exercises each one.
@@ -56,36 +62,78 @@ def _find_manage_credentials() -> Optional[Path]:
     return None
 
 
-def _get_api_key() -> str:
-    """Read the Chutes API key from env or the credential store. Never logged."""
-    env_val = os.environ.get("CHUTES_API_KEY")
+def _get_secret(field: str, env_var: str) -> str:
+    """Read a Chutes secret from env or the credential store. Never logged."""
+    env_val = os.environ.get(env_var)
     if env_val:
         return env_val
     script = _find_manage_credentials()
     if not script:
         raise RuntimeError(
-            "CHUTES_API_KEY not set and manage_credentials.py not found on PATH"
+            f"{env_var} not set and manage_credentials.py not found on PATH"
         )
     result = subprocess.run(
-        [sys.executable, str(script), "get", "--field", "api_key"],
+        [sys.executable, str(script), "get", "--field", field],
         capture_output=True,
         text=True,
     )
     if result.returncode != 0:
-        raise RuntimeError("failed to read Chutes API key from credential store")
+        raise RuntimeError(f"failed to read Chutes {field} from credential store")
     return result.stdout.strip()
+
+
+def _get_api_key() -> str:
+    return _get_secret("api_key", "CHUTES_API_KEY")
+
+
+def _get_fingerprint() -> str:
+    return _get_secret("fingerprint", "CHUTES_FINGERPRINT")
+
+
+def _has_fingerprint() -> bool:
+    try:
+        _get_fingerprint()
+        return True
+    except Exception:
+        return False
+
+
+def _get_management_jwt() -> str:
+    fingerprint = _get_fingerprint()
+    data = json.dumps({"fingerprint": fingerprint}).encode("utf-8")
+    req = urllib.request.Request(
+        CHUTES_API_BASE.rstrip("/") + "/users/login",
+        data=data,
+        headers={"Content-Type": "application/json", "Accept": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            raw = resp.read().decode("utf-8")
+            obj = json.loads(raw) if raw else {}
+            token = obj.get("token") or obj.get("access_token") or obj.get("jwt")
+            if not token:
+                raise RuntimeError("management login succeeded but no JWT/token was returned")
+            return token
+    except urllib.error.HTTPError as e:
+        detail = ""
+        try:
+            detail = json.loads(e.read().decode("utf-8")).get("detail", "")
+        except Exception:
+            pass
+        raise RuntimeError(f"management login failed: HTTP {e.code}: {detail or e.reason}") from None
 
 
 def _request(
     method: str,
     url: str,
     *,
-    bearer: str,
+    headers: dict[str, str],
     body: Any = None,
     timeout: int = 60,
 ) -> Any:
     data: Optional[bytes] = None
-    headers = {"Authorization": f"Bearer {bearer}", "Accept": "application/json"}
+    headers = {**headers, "Accept": "application/json"}
     if body is not None:
         data = json.dumps(body).encode("utf-8")
         headers["Content-Type"] = "application/json"
@@ -106,11 +154,22 @@ def _request(
 
 
 def _mgmt(method: str, path: str, *, body: Any = None) -> Any:
-    return _request(method, CHUTES_API_BASE.rstrip("/") + path, bearer=_get_api_key(), body=body)
+    jwt = _get_management_jwt()
+    return _request(
+        method,
+        CHUTES_API_BASE.rstrip("/") + path,
+        headers={"Authorization": f"Bearer {jwt}"},
+        body=body,
+    )
 
 
 def _infer(method: str, path: str, *, body: Any = None) -> Any:
-    return _request(method, CHUTES_INFER_BASE.rstrip("/") + path, bearer=_get_api_key(), body=body)
+    return _request(
+        method,
+        CHUTES_INFER_BASE.rstrip("/") + path,
+        headers={"X-API-Key": _get_api_key()},
+        body=body,
+    )
 
 
 app = FastMCP("chutes-ai")
@@ -231,11 +290,22 @@ def main() -> int:
 
     if args.self_check:
         try:
-            result = chutes_list_models(limit=1)  # type: ignore[call-arg]
+            model_result = chutes_list_models(limit=1)  # type: ignore[call-arg]
+            mgmt_total = None
+            if _has_fingerprint():
+                mgmt_result = chutes_list_api_keys(page=0, limit=1)  # type: ignore[call-arg]
+                mgmt_total = mgmt_result.get('total')
         except RuntimeError as e:
             print(f"self-check FAILED: {e}", file=sys.stderr)
             return 2
-        print(f"self-check OK: {result.get('count')} model(s) reachable")
+        if mgmt_total is None:
+            print(f"self-check OK: inference reachable ({model_result.get('count')} model(s)); management check skipped (no fingerprint configured)")
+        else:
+            print(
+                "self-check OK: "
+                f"inference reachable ({model_result.get('count')} model(s)); "
+                f"management reachable ({mgmt_total} api key(s) visible)"
+            )
         return 0
 
     app.run()  # stdio transport

@@ -108,6 +108,15 @@ Once the agent profile is saved:
 - Use the stored `api_key` via `manage_credentials.py get --profile agent.myagent --field api_key`.
 - All other skills (`chutes-ai`, `chutes-routing`, `chutes-usage-and-billing`, etc.) accept a `CHUTES_PROFILE` env var or `--profile` flag to scope against the agent profile.
 
+## Wave-3 live constraints discovered outside this stub (verified 2026-04-15)
+
+- Human-owned account registration was not fully autonomous in practice.
+- A one-time token from `https://rtok.chutes.ai/users/registration_token` was required.
+- That token was behind Cloudflare/browser verification and may be IP-bound.
+- The registering coldkey needed at least `0.25 TAO`.
+
+Until this flow is better documented or changed upstream, assume agent bootstrap may still require a human to complete the verification/token handoff step.
+
 ## Endpoint map
 
 | Action | Method | Path |
