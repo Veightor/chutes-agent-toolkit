@@ -1,0 +1,45 @@
+# Chutes Agent Toolkit
+
+> Give any AI agent access to Chutes.ai — decentralized, serverless, 100%-TEE inference for open-source models through the OpenAI API. This repo is a Claude plugin marketplace, a Hermes skill mirror, a runnable cookbook, and the canonical agent-facing Chutes documentation, all in one.
+
+The two facts that matter most: inference lives at `https://llm.chutes.ai/v1` (OpenAI-compatible), and auth is `Authorization: Bearer $CHUTES_API_KEY` on every authenticated request (never `X-API-Key` — it is silently ignored on inference). `GET https://llm.chutes.ai/v1/models` is public and is the source of truth for models, pricing, features, and TEE status.
+
+## Start here
+
+- [Endpoint guide](docs/endpoint-guide.md): the one-page universal guide — auth, first call in 5 languages, routing, errors. Read this first.
+- [README](README.md): repo map, install paths for Claude/Hermes/OpenClaw/anything, verification log and BETA policy.
+- [Cookbook](cookbook/README.md): runnable examples — chat, streaming, tool calling, structured output, routing failover, vision, and a complete ~100-line tool-calling agent.
+- [Model picker](scripts/pick_model.py): `python scripts/pick_model.py --task agentic --routing latency` recommends models or routing pools from the live catalog.
+
+## Skills (Claude plugin: plugins/chutes-ai/skills/, Hermes mirror: other-agents/hermes/skills/)
+
+- [chutes-ai](plugins/chutes-ai/skills/chutes-ai/SKILL.md): hub — accounts, keys, discovery, inference, credential keychain.
+- [chutes-routing](plugins/chutes-ai/skills/chutes-routing/SKILL.md): failover/latency/throughput pools and stable aliases.
+- [chutes-tee](plugins/chutes-ai/skills/chutes-tee/SKILL.md): fetch and parse real TDX/GPU attestation evidence.
+- [chutes-usage-and-billing](plugins/chutes-ai/skills/chutes-usage-and-billing/SKILL.md): spend, quotas, exports.
+- [chutes-sign-in](plugins/chutes-ai/skills/chutes-sign-in/SKILL.md): OAuth "Sign in with Chutes" for your app [BETA in parts].
+- [chutes-platform-ops](plugins/chutes-ai/skills/chutes-platform-ops/SKILL.md): OAuth app fleet ops, alias governance.
+- [chutes-deploy](plugins/chutes-ai/skills/chutes-deploy/SKILL.md): deploy your own chutes [BETA].
+- [chutes-mcp-portability](plugins/chutes-ai/skills/chutes-mcp-portability/SKILL.md): MCP server + configs for Cursor/Cline/Aider/Hermes.
+- [chutes-agent-registration](plugins/chutes-ai/skills/chutes-agent-registration/SKILL.md): autonomous agent accounts [BETA].
+
+## Reference
+
+- [API reference](docs/api-reference.md): endpoint schemas beyond the guide.
+- [Known models snapshot](docs/known-models.md): daily-refreshed catalog table; live endpoint always wins.
+- [Model snapshot JSON](data/chutes-models.json): same data, machine-readable, with fetch timestamp.
+- [Site content pack](site/README.md): draft chutes.ai pages promoting agent use (landing, connect, private-inference).
+
+## Optional
+
+- [Roadmap](docs/roadmap.md): four product lanes, verification history, BETA labeling policy.
+- [Hermes integration guide](docs/hermes-chutes-toolkit-guide.md): custom-provider YAML, skill mounting.
+- [OpenClaw integration](other-agents/openclaw/README.md): JSON5 provider config for chat-gateway agents [BETA].
+- [System prompt block](other-agents/system-prompt/chutes-agent-prompt.md): paste-in Chutes instructions for any agent.
+
+## Upstream Chutes interfaces (live)
+
+- Models (public): https://llm.chutes.ai/v1/models
+- OpenAPI: https://api.chutes.ai/openapi.json
+- Agent docs: https://chutes.ai/llms.txt
+- Pricing (public): https://api.chutes.ai/pricing

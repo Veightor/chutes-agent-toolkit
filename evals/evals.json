@@ -145,6 +145,59 @@
       "prompt": "I'm using a confidential_compute=true chute for sensitive prompts. Verify that the attestation evidence actually looks right.",
       "expected_output": "Should route to chutes-tee:attest_chute.py. Must GET /instances/nonce or generate a 64-hex nonce via secrets.token_hex(32), then GET /chutes/{id}/evidence?nonce=<nonce> (wave-2 finding: nonce query param is REQUIRED and must be exactly 64 hex chars), parse the TDX v4 quote header (version=4, tee_type=0x81, att_key_type=2), extract mrtd + rtmr[0..3] + report_data, parse one NVIDIA GPU certificate (arch is fleet-dependent - Blackwell observed live 2026-06-11, Hopper previously; do not hardcode), optionally cross-check mrtd/rtmr0 against the public GET /servers/tee/measurements golden sets, and return a verdict of 'shape-valid' if crypto validation isn't available (explicitly labeled 'not run - install Intel DCAP for verified mode'). Must NOT claim 'verified' unless DCAP tooling actually ran. Must explain honest limits of TEE (see references/what-tee-does-not-protect.md).",
       "files": []
+    },
+    {
+      "id": 20,
+      "category": "codex-setup",
+      "prompt": "I want to run a Codex-style coding agent on Chutes. Give me the setup pattern, safe credential handling, and a quick smoke test.",
+      "expected_output": "Should use other-agents/codex/README.md and docs/endpoint-guide.md. Must explain the OpenAI-compatible base URL https://llm.chutes.ai/v1, CHUTES_API_KEY as the durable secret name, Bearer auth, and a model value such as default:latency or a live model ID. Must not paste credential-looking examples. Must state that Codex-specific built-in provider support is not claimed unless the installed runtime exposes that provider surface.",
+      "files": [
+        "other-agents/codex/README.md",
+        "docs/endpoint-guide.md"
+      ]
+    },
+    {
+      "id": 21,
+      "category": "coding-agent-routing-presets",
+      "prompt": "Pick Chutes routing presets for interactive coding, code review, planning, and cheap background tasks.",
+      "expected_output": "Should recommend default:latency for interactive edit-test loops, default:throughput for long or batch background work, and concrete live model IDs only after checking /v1/models for required features, context, modalities, pricing, and confidential_compute. Should mention that /v1/models does not expose TTFT/TPS and that latency/throughput strategy is handled by routing or /invocations/stats/llm. Should avoid stale named-model certainty.",
+      "files": [
+        "other-agents/codex/README.md",
+        "docs/endpoint-guide.md",
+        "docs/known-models.md"
+      ]
+    },
+    {
+      "id": 22,
+      "category": "tee-benefits-without-overclaiming",
+      "prompt": "Write website copy explaining why Chutes TEE inference is useful for agents, but keep the claims conservative.",
+      "expected_output": "Should say the current hosted LLM catalog is TEE-backed as of the 2026-06-11 repo verification and that /v1/models confidential_compute is the source of truth. Must not rely only on -TEE suffixes. Must explain that cryptographic attestation requires DCAP verification to run and pass. Must mention limits such as prompt injection, application logs, tool misuse, and user-approved data sharing.",
+      "files": [
+        "docs/site-agent-growth-kit.md",
+        "plugins/chutes-ai/skills/chutes-tee/references/what-tee-does-not-protect.md"
+      ]
+    },
+    {
+      "id": 23,
+      "category": "website-safe-agent-copy",
+      "prompt": "Turn the Chutes agent use cases into website card copy for a Run agents on Chutes page.",
+      "expected_output": "Should use data/agent-use-cases.json or scripts/build_agent_site_pack.py rather than inventing new facts. Must keep Codex as the headline path while presenting Claude, Hermes, MCP/editor agents, OpenClaw, and generic OpenAI SDK agents as ecosystem paths. Must preserve beta/doc-derived status labels and avoid credential-looking examples.",
+      "files": [
+        "data/agent-use-cases.json",
+        "scripts/build_agent_site_pack.py",
+        "docs/site-agent-growth-kit.md"
+      ]
+    },
+    {
+      "id": 24,
+      "category": "provider-comparison",
+      "prompt": "Compare Chutes against a generic OpenAI-compatible provider for coding agents without making stale model claims.",
+      "expected_output": "Should compare durable traits: OpenAI-compatible endpoint, Bearer auth, open-source model catalog, live /v1/models metadata, routing aliases, account/usage APIs, and currently TEE-backed hosted LLMs. Must avoid claiming fixed model availability, superiority, latency, or price without checking the live catalog. Should recommend using /v1/models as the source of truth and mention research endpoint tradeoffs only with explicit opt-in.",
+      "files": [
+        "docs/endpoint-guide.md",
+        "docs/site-agent-growth-kit.md",
+        "data/agent-use-cases.json"
+      ]
     }
   ]
 }

@@ -1,0 +1,192 @@
+{
+  "updated_at": "2026-06-11",
+  "use_cases": [
+    {
+      "agent": "Codex",
+      "audience": "Engineers and platform teams running coding agents that can use OpenAI-compatible chat completions.",
+      "demo_prompt": "Audit this repository for failing tests, propose the smallest fix, and run the relevant test command. Use Chutes for model calls and keep credentials in CHUTES_API_KEY.",
+      "id": "codex",
+      "links": [
+        {
+          "label": "Codex guide",
+          "path": "other-agents/codex/README.md"
+        },
+        {
+          "label": "Endpoint guide",
+          "path": "docs/endpoint-guide.md"
+        },
+        {
+          "label": "Known model snapshot",
+          "path": "docs/known-models.md"
+        },
+        {
+          "label": "Runnable cookbook",
+          "path": "cookbook/README.md"
+        },
+        {
+          "label": "Model picker",
+          "path": "scripts/pick_model.py"
+        }
+      ],
+      "proof_points": [
+        "Chutes exposes OpenAI-compatible chat completions at https://llm.chutes.ai/v1.",
+        "Standard Bearer authorization with CHUTES_API_KEY was re-verified on the inference and management hosts on 2026-06-11.",
+        "The live /v1/models endpoint is public and is the source of truth for model IDs, pricing, context windows, capabilities, and confidential_compute."
+      ],
+      "setup_path": "Set CHUTES_API_KEY in the agent runtime, point the OpenAI-compatible base URL at https://llm.chutes.ai/v1, and choose a routing alias or live model ID from /v1/models.",
+      "status": "flagship_guide",
+      "title": "Run Codex on Chutes",
+      "value_prop": "Give Codex-style coding agents open-source, TEE-backed inference through the OpenAI API shape they already understand."
+    },
+    {
+      "agent": "Claude",
+      "audience": "Claude Code, Claude Cowork, and plugin-marketplace users who want Chutes skills inside their assistant workflow.",
+      "demo_prompt": "Install the Chutes skill suite, list available TEE-backed models, and recommend a routing strategy for a private coding assistant.",
+      "id": "claude",
+      "links": [
+        {
+          "label": "Claude install",
+          "path": "README.md#install-for-claude-code--cowork"
+        },
+        {
+          "label": "Chutes skill hub",
+          "path": "plugins/chutes-ai/skills/chutes-ai/SKILL.md"
+        },
+        {
+          "label": "Credential store",
+          "path": "docs/credential-store.md"
+        }
+      ],
+      "proof_points": [
+        "The plugin tree contains Chutes skills for account setup, inference, routing, usage, platform ops, MCP portability, and TEE evidence parsing.",
+        "Read-only Chutes skill paths were re-verified against the live API on 2026-06-11.",
+        "Credential handling is backed by manage_credentials.py so agents do not need to paste API keys into chat."
+      ],
+      "setup_path": "Add this repo as a plugin marketplace or copy plugins/chutes-ai/skills into the active Claude skills directory.",
+      "status": "active",
+      "title": "Use Chutes from Claude skills",
+      "value_prop": "Turn Chutes operations into agent-callable skills while keeping endpoint facts and credential handling centralized."
+    },
+    {
+      "agent": "Hermes",
+      "audience": "Hermes users who want Chutes as a named OpenAI-compatible provider and optional MCP tool surface.",
+      "demo_prompt": "Configure Hermes with Chutes as a custom provider, use default:latency for chat, and mount the Chutes MCP server for account read tools.",
+      "id": "hermes",
+      "links": [
+        {
+          "label": "Hermes guide",
+          "path": "other-agents/hermes/README.md"
+        },
+        {
+          "label": "Hermes config examples",
+          "path": "other-agents/hermes/config-examples/"
+        },
+        {
+          "label": "Hermes integration spec",
+          "path": "docs/hermes-integration-spec.md"
+        }
+      ],
+      "proof_points": [
+        "The repo ships a Hermes skill mirror under other-agents/hermes/skills.",
+        "Hermes config examples cover basic provider setup, cheap routing, delegation, and the research endpoint.",
+        "The guide distinguishes current Hermes custom-provider support from unsupported first-class-provider claims."
+      ],
+      "setup_path": "Store CHUTES_API_KEY in the Hermes environment, add a providers.chutes entry with base_url https://llm.chutes.ai/v1, and optionally register the local Chutes MCP server.",
+      "status": "active",
+      "title": "Run Hermes on Chutes",
+      "value_prop": "Use Chutes for Hermes chat, delegation, background work, and account-aware tools without waiting for a built-in provider."
+    },
+    {
+      "agent": "Cursor, Cline, Aider, and MCP clients",
+      "audience": "Developers who want Chutes available in editor agents and local coding tools.",
+      "demo_prompt": "Generate a Cursor MCP config for Chutes, run the MCP server self-check, and explain which tools are read-only versus beta write paths.",
+      "id": "cursor-cline-aider-mcp",
+      "links": [
+        {
+          "label": "OpenAI-compatible agent guide",
+          "path": "other-agents/openai-compatible/README.md"
+        },
+        {
+          "label": "MCP portability skill",
+          "path": "plugins/chutes-ai/skills/chutes-mcp-portability/SKILL.md"
+        },
+        {
+          "label": "MCP server",
+          "path": "plugins/chutes-ai/skills/chutes-mcp-portability/mcp-server/README.md"
+        }
+      ],
+      "proof_points": [
+        "The chutes-mcp-portability skill can generate configs for Cursor, Aider, Hermes, and related OpenAI-compatible clients.",
+        "The MCP server exposes model discovery, quota, aliases, usage, discounts, chutes, and API key read tools.",
+        "Write and deploy MCP tools remain beta because they can mutate account or compute state."
+      ],
+      "setup_path": "Run generate_agent_config.py for the target client, keep CHUTES_API_KEY in the environment or keychain, and run chutes-mcp-server --self-check.",
+      "status": "beta_write_tools",
+      "title": "Bring Chutes to editor agents with MCP",
+      "value_prop": "Make Chutes discoverable and callable inside local coding agents while keeping secrets outside checked-in config."
+    },
+    {
+      "agent": "OpenClaw",
+      "audience": "Teams routing chat apps and channel agents through the OpenClaw gateway.",
+      "demo_prompt": "Add Chutes as an OpenClaw provider, configure a latency routing pool for channel agents, and warn when the research endpoint is not appropriate.",
+      "id": "openclaw-channel-agents",
+      "links": [
+        {
+          "label": "OpenClaw guide",
+          "path": "other-agents/openclaw/README.md"
+        },
+        {
+          "label": "OpenClaw minimal config",
+          "path": "other-agents/openclaw/config-examples/openclaw.json"
+        },
+        {
+          "label": "OpenClaw routing config",
+          "path": "other-agents/openclaw/config-examples/openclaw-routing.json"
+        }
+      ],
+      "proof_points": [
+        "Chutes fits OpenClaw as an OpenAI-compatible provider block.",
+        "The Chutes side of the integration is live-verified, while OpenClaw field names are marked doc-derived until an end-to-end install is exercised.",
+        "Routing suffixes such as :latency and :throughput can be represented as model IDs when the client passes IDs through."
+      ],
+      "setup_path": "Export CHUTES_API_KEY, add a chutes provider under models.providers with baseUrl https://llm.chutes.ai/v1, and select either a live model ID or routing pool.",
+      "status": "beta_doc_derived",
+      "title": "Run channel agents on Chutes with OpenClaw",
+      "value_prop": "Put open-source TEE inference behind Discord, Slack, Matrix, and other channel agents through a self-hosted gateway."
+    },
+    {
+      "agent": "Generic OpenAI SDK agents",
+      "audience": "Builders using OpenAI SDKs, LangChain, LiteLLM, Vercel AI SDK, AutoGPT-style tools, or custom agent loops.",
+      "demo_prompt": "Port this OpenAI SDK agent to Chutes by changing only base URL, API key environment variable, and model selection from the live catalog.",
+      "id": "openai-sdk-agents",
+      "links": [
+        {
+          "label": "Endpoint guide",
+          "path": "docs/endpoint-guide.md"
+        },
+        {
+          "label": "OpenAI-compatible guide",
+          "path": "other-agents/openai-compatible/README.md"
+        },
+        {
+          "label": "Live model endpoint",
+          "url": "https://llm.chutes.ai/v1/models"
+        },
+        {
+          "label": "Runnable cookbook",
+          "path": "cookbook/README.md"
+        }
+      ],
+      "proof_points": [
+        "Standard OpenAI SDKs send Authorization: Bearer, which is the live-verified Chutes auth shape.",
+        "Model capabilities such as tools, JSON mode, structured outputs, modalities, and pricing are exposed in /v1/models.",
+        "Routing aliases let callers avoid hardcoding one model for uptime-sensitive agents."
+      ],
+      "setup_path": "Set the SDK base URL to https://llm.chutes.ai/v1, read CHUTES_API_KEY from the environment, and select a live model ID or routing alias.",
+      "status": "active",
+      "title": "Use one OpenAI-compatible endpoint for many agent stacks",
+      "value_prop": "Reuse existing OpenAI-compatible client code while moving inference to Chutes-hosted open-source models."
+    }
+  ],
+  "version": 1
+}
