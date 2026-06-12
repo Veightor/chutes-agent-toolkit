@@ -405,7 +405,7 @@ chutes-agent-toolkit/
 │   └── javascript/chat.mjs
 ├── site/                                  # draft chutes.ai pages promoting agent use
 │   ├── README.md                          # page map + widget specs
-│   └── pages/ (agents, connect-your-agent, private-inference, hermes, hermes-recipes)
+│   └── pages/ (agents, connect-your-agent, private-inference, + per-client deep-dive/recipes pairs for claude, codex, hermes)
 ├── data/ (chutes-models.json, agent-use-cases.json)   # daily model snapshot + site/demo use-case feed
 ├── docs/site-agent-growth-kit.md          # site-builder source material (pairs with the use-case feed)
 ├── llms.txt                               # agent-facing index of this repo

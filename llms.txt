@@ -28,7 +28,7 @@ The two facts that matter most: inference lives at `https://llm.chutes.ai/v1` (O
 - [API reference](docs/api-reference.md): endpoint schemas beyond the guide.
 - [Known models snapshot](docs/known-models.md): daily-refreshed catalog table; live endpoint always wins.
 - [Model snapshot JSON](data/chutes-models.json): same data, machine-readable, with fetch timestamp.
-- [Site content pack](site/README.md): draft chutes.ai pages promoting agent use (landing, connect, private-inference, hermes, hermes-recipes).
+- [Site content pack](site/README.md): draft chutes.ai pages promoting agent use — landing, connect, private-inference, plus a deep-dive + recipes pair each for Claude, Codex, and Hermes.
 - [Agent use-case feed](data/agent-use-cases.json): structured per-client use-case data; render with `scripts/build_agent_site_pack.py`.
 
 ## Optional

@@ -11,6 +11,10 @@ Sibling asset: [`docs/site-agent-growth-kit.md`](../docs/site-agent-growth-kit.m
 | [`pages/agents.md`](pages/agents.md) | `chutes.ai/agents` | Landing page. Convince an agent builder in 30 seconds, get them to a working call in 60. |
 | [`pages/connect-your-agent.md`](pages/connect-your-agent.md) | `chutes.ai/agents/connect` | Per-client recipes: Claude Code, Cursor, Cline, Aider, Codex, Hermes, OpenClaw, LangChain, LiteLLM, Vercel AI SDK. |
 | [`pages/private-inference.md`](pages/private-inference.md) | `chutes.ai/agents/private` | The TEE story: 100% confidential-compute catalog, attestation you can fetch yourself. |
+| [`pages/claude.md`](pages/claude.md) | `chutes.ai/agents/claude` | Claude deep-dive: 9-skill plugin suite, keychain credentials, MCP server. |
+| [`pages/claude-recipes.md`](pages/claude-recipes.md) | `chutes.ai/agents/claude/recipes` | Copy-paste Claude recipes: plugin install, onboarding prompts, CLAUDE.md block, MCP, porting. |
+| [`pages/codex.md`](pages/codex.md) | `chutes.ai/agents/codex` | Codex deep-dive: OpenAI-compatible setup pattern, presets, smoke test. |
+| [`pages/codex-recipes.md`](pages/codex-recipes.md) | `chutes.ai/agents/codex/recipes` | Copy-paste Codex recipes: env mapping, config JSON, presets, sidecar fallback. |
 | [`pages/hermes.md`](pages/hermes.md) | `chutes.ai/agents/hermes` | Hermes deep-dive: provider YAML, skill mirror, doctor script. |
 | [`pages/hermes-recipes.md`](pages/hermes-recipes.md) | `chutes.ai/agents/hermes/recipes` | Copy-paste Hermes configs: routing, delegation, dual endpoints, troubleshooting. |
 

@@ -9,6 +9,8 @@ Source assets:
 - Site page drafts: `site/README.md` and `site/pages/`
 - Runnable examples: `cookbook/README.md`
 - Model picker logic: `scripts/pick_model.py`
+- Claude install + skills: `README.md` ("Install for Claude Code / Cowork") and `plugins/chutes-ai/skills/`
+- Hermes guide + doctor: `other-agents/hermes/README.md`, `docs/hermes-chutes-toolkit-guide.md`, `scripts/hermes_chutes_doctor.py`
 - Codex guide: `other-agents/codex/README.md`
 - Universal endpoint guide: `docs/endpoint-guide.md`
 - Live catalog source: `https://llm.chutes.ai/v1/models`
@@ -17,8 +19,40 @@ Generate the site pack:
 
 ```bash
 python3 scripts/build_agent_site_pack.py --format markdown
-python3 scripts/build_agent_site_pack.py --focus codex --format json
+python3 scripts/build_agent_site_pack.py --focus claude --format json   # any use-case id works
 ```
+
+## Run Claude on Chutes
+
+Page angle: Claude Code and Claude Cowork get the toolkit's deepest integration — a nine-skill plugin suite, OS-keychain credential storage, and a stdio MCP server. Claude can onboard a user to Chutes end to end, including creating the account.
+
+Copy block and demo prompt: generate from `data/agent-use-cases.json` (id `claude`) via `scripts/build_agent_site_pack.py --focus claude` — do not hand-copy them here. Preserve the per-skill BETA labels (sign-in, deploy, agent-registration, MCP write tools) exactly as the skill files carry them.
+
+Page draft: `site/pages/claude.md` + `site/pages/claude-recipes.md`.
+
+Proof links:
+
+- `README.md#install-for-claude-code--cowork`
+- `plugins/chutes-ai/skills/chutes-ai/SKILL.md`
+- `docs/credential-store.md`
+- `plugins/chutes-ai/skills/chutes-mcp-portability/SKILL.md`
+- `cookbook/README.md`
+
+## Run Hermes on Chutes
+
+Page angle: Hermes works with Chutes today as a named OpenAI-compatible provider, with a full skill mirror, copy-paste config examples, and a local doctor script that smoke-tests the setup without printing secrets.
+
+Copy block and demo prompt: generate from `data/agent-use-cases.json` (id `hermes`) via `scripts/build_agent_site_pack.py --focus hermes` — do not hand-copy them here. Do not claim first-class built-in provider support; the guide distinguishes custom-provider support from unsupported first-class claims.
+
+Page draft: `site/pages/hermes.md` + `site/pages/hermes-recipes.md`.
+
+Proof links:
+
+- `other-agents/hermes/README.md`
+- `other-agents/hermes/config-examples/`
+- `docs/hermes-chutes-toolkit-guide.md`
+- `scripts/hermes_chutes_doctor.py`
+- `docs/hermes-integration-spec.md`
 
 ## Run Codex on Chutes
 
@@ -27,6 +61,8 @@ Page angle: coding agents already speak the OpenAI API. Chutes gives those agent
 Copy block and demo prompt: generate from `data/agent-use-cases.json` (id `codex`) via `scripts/build_agent_site_pack.py --focus codex` — do not hand-copy them here. Note that `default:*` routing aliases require a pool configured once at chutes.ai/app → Model Routing; a concrete model ID from the live `/v1/models` catalog works with zero setup.
 
 Do not claim that every upstream Codex build has a built-in Chutes provider. The repo-supported claim is narrower: Chutes works through the OpenAI-compatible configuration surface used by Codex-style agents and SDK-backed tools.
+
+Page draft: `site/pages/codex.md` + `site/pages/codex-recipes.md`.
 
 Proof links:
 

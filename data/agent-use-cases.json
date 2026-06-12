@@ -55,6 +55,14 @@
         {
           "label": "Credential store",
           "path": "docs/credential-store.md"
+        },
+        {
+          "label": "MCP portability skill",
+          "path": "plugins/chutes-ai/skills/chutes-mcp-portability/SKILL.md"
+        },
+        {
+          "label": "Runnable cookbook",
+          "path": "cookbook/README.md"
         }
       ],
       "proof_points": [
@@ -84,6 +92,14 @@
         {
           "label": "Hermes integration spec",
           "path": "docs/hermes-integration-spec.md"
+        },
+        {
+          "label": "Hermes toolkit guide",
+          "path": "docs/hermes-chutes-toolkit-guide.md"
+        },
+        {
+          "label": "Hermes doctor",
+          "path": "scripts/hermes_chutes_doctor.py"
         }
       ],
       "proof_points": [
