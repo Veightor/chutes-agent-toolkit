@@ -4,7 +4,7 @@ The loop every agent framework wraps: model picks tools, we execute them,
 results go back, repeat until the model answers in plain text. No framework,
 one dependency (openai), running entirely on open-source TEE models.
 
-Run: CHUTES_API_KEY=cpk_... python 07_mini_agent.py "What is 21 * 2, and how many letters is the answer spelled out in English?"
+Run: CHUTES_API_KEY="<redacted>" python 07_mini_agent.py "What is 21 * 2, and how many letters is the answer spelled out in English?"
 """
 
 import json

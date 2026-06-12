@@ -7,7 +7,7 @@ Images can be a data URI (shown here, always works) or a public URL — note tha
 some hosts (e.g. Wikimedia) block Chutes' server-side fetcher with 403, so
 prefer data URIs or hosts you control.
 
-Run: CHUTES_API_KEY=cpk_... python 06_vision.py [image_url]
+Run: CHUTES_API_KEY="<redacted>" python 06_vision.py [image_url]
 """
 
 import os

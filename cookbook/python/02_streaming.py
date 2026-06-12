@@ -1,6 +1,6 @@
 """Streaming completion (SSE deltas). [VERIFIED 2026-06-11: ran live against the paid API]
 
-Run: CHUTES_API_KEY=cpk_... python 02_streaming.py
+Run: CHUTES_API_KEY="<redacted>" python 02_streaming.py
 """
 
 import os

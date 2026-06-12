@@ -13,13 +13,32 @@ Everything below boils down to the same two settings:
 | Setting | Value |
 |---|---|
 | Base URL | `https://llm.chutes.ai/v1` |
-| API key | your `cpk_...` key, sent as `Authorization: Bearer` |
+| API key | `CHUTES_API_KEY`, sent as `Authorization: Bearer` |
 
 Standard OpenAI SDKs send Bearer by default, so most tools need zero auth configuration beyond pasting the key. Pick your client:
 
 ---
 
-## Tab: Claude Code ⭐ (deepest integration)
+## Tab: Codex ⭐ (flagship coding path)
+
+Codex-style coding agents can use Chutes anywhere the runtime accepts an OpenAI-compatible base URL, Bearer API key, and model value.
+
+**Provider shape:**
+
+```json
+{
+  "provider": "openai-compatible",
+  "base_url": "https://llm.chutes.ai/v1",
+  "api_key_env": "CHUTES_API_KEY",
+  "model": "default:latency"
+}
+```
+
+Use `default:latency` for interactive edit-test loops, `default:throughput` for long background work, or a live model ID from `/v1/models` when you need a specific context window, price, modality, or feature flag.
+
+[Full Codex guide →](https://github.com/Veightor/chutes-agent-toolkit/tree/main/other-agents/codex)
+
+## Tab: Claude Code (deepest skill integration)
 
 Claude gets the full treatment: a 9-skill plugin suite, OS-keychain credential storage, and an MCP server. Claude can onboard you to Chutes end to end, including creating the account.
 
@@ -175,6 +194,6 @@ Stuck? The [endpoint guide](https://github.com/Veightor/chutes-agent-toolkit/blo
 
 ## Build notes (not page copy)
 
-- Tabs ordered by observed demand: Claude → Cursor/Cline/Aider → Hermes → OpenClaw → frameworks → MCP/system-prompt. Reorder freely from analytics.
+- Tabs ordered by campaign priority: Codex → Claude → Cursor/Cline/Aider → Hermes → OpenClaw → frameworks → MCP/system-prompt. Reorder freely from analytics.
 - Model IDs in snippets churn with the catalog. Either render the example ID from `/v1/models` at build time or pin a redirector alias the platform commits to keeping.
 - The Hermes YAML shape (`providers:`) matches Hermes v0.16.0; the toolkit tracks this; re-check there before shipping changes.

@@ -2,7 +2,7 @@
 
 Works on models advertising "structured_outputs"; for looser JSON use
 response_format={"type": "json_object"} on models advertising "json_mode".
-Run: CHUTES_API_KEY=cpk_... python 04_structured_output.py
+Run: CHUTES_API_KEY="<redacted>" python 04_structured_output.py
 """
 
 import json

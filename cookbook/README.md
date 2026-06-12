@@ -8,7 +8,7 @@ These files are also the **source of truth for code snippets on chutes.ai page d
 
 ```bash
 pip install openai                      # the only Python dependency
-export CHUTES_API_KEY=cpk_...           # from https://chutes.ai/auth/start
+export CHUTES_API_KEY="<redacted>"      # from https://chutes.ai/auth/start
 # optional: override the default model used by the examples
 export CHUTES_MODEL=deepseek-ai/DeepSeek-V3.2-TEE
 ```
@@ -39,7 +39,7 @@ export CHUTES_API_KEY="$(python plugins/chutes-ai/skills/chutes-ai/scripts/manag
 
 ## Conventions
 
-- Auth is always `Authorization: Bearer cpk_...` — the OpenAI SDKs do this by default. Never use `X-API-Key` (silently ignored on inference).
+- Auth is always `Authorization: Bearer $CHUTES_API_KEY` — the OpenAI SDKs do this by default. Never use `X-API-Key` (silently ignored on inference).
 - Model IDs churn. Examples default to known-good IDs but accept `CHUTES_MODEL`; when in doubt, `curl https://llm.chutes.ai/v1/models` (public) and pick from `data[].id`.
 - Feature support varies per model — check `supported_features` before assuming tools/JSON mode work.
 

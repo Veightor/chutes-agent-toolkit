@@ -9,7 +9,7 @@ Sibling asset: [`docs/site-agent-growth-kit.md`](../docs/site-agent-growth-kit.m
 | Draft | Proposed URL | Job |
 |---|---|---|
 | [`pages/agents.md`](pages/agents.md) | `chutes.ai/agents` | Landing page. Convince an agent builder in 30 seconds, get them to a working call in 60. |
-| [`pages/connect-your-agent.md`](pages/connect-your-agent.md) | `chutes.ai/agents/connect` | Per-client recipes: Claude Code, Cursor, Cline, Aider, Hermes, OpenClaw, LangChain, LiteLLM, Vercel AI SDK. |
+| [`pages/connect-your-agent.md`](pages/connect-your-agent.md) | `chutes.ai/agents/connect` | Per-client recipes: Codex, Claude Code, Cursor, Cline, Aider, Hermes, OpenClaw, LangChain, LiteLLM, Vercel AI SDK. |
 | [`pages/private-inference.md`](pages/private-inference.md) | `chutes.ai/agents/private` | The TEE story: 100% confidential-compute catalog, attestation you can fetch yourself. |
 
 Each draft contains the page copy plus a **Build notes** section (data sources, components, what must stay live-driven vs. static).
@@ -17,7 +17,7 @@ Each draft contains the page copy plus a **Build notes** section (data sources, 
 ## Rules the drafts follow
 
 1. **Pricing and the model list are never hardcoded in page copy.** Tables render from `GET https://llm.chutes.ai/v1/models` (public, no auth) at build time or client side. Snapshot numbers in the drafts are placeholders stamped with their fetch date.
-2. **Claims match the toolkit's verification log.** Auth is `Authorization: Bearer cpk_...` everywhere; `GET /v1/models` is public; the catalog is currently 100% TEE. If the platform changes, the drafts cite where the fact came from so it can be re-checked.
+2. **Claims match the toolkit's verification log.** Auth is `Authorization: Bearer $CHUTES_API_KEY` everywhere; `GET /v1/models` is public; the catalog is currently 100% TEE. If the platform changes, the drafts cite where the fact came from so it can be re-checked.
 3. **Every code block is runnable.** Snippets are copies of files in [`../cookbook/`](../cookbook/), which keeps the site honest: if a cookbook script breaks, its page snippet is broken too.
 
 ## Widget specs
