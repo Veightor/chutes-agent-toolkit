@@ -33,8 +33,8 @@
         "Standard Bearer authorization with CHUTES_API_KEY was re-verified on the inference and management hosts on 2026-06-11.",
         "The live /v1/models endpoint is public and is the source of truth for model IDs, pricing, context windows, capabilities, and confidential_compute."
       ],
-      "setup_path": "Set CHUTES_API_KEY in the agent runtime, point the OpenAI-compatible base URL at https://llm.chutes.ai/v1, and choose a routing alias or live model ID from /v1/models.",
-      "status": "flagship_guide",
+      "setup_path": "Set CHUTES_API_KEY in the agent runtime, point the OpenAI-compatible base URL at https://llm.chutes.ai/v1, and choose a live model ID from /v1/models (or a routing alias such as default:latency after configuring a pool once at chutes.ai/app -> Model Routing).",
+      "status": "guide_only",
       "title": "Run Codex on Chutes",
       "value_prop": "Give Codex-style coding agents open-source, TEE-backed inference through the OpenAI API shape they already understand."
     },

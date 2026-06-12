@@ -19,26 +19,7 @@ Standard OpenAI SDKs send Bearer by default, so most tools need zero auth config
 
 ---
 
-## Tab: Codex ⭐ (flagship coding path)
-
-Codex-style coding agents can use Chutes anywhere the runtime accepts an OpenAI-compatible base URL, Bearer API key, and model value.
-
-**Provider shape:**
-
-```json
-{
-  "provider": "openai-compatible",
-  "base_url": "https://llm.chutes.ai/v1",
-  "api_key_env": "CHUTES_API_KEY",
-  "model": "default:latency"
-}
-```
-
-Use `default:latency` for interactive edit-test loops, `default:throughput` for long background work, or a live model ID from `/v1/models` when you need a specific context window, price, modality, or feature flag.
-
-[Full Codex guide →](https://github.com/Veightor/chutes-agent-toolkit/tree/main/other-agents/codex)
-
-## Tab: Claude Code (deepest skill integration)
+## Tab: Claude Code ⭐ (deepest integration)
 
 Claude gets the full treatment: a 9-skill plugin suite, OS-keychain credential storage, and an MCP server. Claude can onboard you to Chutes end to end, including creating the account.
 
@@ -100,6 +81,25 @@ aider --model openai/deepseek-ai/DeepSeek-V3.2-TEE
 ```
 
 [Per-client references →](https://github.com/Veightor/chutes-agent-toolkit/tree/main/plugins/chutes-ai/skills/chutes-mcp-portability/references)
+
+## Tab: Codex
+
+Codex-style coding agents can use Chutes anywhere the runtime accepts an OpenAI-compatible base URL, Bearer API key, and model value.
+
+**Provider shape:**
+
+```json
+{
+  "provider": "openai-compatible",
+  "base_url": "https://llm.chutes.ai/v1",
+  "api_key_env": "CHUTES_API_KEY",
+  "model": "deepseek-ai/DeepSeek-V3.2-TEE"
+}
+```
+
+Pin a live model ID from `/v1/models` when you need a specific context window, price, modality, or feature flag. Routing aliases (`default:latency` for interactive edit-test loops, `default:throughput` for long background work) require a pool configured once at chutes.ai/app → Model Routing — see the [endpoint guide](https://github.com/Veightor/chutes-agent-toolkit/blob/main/docs/endpoint-guide.md).
+
+[Full Codex guide →](https://github.com/Veightor/chutes-agent-toolkit/tree/main/other-agents/codex)
 
 ## Tab: Hermes
 
@@ -194,6 +194,6 @@ Stuck? The [endpoint guide](https://github.com/Veightor/chutes-agent-toolkit/blo
 
 ## Build notes (not page copy)
 
-- Tabs ordered by campaign priority: Codex → Claude → Cursor/Cline/Aider → Hermes → OpenClaw → frameworks → MCP/system-prompt. Reorder freely from analytics.
+- Tabs ordered by depth of in-repo support, then observed demand: Claude → Cursor/Cline/Aider → Codex → Hermes → OpenClaw → frameworks → MCP/system-prompt. Reorder freely from analytics.
 - Model IDs in snippets churn with the catalog. Either render the example ID from `/v1/models` at build time or pin a redirector alias the platform commits to keeping.
 - The Hermes YAML shape (`providers:`) matches Hermes v0.16.0; the toolkit tracks this; re-check there before shipping changes.

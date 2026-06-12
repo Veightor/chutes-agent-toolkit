@@ -207,7 +207,6 @@ For stronger claims, load `chutes-tee` and fetch/parse the chute evidence. Do no
 ## Related docs
 
 - `site/pages/hermes.md` and `site/pages/hermes-recipes.md` — Chutes-site page drafts for promoting Hermes agent use
-- `docs/hermes-agent-hub-plan.md`
 - `docs/hermes-chutes-toolkit-guide.md`
 - `docs/hermes-integration-spec.md`
 - `docs/llms-txt-review.md`

@@ -5,7 +5,7 @@ Pass several model IDs comma-separated in the `model` field:
   - list + ":latency"     -> fastest first token right now
   - list + ":throughput"  -> most tokens/sec right now
 A single concrete model ID bypasses routing entirely.
-Run: CHUTES_API_KEY="<redacted>" python 05_routing_failover.py
+Run: CHUTES_API_KEY=cpk_... python 05_routing_failover.py
 """
 
 import os

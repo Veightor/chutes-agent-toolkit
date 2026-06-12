@@ -150,7 +150,7 @@
       "id": 20,
       "category": "codex-setup",
       "prompt": "I want to run a Codex-style coding agent on Chutes. Give me the setup pattern, safe credential handling, and a quick smoke test.",
-      "expected_output": "Should use other-agents/codex/README.md and docs/endpoint-guide.md. Must explain the OpenAI-compatible base URL https://llm.chutes.ai/v1, CHUTES_API_KEY as the durable secret name, Bearer auth, and a model value such as default:latency or a live model ID. Must not paste credential-looking examples. Must state that Codex-specific built-in provider support is not claimed unless the installed runtime exposes that provider surface.",
+      "expected_output": "Should use other-agents/codex/README.md and docs/endpoint-guide.md. Must explain the OpenAI-compatible base URL https://llm.chutes.ai/v1, CHUTES_API_KEY as the durable secret name, Bearer auth, and a model value: a live model ID from /v1/models, or a routing alias such as default:latency once a routing pool is configured at chutes.ai/app -> Model Routing. Must not paste real-looking credentials (the cpk_... format placeholder is fine). Must state that Codex-specific built-in provider support is not claimed unless the installed runtime exposes that provider surface.",
       "files": [
         "other-agents/codex/README.md",
         "docs/endpoint-guide.md"
@@ -160,7 +160,7 @@
       "id": 21,
       "category": "coding-agent-routing-presets",
       "prompt": "Pick Chutes routing presets for interactive coding, code review, planning, and cheap background tasks.",
-      "expected_output": "Should recommend default:latency for interactive edit-test loops, default:throughput for long or batch background work, and concrete live model IDs only after checking /v1/models for required features, context, modalities, pricing, and confidential_compute. Should mention that /v1/models does not expose TTFT/TPS and that latency/throughput strategy is handled by routing or /invocations/stats/llm. Should avoid stale named-model certainty.",
+      "expected_output": "Should recommend default:latency for interactive edit-test loops and default:throughput for long or batch background work (noting the default alias family requires a routing pool configured once in the Chutes dashboard), and concrete live model IDs only after checking /v1/models for required features, context, modalities, pricing, and confidential_compute. Should mention that /v1/models does not expose TTFT/TPS and that latency/throughput strategy is handled by routing or /invocations/stats/llm. Should avoid stale named-model certainty.",
       "files": [
         "other-agents/codex/README.md",
         "docs/endpoint-guide.md",
@@ -181,7 +181,7 @@
       "id": 23,
       "category": "website-safe-agent-copy",
       "prompt": "Turn the Chutes agent use cases into website card copy for a Run agents on Chutes page.",
-      "expected_output": "Should use data/agent-use-cases.json or scripts/build_agent_site_pack.py rather than inventing new facts. Must keep Codex as the headline path while presenting Claude, Hermes, MCP/editor agents, OpenClaw, and generic OpenAI SDK agents as ecosystem paths. Must preserve beta/doc-derived status labels and avoid credential-looking examples.",
+      "expected_output": "Should use data/agent-use-cases.json or scripts/build_agent_site_pack.py rather than inventing new facts. Must present Claude, Codex, Hermes, MCP/editor agents, OpenClaw, and generic OpenAI SDK agents with parity, ordered by depth of in-repo support, without singling any client out as the headline path. Must preserve beta/doc-derived status labels and avoid real-looking credentials (the cpk_... format placeholder is fine).",
       "files": [
         "data/agent-use-cases.json",
         "scripts/build_agent_site_pack.py",

@@ -33,7 +33,7 @@ def good_payload():
                 "demo_prompt": "Review this repository.",
                 "proof_points": ["Bearer auth works with standard OpenAI-compatible clients."],
                 "links": [{"label": "Codex guide", "path": "other-agents/codex/README.md"}],
-                "status": "flagship_guide",
+                "status": "guide_only",
             },
             {
                 "id": "hermes",

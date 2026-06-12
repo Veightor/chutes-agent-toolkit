@@ -9,7 +9,7 @@ Source assets:
 - Site page drafts: `site/README.md` and `site/pages/`
 - Runnable examples: `cookbook/README.md`
 - Model picker logic: `scripts/pick_model.py`
-- Flagship Codex guide: `other-agents/codex/README.md`
+- Codex guide: `other-agents/codex/README.md`
 - Universal endpoint guide: `docs/endpoint-guide.md`
 - Live catalog source: `https://llm.chutes.ai/v1/models`
 
@@ -24,15 +24,7 @@ python3 scripts/build_agent_site_pack.py --focus codex --format json
 
 Page angle: coding agents already speak the OpenAI API. Chutes gives those agents an OpenAI-compatible inference endpoint for open-source models, with Bearer auth and routing in the `model` field.
 
-Copy block:
-
-Codex-style coding agents can use Chutes anywhere the runtime accepts an OpenAI-compatible chat-completions base URL. Store the key in `CHUTES_API_KEY`, set the base URL to `https://llm.chutes.ai/v1`, and pick either a routing alias such as `default:latency` or a concrete model ID from the live `/v1/models` catalog.
-
-Recommended demo:
-
-```text
-Audit this repository for failing tests, propose the smallest fix, and run the relevant test command. Use Chutes for model calls and keep credentials in CHUTES_API_KEY.
-```
+Copy block and demo prompt: generate from `data/agent-use-cases.json` (id `codex`) via `scripts/build_agent_site_pack.py --focus codex` — do not hand-copy them here. Note that `default:*` routing aliases require a pool configured once at chutes.ai/app → Model Routing; a concrete model ID from the live `/v1/models` catalog works with zero setup.
 
 Do not claim that every upstream Codex build has a built-in Chutes provider. The repo-supported claim is narrower: Chutes works through the OpenAI-compatible configuration surface used by Codex-style agents and SDK-backed tools.
 
@@ -91,7 +83,7 @@ Companion proof assets:
 
 - Use `cookbook/` for snippets on marketing pages and docs. The examples cover first call, streaming, tool calling, structured output, routing failover, vision, and a small tool-calling agent loop.
 - Use `scripts/pick_model.py` as the reference implementation for model-picker widgets and "which model should my agent use?" demos.
-- Use `site/pages/` for page drafts, but keep Codex as the first coding-agent path when this kit is the source of truth.
+- Use `site/pages/` for page drafts; order client paths by depth of in-repo support, and present every client with parity.
 
 ## Routing, cost control, and private inference
 
@@ -99,7 +91,7 @@ Page angle: agent traffic is mixed. Interactive coding, review, planning, summar
 
 Copy block:
 
-Chutes routing lets agents choose a policy in the `model` string. Use `default:latency` for interactive work, `default:throughput` for longer background generations, or a comma-separated pool with a strategy suffix for explicit failover. When a workflow needs a specific context window, modality, tool support, JSON mode, or price point, fetch `https://llm.chutes.ai/v1/models` and choose from current metadata.
+Chutes routing lets agents choose a policy in the `model` string. Use a comma-separated pool with a strategy suffix for explicit failover, or — after configuring a pool once at chutes.ai/app → Model Routing — `default:latency` for interactive work and `default:throughput` for longer background generations. When a workflow needs a specific context window, modality, tool support, JSON mode, or price point, fetch `https://llm.chutes.ai/v1/models` and choose from current metadata.
 
 Cost-control patterns:
 
@@ -121,66 +113,24 @@ Private-inference pattern:
 
 ## Agent demos worth showing
 
-Use demos that prove agent value and Chutes-specific behavior without needing live writes, paid deploys, or credential reads.
+Use demos that prove agent value and Chutes-specific behavior without needing live writes, paid deploys, or credential reads. The canonical demo prompts are the `demo_prompt` fields in `data/agent-use-cases.json` — render them with `scripts/build_agent_site_pack.py` rather than copying them into page copy. Why each one earns its slot:
 
-### Codex repository repair
+- **Repository repair** (`codex`): shows the coding-agent workflow, Chutes as OpenAI-compatible inference, and secret-safe setup.
+- **SDK port** (`openai-sdk-agents`): shows that moving an existing OpenAI SDK agent to Chutes is a base-URL/key/model change, nothing more.
+- **Skill-suite onboarding** (`claude`): shows install-to-routing-recommendation inside an assistant workflow.
+- **MCP editor-agent setup** (`cursor-cline-aider-mcp`): shows editor-agent distribution through a concrete toolkit path.
+- **Channel agent provider swap** (`openclaw-channel-agents`): connects OpenAI-compatible setup, routing, and privacy tradeoffs.
 
-Prompt:
-
-```text
-Find the smallest failing test path in this repo, patch the bug, and rerun only the relevant test command. Use CHUTES_API_KEY from the environment for model calls.
-```
-
-Why it works: shows coding-agent workflow, Chutes as OpenAI-compatible inference, and secret-safe setup.
-
-### Routing preset picker
-
-Prompt:
-
-```text
-Given an interactive coding agent, a review agent, and a nightly documentation agent, choose Chutes model values and explain when to use default:latency, default:throughput, or a concrete live model ID.
-```
-
-Why it works: shows routing, cost control, and avoiding stale model claims.
-
-### TEE-safe copy audit
-
-Prompt:
-
-```text
-Rewrite this landing-page section so it explains Chutes TEE benefits for agents without claiming cryptographic attestation unless verification was actually run.
-```
-
-Why it works: demonstrates accurate privacy messaging and avoids overclaiming.
-
-### MCP editor-agent setup
-
-Prompt:
-
-```text
-Generate a Cursor MCP config for Chutes, run the MCP self-check, and label which tools are read-only versus beta write tools.
-```
-
-Why it works: shows editor-agent distribution through a concrete toolkit path.
-
-### Channel agent provider swap
-
-Prompt:
-
-```text
-Add Chutes as an OpenClaw provider for channel agents and explain why the research endpoint should not be the default for private conversations.
-```
-
-Why it works: connects OpenAI-compatible setup, routing, and privacy tradeoffs.
+Two extra demo angles worth scripting that are not yet in the JSON: a routing preset picker (when to use `default:latency` vs `default:throughput` vs a concrete live ID) and a TEE-safe copy audit (explain `confidential_compute` benefits without claiming attestation unless DCAP verification ran).
 
 ## Publishing Checklist
 
-- Keep Codex as the headline integration, with other agents as supporting ecosystem paths.
+- Present every client integration with parity; order by depth of in-repo support (Claude → Hermes → editor/MCP clients → OpenClaw → Codex/generic OpenAI-compatible).
 - Use `data/agent-use-cases.json` for page cards and demo prompts.
 - Generate Markdown or JSON with `scripts/build_agent_site_pack.py` rather than hand-copying tables.
-- Keep `site/pages/connect-your-agent.md` aligned with the Codex-first positioning in this kit.
+- Keep `site/pages/connect-your-agent.md` aligned with the ordering rationale in its own build notes.
 - Keep code snippets backed by `cookbook/` examples and model-choice UI backed by `scripts/pick_model.py`.
 - Link to `https://llm.chutes.ai/v1/models` for current model facts.
-- Avoid raw credential-looking values in page copy. Use `CHUTES_API_KEY` or redacted placeholders.
+- Avoid real-looking credentials in page copy. Use `CHUTES_API_KEY` or the `cpk_...` format placeholder.
 - Label beta and doc-derived integrations clearly.
 - Do not imply live Chutes writes, paid deploy calls, or credential reads happened unless a verification record says they did.

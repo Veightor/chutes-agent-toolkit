@@ -35,6 +35,22 @@ def test_parse_env_file_accepts_export_and_quotes(tmp_path):
     assert module.parse_env_file(env_file) == "cpk_test_value"
 
 
+def test_parse_env_file_strips_unquoted_inline_comments(tmp_path):
+    module = load_module()
+    env_file = tmp_path / ".env"
+    env_file.write_text("CHUTES_API_KEY=cpk_test_value  # personal key\n")
+
+    assert module.parse_env_file(env_file) == "cpk_test_value"
+
+
+def test_parse_env_file_keeps_hash_inside_quoted_value(tmp_path):
+    module = load_module()
+    env_file = tmp_path / ".env"
+    env_file.write_text('CHUTES_API_KEY="cpk_test#value"\n')
+
+    assert module.parse_env_file(env_file) == "cpk_test#value"
+
+
 def test_summarize_models_counts_hermes_relevant_capabilities():
     module = load_module()
     models = [

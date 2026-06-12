@@ -9,8 +9,10 @@ Sibling asset: [`docs/site-agent-growth-kit.md`](../docs/site-agent-growth-kit.m
 | Draft | Proposed URL | Job |
 |---|---|---|
 | [`pages/agents.md`](pages/agents.md) | `chutes.ai/agents` | Landing page. Convince an agent builder in 30 seconds, get them to a working call in 60. |
-| [`pages/connect-your-agent.md`](pages/connect-your-agent.md) | `chutes.ai/agents/connect` | Per-client recipes: Codex, Claude Code, Cursor, Cline, Aider, Hermes, OpenClaw, LangChain, LiteLLM, Vercel AI SDK. |
+| [`pages/connect-your-agent.md`](pages/connect-your-agent.md) | `chutes.ai/agents/connect` | Per-client recipes: Claude Code, Cursor, Cline, Aider, Codex, Hermes, OpenClaw, LangChain, LiteLLM, Vercel AI SDK. |
 | [`pages/private-inference.md`](pages/private-inference.md) | `chutes.ai/agents/private` | The TEE story: 100% confidential-compute catalog, attestation you can fetch yourself. |
+| [`pages/hermes.md`](pages/hermes.md) | `chutes.ai/agents/hermes` | Hermes deep-dive: provider YAML, skill mirror, doctor script. |
+| [`pages/hermes-recipes.md`](pages/hermes-recipes.md) | `chutes.ai/agents/hermes/recipes` | Copy-paste Hermes configs: routing, delegation, dual endpoints, troubleshooting. |
 
 Each draft contains the page copy plus a **Build notes** section (data sources, components, what must stay live-driven vs. static).
 

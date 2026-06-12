@@ -11,7 +11,7 @@
 [![Powered by Bittensor](https://img.shields.io/badge/powered%20by-Bittensor-FF6B00)](https://bittensor.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-One toolkit, every agent. Drop Chutes into **Codex**, **Claude**, **Hermes**, **OpenClaw**, or any OpenAI-compatible client — decentralized serverless inference for open-source models (Kimi, GLM, Qwen, DeepSeek, MiniMax, Gemma, Nemotron, Mistral), powered by Bittensor. The hosted catalog is currently **all TEE-backed** (`confidential_compute: true`); the live list at [`https://llm.chutes.ai/v1/models`](https://llm.chutes.ai/v1/models) is always the source of truth (and the badges above read straight from the daily-refreshed snapshot).
+One toolkit, every agent. Drop Chutes into **Claude**, **Hermes**, **OpenClaw**, **Codex**, or any OpenAI-compatible client — decentralized serverless inference for open-source models (Kimi, GLM, Qwen, DeepSeek, MiniMax, Gemma, Nemotron, Mistral), powered by Bittensor. The hosted catalog is currently **all TEE-backed** (`confidential_compute: true`); the live list at [`https://llm.chutes.ai/v1/models`](https://llm.chutes.ai/v1/models) is always the source of truth (and the badges above read straight from the daily-refreshed snapshot).
 
 ### 🚀 Start here
 
@@ -20,12 +20,11 @@ One toolkit, every agent. Drop Chutes into **Codex**, **Claude**, **Hermes**, **
 | **Call the endpoint from anything** (the one-page universal guide) | 📘 [**`docs/endpoint-guide.md`**](docs/endpoint-guide.md) |
 | **Run working code right now** (chat, tools, routing, a full mini-agent — live-verified 2026-06-11) | 🍳 [**`cookbook/`**](cookbook/README.md) |
 | **Pick a model for your task** (`--task agentic --routing latency`) | 🎯 [`scripts/pick_model.py`](scripts/pick_model.py) |
-| Run **Codex-style coding agents** on Chutes | [`other-agents/codex/`](other-agents/codex/README.md) |
 | Use it inside **Claude** (Code / Cowork) | [Install for Claude](#install-for-claude-code--cowork) |
 | Use it inside **Hermes** | [`other-agents/hermes/`](other-agents/hermes/README.md) |
-| Build Chutes-site pages for **Hermes agents** | [`site/pages/hermes.md`](site/pages/hermes.md) · [`docs/hermes-agent-hub-plan.md`](docs/hermes-agent-hub-plan.md) |
 | Use it inside **OpenClaw** 🦞 **[BETA]** | [`other-agents/openclaw/`](other-agents/openclaw/README.md) |
 | Use it in **Aider / Cursor / Cline / LangChain / LiteLLM** | [`other-agents/openai-compatible/`](other-agents/openai-compatible/README.md) |
+| Run **Codex-style coding agents** on Chutes | [`other-agents/codex/`](other-agents/codex/README.md) |
 | Drop it into **any agent's system prompt** | [`other-agents/system-prompt/`](other-agents/system-prompt/chutes-agent-prompt.md) |
 | Publish **Run agents on Chutes** site copy and demos | 🌐 [`site/`](site/README.md) (page drafts) + [`docs/site-agent-growth-kit.md`](docs/site-agent-growth-kit.md) (data + generator) |
 
@@ -130,12 +129,6 @@ cp -r plugins/chutes-ai/skills/* ~/.claude/skills/
 
 ## Install for Other Agents
 
-### Codex
-
-Codex-style coding agents can use Chutes anywhere the runtime accepts an OpenAI-compatible base URL, Bearer API key, and model value. Use `CHUTES_API_KEY`, point the base URL at `https://llm.chutes.ai/v1`, and choose `default:latency`, `default:throughput`, or a concrete model ID from the live `/v1/models` catalog.
-
-See [`other-agents/codex/README.md`](other-agents/codex/README.md) for setup patterns, routing presets for coding/review/planning/background work, credential handling, and current verification limits.
-
 ### Hermes
 
 Hermes works with Chutes today via named OpenAI-compatible provider configuration (`providers:` preferred, legacy `custom_providers:` still supported), and has a full Hermes skill mirror at `other-agents/hermes/skills/`:
@@ -185,6 +178,12 @@ models: {
 ```
 
 Full guide + routing/vision config examples: [`other-agents/openclaw/README.md`](other-agents/openclaw/README.md) · [`config-examples/`](other-agents/openclaw/config-examples/).
+
+### Codex
+
+Codex-style coding agents can use Chutes anywhere the runtime accepts an OpenAI-compatible base URL, Bearer API key, and model value. Use `CHUTES_API_KEY`, point the base URL at `https://llm.chutes.ai/v1`, and choose a concrete model ID from the live `/v1/models` catalog (or a `default:latency` / `default:throughput` routing alias after configuring a pool once at chutes.ai/app → Model Routing).
+
+See [`other-agents/codex/README.md`](other-agents/codex/README.md) for setup patterns, routing presets for coding/review/planning/background work, credential handling, and current verification limits.
 
 ### Any OpenAI-compatible client (Aider, Cursor, Cline, LangChain, LiteLLM, …)
 
@@ -406,12 +405,16 @@ chutes-agent-toolkit/
 │   └── javascript/chat.mjs
 ├── site/                                  # draft chutes.ai pages promoting agent use
 │   ├── README.md                          # page map + widget specs
-│   └── pages/ (agents, connect-your-agent, private-inference)
+│   └── pages/ (agents, connect-your-agent, private-inference, hermes, hermes-recipes)
+├── data/ (chutes-models.json, agent-use-cases.json)   # daily model snapshot + site/demo use-case feed
+├── docs/site-agent-growth-kit.md          # site-builder source material (pairs with the use-case feed)
 ├── llms.txt                               # agent-facing index of this repo
 ├── evals/ (evals.json, README.md)
 ├── scripts/run_evals.py
 ├── scripts/pick_model.py                  # task → model/routing recommender (live catalog)
-├── tests/ (test_manage_credentials.py, test_run_evals.py)
+├── scripts/build_agent_site_pack.py       # renders site cards from data/agent-use-cases.json
+├── scripts/hermes_chutes_doctor.py        # Hermes + Chutes local smoke test / config emitter
+├── tests/ (manage_credentials, run_evals, pick_model, build_agent_site_pack, hermes_chutes_doctor)
 ├── LICENSE
 └── README.md
 ```

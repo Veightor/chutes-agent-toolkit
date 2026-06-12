@@ -11,7 +11,7 @@ Status: the Chutes endpoint behavior in this guide was verified by this repo's 2
 | Inference base URL | `https://llm.chutes.ai/v1` |
 | Auth | `Authorization: Bearer $CHUTES_API_KEY` |
 | Model source of truth | `https://llm.chutes.ai/v1/models` |
-| Useful routing aliases | `default`, `default:latency`, `default:throughput` |
+| Useful routing aliases | `default`, `default:latency`, `default:throughput` — require a pool configured once at chutes.ai/app → Model Routing (see [`docs/endpoint-guide.md`](../../docs/endpoint-guide.md)) |
 | Account and usage host | `https://api.chutes.ai` |
 
 Use `CHUTES_API_KEY` as the local secret name. Do not paste API keys into agent prompts, committed config, demo transcripts, or issue comments.
@@ -38,9 +38,11 @@ For config-driven agents, use this shape:
   "provider": "openai-compatible",
   "base_url": "https://llm.chutes.ai/v1",
   "api_key_env": "CHUTES_API_KEY",
-  "model": "default:latency"
+  "model": "deepseek-ai/DeepSeek-V3.2-TEE"
 }
 ```
+
+Swap the model for any live ID from `/v1/models`, an inline pool (`"<id1>,<id2>:latency"`), or a `default:*` alias once a routing pool is configured.
 
 If your Codex runtime does not expose custom provider configuration, keep Chutes in a sidecar tool, SDK-backed task runner, MCP server, or repo-local script until that runtime offers a supported provider surface.
 
@@ -58,7 +60,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="default:latency",
+    model="deepseek-ai/DeepSeek-V3.2-TEE",  # any live ID from /v1/models
     messages=[
         {
             "role": "user",
@@ -72,6 +74,8 @@ print(response.choices[0].message.content)
 `GET https://llm.chutes.ai/v1/models` is public, so a successful model-list call does not prove the key works. Validate credentials with an authenticated completion or a management read such as `GET https://api.chutes.ai/users/me`.
 
 ## Recommended Presets
+
+The `default:*` aliases below assume a routing pool has been configured once at chutes.ai/app → Model Routing; without one, use a live model ID or an inline pool string instead.
 
 | Codex-style task | Model value | Why |
 |---|---|---|
@@ -120,14 +124,14 @@ Rewrite this agent landing-page copy so it explains confidential_compute benefit
 - Keep the raw API key in a local secret manager, CI secret, or process environment.
 - Prefer `CHUTES_API_KEY` as the durable name, then map to `OPENAI_API_KEY` only inside tools that require the OpenAI variable name.
 - Do not commit generated configs with literal keys.
-- Do not include credential-looking examples in docs. Use `$CHUTES_API_KEY` or redacted placeholders.
+- Do not include real-looking credentials in docs. Use `$CHUTES_API_KEY` or the repo's `cpk_...` format placeholder.
 - When using this repo's Chutes skills, use `plugins/chutes-ai/skills/chutes-ai/scripts/manage_credentials.py` for keychain-backed storage.
 
 ## Limitations
 
 - Chutes is OpenAI-compatible, but not every Codex runtime exposes the same provider knobs.
 - Provider-mode setup for a specific Codex build should be verified against that installed build before publishing as first-class support.
-- Routing aliases are convenient defaults; use concrete live model IDs when a task requires a specific context window, modality, tool support, or price.
+- Routing aliases are convenient defaults but need a one-time pool setup in the Chutes dashboard; use concrete live model IDs when a task requires a specific context window, modality, tool support, or price.
 - TEE status should be read from `confidential_compute`, not inferred from the model name.
 - Do not claim cryptographic attestation unless the `chutes-tee` verification path actually ran with the required tooling.
 

@@ -163,7 +163,7 @@ python3 scripts/hermes_chutes_doctor.py
 python3 scripts/hermes_chutes_doctor.py --emit-config
 ```
 
-It checks the local Hermes CLI, finds whether `CHUTES_API_KEY` is configured without printing the raw key, fetches the live public model catalog, summarizes Hermes-relevant capabilities, and can emit the provider YAML used in this guide. Auth validation is intentionally opt-in:
+It checks the local Hermes CLI, finds whether `CHUTES_API_KEY` is configured without printing the raw key, fetches the live public model catalog, summarizes Hermes-relevant capabilities, and can emit a starter provider YAML (the §5 shape, plus a pinned direct model picked from the live catalog — re-check the pin before pasting, since concrete IDs go stale). Auth validation is intentionally opt-in:
 
 ```bash
 python3 scripts/hermes_chutes_doctor.py --check-auth

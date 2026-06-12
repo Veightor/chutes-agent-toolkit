@@ -2,7 +2,7 @@
 
 > Give any AI agent access to Chutes.ai — decentralized, serverless, 100%-TEE inference for open-source models through the OpenAI API. This repo is a Claude plugin marketplace, a Hermes skill mirror, a runnable cookbook, and the canonical agent-facing Chutes documentation, all in one.
 
-The two facts that matter most: inference lives at `https://llm.chutes.ai/v1` (OpenAI-compatible), and auth is `Authorization: Bearer $CHUTES_API_KEY` on every authenticated request (never `X-API-Key` — it is silently ignored on inference). `GET https://llm.chutes.ai/v1/models` is public and is the source of truth for models, pricing, features, and TEE status.
+The two facts that matter most: inference lives at `https://llm.chutes.ai/v1` (OpenAI-compatible), and auth is `Authorization: Bearer cpk_...` on every authenticated request (never `X-API-Key` — it is silently ignored on inference). `GET https://llm.chutes.ai/v1/models` is public and is the source of truth for models, pricing, features, and TEE status.
 
 ## Start here
 
@@ -28,12 +28,15 @@ The two facts that matter most: inference lives at `https://llm.chutes.ai/v1` (O
 - [API reference](docs/api-reference.md): endpoint schemas beyond the guide.
 - [Known models snapshot](docs/known-models.md): daily-refreshed catalog table; live endpoint always wins.
 - [Model snapshot JSON](data/chutes-models.json): same data, machine-readable, with fetch timestamp.
-- [Site content pack](site/README.md): draft chutes.ai pages promoting agent use (landing, connect, private-inference).
+- [Site content pack](site/README.md): draft chutes.ai pages promoting agent use (landing, connect, private-inference, hermes, hermes-recipes).
+- [Agent use-case feed](data/agent-use-cases.json): structured per-client use-case data; render with `scripts/build_agent_site_pack.py`.
 
 ## Optional
 
 - [Roadmap](docs/roadmap.md): four product lanes, verification history, BETA labeling policy.
 - [Hermes integration guide](docs/hermes-chutes-toolkit-guide.md): custom-provider YAML, skill mounting.
+- [Hermes doctor](scripts/hermes_chutes_doctor.py): local smoke test — checks the Hermes CLI, key presence (never printed), live catalog, and emits a starter provider YAML.
+- [Codex guide](other-agents/codex/README.md): OpenAI-compatible setup pattern for Codex-style coding agents.
 - [OpenClaw integration](other-agents/openclaw/README.md): JSON5 provider config for chat-gateway agents [BETA].
 - [System prompt block](other-agents/system-prompt/chutes-agent-prompt.md): paste-in Chutes instructions for any agent.
 

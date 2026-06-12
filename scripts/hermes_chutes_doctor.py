@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -30,7 +31,6 @@ from typing import Any, Callable
 
 MODELS_URL = "https://llm.chutes.ai/v1/models"
 ACCOUNT_URL = "https://api.chutes.ai/users/me"
-REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_HERMES_ENV = Path.home() / ".hermes" / ".env"
 USER_AGENT = "chutes-agent-toolkit-hermes-doctor/1.0"
 
@@ -215,7 +215,14 @@ def parse_env_file(path: Path, key: str = "CHUTES_API_KEY") -> str | None:
             value = line[len(prefix) :]
         else:
             continue
-        value = value.strip().strip('"').strip("'")
+        value = value.strip()
+        if value[:1] in ('"', "'"):
+            quote = value[0]
+            end = value.find(quote, 1)
+            value = value[1:end] if end != -1 else value[1:]
+        else:
+            # unquoted values: drop trailing inline comments (` # note`)
+            value = re.split(r"\s+#", value, maxsplit=1)[0].strip()
         return value or None
     return None
 
@@ -359,9 +366,11 @@ def render_report(
             f"- confidential_compute=true: {summary['tee_count']}/{summary['count']}" + (" (currently TEE-only)" if summary["all_tee"] else ""),
             f"- models advertising tools/json/structured outputs: {summary['tools_count']}/{summary['json_mode_count']}/{summary['structured_outputs_count']}",
             f"- image-capable models: {summary['vision_count']}",
-            f"- cheapest model advertising tools: {summary['cheapest_tool_model']} ({summary['cheapest_tool_price']})",
-            f"- cheapest image-capable model: {summary['cheapest_vision_model']}",
-            f"- longest context model: {summary['longest_context_model']} ({summary['longest_context']})",
+            f"- cheapest model advertising tools: {summary['cheapest_tool_model'] or 'none found'}"
+            + (f" ({summary['cheapest_tool_price']})" if summary["cheapest_tool_price"] else ""),
+            f"- cheapest image-capable model: {summary['cheapest_vision_model'] or 'none found'}",
+            f"- longest context model: {summary['longest_context_model'] or 'none found'}"
+            + (f" ({summary['longest_context']})" if summary["longest_context_model"] else ""),
             "",
             "Recommended Hermes defaults:",
             "- interactive chat: model `default:latency`",
@@ -405,11 +414,20 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--json", action="store_true", help="Emit machine-readable JSON instead of text")
     args = parser.parse_args(argv)
 
+    if args.include_research and not args.emit_config:
+        print("warning: --include-research only affects --emit-config output; pass --emit-config too", file=sys.stderr)
+
+    fetch_error = None
     try:
         models = load_models(timeout=args.timeout)
     except Exception as exc:
+        fetch_error = str(exc)
         print(f"error: failed to fetch live Chutes models from {MODELS_URL}: {exc}", file=sys.stderr)
-        return 2
+        if not args.emit_config:
+            return 2
+        # --emit-config does not need the catalog (it only adds an optional model pin),
+        # so keep going offline with an empty catalog.
+        models = []
 
     summary = summarize_models(models)
     hermes = detect_hermes()
@@ -423,16 +441,20 @@ def main(argv: list[str] | None = None) -> int:
         payload = {
             "hermes": {"found": hermes.found, "executable": hermes.executable, "version": hermes.version, "error": hermes.error},
             "chutes_key": {"found": secret.found, "source": secret.source, "masked": mask_secret(secret.value)},
-            "models": summary,
+            "models": None if fetch_error else summary,
+            "models_fetch_error": fetch_error,
             "auth_check": auth_result,
             "config": config if args.emit_config else None,
         }
         print(json.dumps(payload, indent=2, sort_keys=True))
     else:
-        print(render_report(hermes, secret, summary, auth_result), end="")
+        if fetch_error is None:
+            print(render_report(hermes, secret, summary, auth_result), end="")
         if args.emit_config:
             print("\n--- Hermes config snippet ---")
             print(config, end="")
+    if fetch_error:
+        return 2
     return 0 if not auth_result or auth_result.get("ok") else 1
 
 

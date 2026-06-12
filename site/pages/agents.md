@@ -39,7 +39,7 @@ Kimi K2.6, GLM-5.1, DeepSeek V3.2, and Qwen3.5-397B, served from a competitive G
 
 ```bash
 # 1. Get a key at chutes.ai/auth/start, then export it from your secret store:
-export CHUTES_API_KEY="<redacted>"
+export CHUTES_API_KEY=cpk_...
 
 # 2. See what's live right now (public, no auth)
 curl https://llm.chutes.ai/v1/models

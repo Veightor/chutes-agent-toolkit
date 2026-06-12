@@ -2,7 +2,7 @@
 
 Works on any model whose supported_features includes "tools"
 (check GET https://llm.chutes.ai/v1/models — public).
-Run: CHUTES_API_KEY="<redacted>" python 03_tool_calling.py
+Run: CHUTES_API_KEY=cpk_... python 03_tool_calling.py
 """
 
 import json

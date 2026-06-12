@@ -1,7 +1,7 @@
 """Minimal Chutes chat completion. [VERIFIED 2026-06-11: ran live against the paid API]
 
 Chutes speaks the OpenAI API: change the base_url, keep everything else.
-Run: CHUTES_API_KEY="<redacted>" python 01_first_call.py
+Run: CHUTES_API_KEY=cpk_... python 01_first_call.py
 """
 
 import os
