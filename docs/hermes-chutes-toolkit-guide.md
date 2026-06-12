@@ -154,6 +154,23 @@ Decision tree:
 7. Need interactive speed? Start with `default:latency` or a live low-latency recommendation.
 8. Need background/delegated throughput? Start with `default:throughput`.
 
+## 4a. Run the Hermes + Chutes doctor
+
+Before editing user config, run the repo-local smoke test:
+
+```bash
+python3 scripts/hermes_chutes_doctor.py
+python3 scripts/hermes_chutes_doctor.py --emit-config
+```
+
+It checks the local Hermes CLI, finds whether `CHUTES_API_KEY` is configured without printing the raw key, fetches the live public model catalog, summarizes Hermes-relevant capabilities, and can emit the provider YAML used in this guide. Auth validation is intentionally opt-in:
+
+```bash
+python3 scripts/hermes_chutes_doctor.py --check-auth
+```
+
+Use `--json` when wiring the same checks into a Chutes-site widget or CI helper.
+
 ## 5. Configure Chutes as a Hermes provider
 
 Edit the Hermes config:
@@ -377,6 +394,7 @@ When an agent works on Hermes + Chutes in this repo, it should follow these rule
 Run these before claiming Hermes assets are current:
 
 ```bash
+python3 scripts/hermes_chutes_doctor.py
 python3 plugins/chutes-ai/skills/chutes-mcp-portability/scripts/generate_agent_config.py --target hermes
 
 python3 - <<'PY'

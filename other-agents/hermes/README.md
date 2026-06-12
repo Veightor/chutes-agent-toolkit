@@ -31,6 +31,14 @@ hermes mcp --help
 hermes skills --help
 ```
 
+Repo-local smoke test:
+
+```bash
+python3 scripts/hermes_chutes_doctor.py --emit-config
+```
+
+Run it from the repository root before changing a user's Hermes config. It fetches the live public Chutes model catalog, detects Hermes, checks whether `CHUTES_API_KEY` is available without printing the raw key, and emits a safe provider block. Add `--check-auth` only when you intentionally want a read-only `GET /users/me` auth validation.
+
 ## Install the Hermes skills
 
 The Hermes skills live in `other-agents/hermes/skills/` and are thin entry points that call the shared scripts under `plugins/chutes-ai/skills/`.
@@ -198,6 +206,8 @@ For stronger claims, load `chutes-tee` and fetch/parse the chute evidence. Do no
 
 ## Related docs
 
+- `site/pages/hermes.md` and `site/pages/hermes-recipes.md` — Chutes-site page drafts for promoting Hermes agent use
+- `docs/hermes-agent-hub-plan.md`
 - `docs/hermes-chutes-toolkit-guide.md`
 - `docs/hermes-integration-spec.md`
 - `docs/llms-txt-review.md`

@@ -20,6 +20,7 @@ One toolkit, every agent. Drop Chutes into **Claude**, **Hermes**, **OpenClaw**,
 | **Call the endpoint from anything** (the one-page universal guide) | 📘 [**`docs/endpoint-guide.md`**](docs/endpoint-guide.md) |
 | Use it inside **Claude** (Code / Cowork) | [Install for Claude](#install-for-claude-code--cowork) |
 | Use it inside **Hermes** | [`other-agents/hermes/`](other-agents/hermes/README.md) |
+| Build Chutes-site pages for **Hermes agents** | [`site/pages/hermes.md`](site/pages/hermes.md) · [`docs/hermes-agent-hub-plan.md`](docs/hermes-agent-hub-plan.md) |
 | Use it inside **OpenClaw** 🦞 **[BETA]** | [`other-agents/openclaw/`](other-agents/openclaw/README.md) |
 | Use it in **Aider / Cursor / Cline / LangChain / LiteLLM** | [`other-agents/openai-compatible/`](other-agents/openai-compatible/README.md) |
 | Drop it into **any agent's system prompt** | [`other-agents/system-prompt/`](other-agents/system-prompt/chutes-agent-prompt.md) |
@@ -145,6 +146,14 @@ See also:
 - [`other-agents/hermes/config-examples/`](other-agents/hermes/config-examples/)
 
 Hermes users can either copy those skills into `~/.hermes/skills/` or mount the directory with `skills.external_dirs` in `~/.hermes/config.yaml`. Scripts live in the Claude plugin tree; Hermes users invoke them from the repo root. There is one implementation, two skill trees.
+
+Hermes users and maintainers can also run the local smoke test before editing config:
+
+```bash
+python3 scripts/hermes_chutes_doctor.py --emit-config
+```
+
+It checks Hermes availability, fetches the live public model catalog, detects whether `CHUTES_API_KEY` is configured without printing the raw key, and emits a safe provider snippet. Draft Chutes-site pages for promoting Hermes agent use live in [`site/pages/hermes.md`](site/pages/hermes.md) and [`site/pages/hermes-recipes.md`](site/pages/hermes-recipes.md).
 
 ### OpenClaw 🦞 **[BETA]**
 
