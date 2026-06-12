@@ -106,7 +106,7 @@ A full re-verification pass (real GETs against the live API, no management write
 Add this repo as a marketplace, then install the plugin:
 
 ```
-/plugin marketplace add YOUR_ORG/chutes-agent-toolkit
+/plugin marketplace add Veightor/chutes-agent-toolkit
 /plugin install chutes-ai@chutes-agent-toolkit
 ```
 
