@@ -3,12 +3,12 @@
 This file is generated from the public Chutes OpenAI-compatible model endpoint. Do not edit it by hand; run `python3 scripts/update_chutes_models.py` instead.
 
 Source: `GET https://llm.chutes.ai/v1/models` (no auth headers sent)
-Last updated: 2026-06-16 10:59 UTC
+Last updated: 2026-06-17 10:58 UTC
 
 ## Summary
 
-- Models returned: **13**
-- TEE/confidential-compute models: **13/13** — the hosted gateway is currently TEE-only.
+- Models returned: **14**
+- TEE/confidential-compute models: **14/14** — the hosted gateway is currently TEE-only.
 - Models advertising `tools`: **11**
 - Models advertising `json_mode`: **11**
 - Models advertising `structured_outputs`: **11**
@@ -18,6 +18,7 @@ Last updated: 2026-06-16 10:59 UTC
 
 | Model ID | $ in | $ out | Cache read | Context | Quant | Engine | TEE | Modalities | Features |
 |---|---:|---:|---:|---:|---|---|---|---|---|
+| `zai-org/GLM-5.2-TEE` | 1.4 | 4.4 | 0.7 | 1049k | — | sglang | yes | text | — |
 | `nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-TEE` | 1.5 | 4 | 0.75 | 262k | — | vllm | yes | text | — |
 | `zai-org/GLM-5.1-TEE` | 1.2 | 4 | 0.6 | 203k | fp8 | sglang | yes | text | json_mode, structured_outputs, tools, reasoning |
 | `moonshotai/Kimi-K2.6-TEE` | 0.74 | 3.5 | 0.37 | 262k | int4 | vllm | yes | text+image+video | json_mode, structured_outputs, tools, reasoning |
@@ -48,17 +49,17 @@ Last updated: 2026-06-16 10:59 UTC
 
 ### Largest context windows
 
+- `zai-org/GLM-5.2-TEE` ($1.4/$4.4, context 1049k, text)
 - `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE` ($0.2989/$1.1957, context 262k, text)
 - `Qwen/Qwen3.5-397B-A17B-TEE` ($0.45/$3, context 262k, text+image)
-- `Qwen/Qwen3.6-27B-TEE` ($0.3/$2, context 262k, text+image)
 
 ### Tool-capable examples
 
 - `Qwen/Qwen3-32B-TEE` ($0.104/$0.416, context 41k, text)
 - `google/gemma-4-31B-turbo-TEE` ($0.15/$0.42, context 131k, text+image)
 - `zai-org/GLM-5.1-TEE` ($1.2/$4, context 203k, text)
-- `moonshotai/Kimi-K2.6-TEE` ($0.74/$3.5, context 262k, text+image+video)
 - `deepseek-ai/DeepSeek-V3.2-TEE` ($1/$1, context 131k, text)
+- `moonshotai/Kimi-K2.5-TEE` ($0.44/$2, context 262k, text+image+video)
 
 ## Routing aliases
 
