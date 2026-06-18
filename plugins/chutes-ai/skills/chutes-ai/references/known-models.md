@@ -3,23 +3,22 @@
 This file is generated from the public Chutes OpenAI-compatible model endpoint. Do not edit it by hand; run `python3 scripts/update_chutes_models.py` instead.
 
 Source: `GET https://llm.chutes.ai/v1/models` (no auth headers sent)
-Last updated: 2026-06-17 10:58 UTC
+Last updated: 2026-06-18 10:49 UTC
 
 ## Summary
 
-- Models returned: **14**
-- TEE/confidential-compute models: **14/14** — the hosted gateway is currently TEE-only.
-- Models advertising `tools`: **11**
-- Models advertising `json_mode`: **11**
-- Models advertising `structured_outputs`: **11**
+- Models returned: **13**
+- TEE/confidential-compute models: **13/13** — the hosted gateway is currently TEE-only.
+- Models advertising `tools`: **12**
+- Models advertising `json_mode`: **12**
+- Models advertising `structured_outputs`: **12**
 - The models endpoint carries pricing and capability metadata, but not TTFT/TPS latency stats. For live latency/throughput data, use `GET https://api.chutes.ai/invocations/stats/llm` or the `default:latency` / `default:throughput` routing aliases.
 
 ## Live model table (USD per 1M tokens)
 
 | Model ID | $ in | $ out | Cache read | Context | Quant | Engine | TEE | Modalities | Features |
 |---|---:|---:|---:|---:|---|---|---|---|---|
-| `zai-org/GLM-5.2-TEE` | 1.4 | 4.4 | 0.7 | 1049k | — | sglang | yes | text | — |
-| `nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-TEE` | 1.5 | 4 | 0.75 | 262k | — | vllm | yes | text | — |
+| `zai-org/GLM-5.2-TEE` | 1.4 | 4.4 | 0.7 | 1049k | fp8 | sglang | yes | text | json_mode, structured_outputs, tools, reasoning |
 | `zai-org/GLM-5.1-TEE` | 1.2 | 4 | 0.6 | 203k | fp8 | sglang | yes | text | json_mode, structured_outputs, tools, reasoning |
 | `moonshotai/Kimi-K2.6-TEE` | 0.74 | 3.5 | 0.37 | 262k | int4 | vllm | yes | text+image+video | json_mode, structured_outputs, tools, reasoning |
 | `Qwen/Qwen3.5-397B-A17B-TEE` | 0.45 | 3 | 0.225 | 262k | fp8 | sglang | yes | text+image | json_mode, tools, structured_outputs, reasoning |
