@@ -1,0 +1,298 @@
+# ACE-Step-15-Music-Generator
+
+> MIT-licensed ACE-Step 1.5 XL — dual DiT (SFT quality + Turbo speed) with LM 4B planner. Text-to-music, cover, and repaint in one sync API.
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/vonkaiser-ace-step-15-music-generator
+- Model llms.txt: https://chutes.ai/app/chute/vonkaiser-ace-step-15-music-generator/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/vonkaiser-ace-step-15-music-generator/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `ACE-Step-15-Music-Generator`
+- Chute ID: `5abec352-a6fa-5201-b4a9-f1f182dbc252`
+- Slug: `vonkaiser-ace-step-15-music-generator`
+- Owner: `vonkaiser`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is WRAPPED — nest the request fields under a top-level `args` object (the request-field list below describes the inner object; see the example call).
+- This model is served on its own host (`https://vonkaiser-ace-step-15-music-generator.chutes.ai`). Call the endpoint paths listed below directly.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Endpoints
+
+### 1. POST /generate
+
+- Base URL: `https://vonkaiser-ace-step-15-music-generator.chutes.ai`
+- Output content type: `text/plain`
+
+Request fields:
+
+- `bpm` (integer, optional) Default: null.
+- `seed` (integer, optional) Default: null.
+- `model` (string, optional) Default: "xl-turbo". Options: xl-sft, xl-turbo.
+- `shift` (number, optional) Default: null.
+- `lyrics` (string, optional) - Lyrics with optional section tags Default: "[Instrumental]".
+- `caption` (string, optional) - Music description (ACE-Step prompt/caption) Default: "instrumental lo-fi hip hop, warm vinyl texture, relaxed groove".
+- `duration` (number, optional) Default: 120.
+- `thinking` (boolean, optional) - Use LM planner for metadata and codes Default: true.
+- `key_scale` (string, optional) Default: null.
+- `task_type` (string, optional) Default: "text2music". Options: text2music, cover, repaint, lego, extract, complete.
+- `timesteps` (string, optional) Default: null.
+- `batch_size` (integer, optional) Default: 1.
+- `use_format` (boolean, optional) - LM-enhance caption/lyrics before generation Default: false.
+- `return_json` (boolean, optional) - If true, return JSON with base64 audio instead of raw bytes Default: false.
+- `audio_format` (string, optional) Default: "mp3". Options: mp3, wav, flac, opus, aac, wav32.
+- `infer_method` (string, optional) Default: "ode". Options: ode, sde.
+- `sample_query` (string, optional) - Natural language description for sample mode (alternative to caption) Default: null.
+- `src_audio_b64` (string, optional) Default: null.
+- `use_cot_metas` (boolean, optional) Default: true.
+- `guidance_scale` (number, optional) Default: null.
+- `repainting_end` (number, optional) Default: null.
+- `time_signature` (string, optional) Default: null.
+- `vocal_language` (string, optional) Default: "en".
+- `inference_steps` (integer, optional) Default: null.
+- `use_cot_caption` (boolean, optional) Default: true.
+- `use_random_seed` (boolean, optional) Default: true.
+- `repainting_start` (number, optional) Default: 0.
+- `use_cot_language` (boolean, optional) Default: true.
+- `reference_audio_b64` (string, optional) Default: null.
+- `audio_cover_strength` (number, optional) Default: 1.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-ace-step-15-music-generator.chutes.ai/generate" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "args": {
+    "seed": 42,
+    "model": "xl-turbo",
+    "lyrics": "[Instrumental]",
+    "caption": "instrumental lo-fi hip hop, warm vinyl texture, relaxed groove",
+    "duration": 120,
+    "thinking": true,
+    "task_type": "text2music",
+    "batch_size": 1,
+    "use_format": false,
+    "return_json": false,
+    "audio_format": "mp3",
+    "infer_method": "ode",
+    "use_cot_metas": true,
+    "vocal_language": "en",
+    "use_cot_caption": true,
+    "use_random_seed": true,
+    "repainting_start": 0,
+    "use_cot_language": true,
+    "audio_cover_strength": 1
+  }
+}' \
+  --output output.bin
+```
+
+### 2. GET /models
+
+- Base URL: `https://vonkaiser-ace-step-15-music-generator.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+
+Example call:
+
+```bash
+curl -X GET "https://vonkaiser-ace-step-15-music-generator.chutes.ai/models" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "args": {}
+}'
+```
+
+### 3. GET /stats
+
+- Base URL: `https://vonkaiser-ace-step-15-music-generator.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+
+Example call:
+
+```bash
+curl -X GET "https://vonkaiser-ace-step-15-music-generator.chutes.ai/stats" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "args": {}
+}'
+```
+
+### 4. GET /health
+
+- Base URL: `https://vonkaiser-ace-step-15-music-generator.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+
+Example call:
+
+```bash
+curl -X GET "https://vonkaiser-ace-step-15-music-generator.chutes.ai/health" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "args": {}
+}'
+```
+
+### 5. POST /format
+
+- Base URL: `https://vonkaiser-ace-step-15-music-generator.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `bpm` (integer, optional) Default: null.
+- `lyrics` (string, optional) Default: "".
+- `caption` (string, optional) Default: "".
+- `duration` (number, optional) Default: null.
+- `language` (string, optional) Default: "en".
+- `key_scale` (string, optional) Default: null.
+- `temperature` (number, optional) Default: 0.85.
+- `time_signature` (string, optional) Default: null.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-ace-step-15-music-generator.chutes.ai/format" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "args": {
+    "lyrics": "",
+    "caption": "",
+    "language": "en",
+    "temperature": 0.85
+  }
+}'
+```
+
+### 6. POST /sample
+
+- Base URL: `https://vonkaiser-ace-step-15-music-generator.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `sample_type` (string, optional) Default: "simple_mode". Options: simple_mode, custom_mode.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-ace-step-15-music-generator.chutes.ai/sample" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "args": {
+    "sample_type": "simple_mode"
+  }
+}'
+```
+
+## Model Facts
+
+- Parameters: ~4B per XL DiT checkpoint (4.99B in safetensors) + 4B LM planner
+- Architecture: Hybrid LM + Diffusion Transformer: a Qwen3-4B-based language model plans BPM, key, duration, and semantic audio codes via Chain-of-Thought, then a DiT (decoder: 32 layers, hidden 2560, 32 heads; encoder: 8 layers, hidden 2048) synthesizes the audio
+- Modalities: text, audio in → audio out
+- License: MIT
+- Released: 2026-04
+- Checkpoints on this chute: xl-turbo (8 steps, no CFG) and xl-sft (50 steps, CFG) sharing one acestep-5Hz-lm-4B planner
+- Tasks: text2music, cover, repaint (lego/extract/complete return 400: xl-base is not loaded)
+- Duration: 10-240 s (chute readme); endpoint default 120 s. Live testing (July 2026): the endpoint returned ~120 s tracks regardless of the duration field
+- Languages: 50+ vocal languages per model card; chute default vocal_language en
+- Audio formats: mp3 (default), wav, flac, opus, aac, wav32
+- Commercial use: Model card: trained on licensed, royalty-free, and synthetic data; generated music usable commercially
+- Hugging Face: https://huggingface.co/ACE-Step/Ace-Step1.5
+
+## Recommended Parameters
+
+- `inference_steps`: 8 (xl-turbo) / 50 (xl-sft) (model-card defaults per variant; chute readme suggests 64+ on xl-sft for maximum quality)
+- `guidance_scale`: 2.0 (xl-sft only) (xl-turbo is distilled without CFG and ignores it; chute readme warns cfg > 5 often breaks vocals on SFT)
+- `thinking`: true (enables the LM 4B planner (BPM, key, duration, semantic codes); recommended for both variants)
+- `use_cot_caption`: false when passing vocal lyrics (chute readme: prevents the LM from rewriting the prompt to instrumental)
+
+## Best For
+
+- Text-to-music from a style caption plus section-tagged lyrics ([Verse], [Chorus], [Bridge])
+- Fast drafts and iteration on xl-turbo (8 steps), then final renders on xl-sft (50 steps, CFG)
+- Cover generation: re-render existing audio in a new style via src_audio_b64
+- Repainting: regenerate a time window of a track while keeping the rest
+- Commercial soundtrack production, since the MIT license and training-data policy permit commercial use of outputs
+
+Not ideal for:
+
+- Stem extraction, lego, or completion tasks: the xl-base checkpoint is not loaded and these return 400
+- Speech synthesis or narration; this is a music model, not TTS
+- Tracks over 240 seconds in a single call (use repaint/cover workflows to extend)
+
+## FAQ
+
+### What is the difference between xl-turbo and xl-sft?
+
+xl-turbo is distilled for 8-step inference without classifier-free guidance: fastest, ideal for drafts. xl-sft is the supervised fine-tuned checkpoint running 50 steps with CFG (default guidance 2.0): highest quality for final renders. Select per request with the model field; both share the same LM 4B planner.
+
+### How do I write good prompts for it?
+
+Put style in caption (genre, instruments, mood, BPM, vocal style; be specific) and vocal content in lyrics with section tags like [Verse 1], [Chorus], [Bridge], or [Instrumental]. You can also POST /format to have the LM enhance a rough caption/lyrics pair, or set use_format: true on /generate.
+
+### What does the thinking parameter do?
+
+With thinking: true (the default and recommendation), the shared acestep-5Hz-lm-4B planner runs first: it plans BPM, key, duration, and semantic audio codes via Chain-of-Thought before the DiT synthesizes audio. This is the core of ACE-Step 1.5's hybrid LM+DiT design.
+
+### Why did my vocal track come out instrumental?
+
+The LM caption-rewrite step can turn a prompt instrumental. When you pass real lyrics, set use_cot_caption: false (per the chute readme) so the planner keeps your vocal intent, and make sure lyrics contains tagged vocal sections rather than the default [Instrumental].
+
+### How is the request body structured?
+
+Unlike most Chutes media endpoints, this chute wraps the body: nest all fields under a top-level args object, e.g. {"args": {"caption": "...", "lyrics": "..."}}. The response from /generate is raw audio bytes (mp3 by default) unless return_json: true.
+
+### Can I use generated music commercially?
+
+Yes. The model is MIT-licensed and the ACE-Step 1.5 card states it is trained on licensed, royalty-free/public-domain, and synthetic data specifically so generated music can be used for commercial purposes.
+
+### Can it edit existing audio?
+
+Partially. task_type cover restyles existing audio (send src_audio_b64, tune audio_cover_strength), and repaint regenerates a chosen time window (repainting_start/repainting_end). Stem extraction, lego, and complete require the xl-base checkpoint, which is not loaded on this chute and returns 400.
+
+### How long can a track be and what formats are supported?
+
+10 to 240 seconds per the chute readme, with a 120-second endpoint default. Note: in live testing (July 2026) the deployment returned ~120-second tracks regardless of the duration value sent, so treat shorter/longer requests as best-effort. Output formats: mp3 (default), wav, flac, opus, aac, and wav32 via the audio_format field.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/vonkaiser-ace-step-15-music-generator
+- Source: https://huggingface.co/ACE-Step/Ace-Step1.5
+- Source: https://huggingface.co/ACE-Step/acestep-v15-xl-turbo
+- Source: https://huggingface.co/ACE-Step/acestep-v15-xl-sft
+- Source: https://chutes.ai/app/chute/vonkaiser-ace-step-15-music-generator/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

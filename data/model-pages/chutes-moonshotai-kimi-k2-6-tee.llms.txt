@@ -1,0 +1,343 @@
+# moonshotai/Kimi-K2.6-TEE
+
+> moonshotai/Kimi-K2.6
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/chutes-moonshotai-kimi-k2-6-tee
+- Model llms.txt: https://chutes.ai/app/chute/chutes-moonshotai-kimi-k2-6-tee/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/chutes-moonshotai-kimi-k2-6-tee/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `moonshotai/Kimi-K2.6-TEE`
+- Chute ID: `aac09863-35b4-5d9b-9b67-6e6a9d54273a`
+- Slug: `chutes-moonshotai-kimi-k2-6-tee`
+- Owner: `chutes`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on the shared OpenAI-compatible gateway. Set the request `model` field to the exact Name above (`moonshotai/Kimi-K2.6-TEE`), and use base URL `https://llm.chutes.ai/v1`.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Endpoints
+
+### 1. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "moonshotai/Kimi-K2.6".
+- `stream` (boolean, optional) Default: true.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "moonshotai/Kimi-K2.6-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": true,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 2. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "moonshotai/Kimi-K2.6".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: true.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "moonshotai/Kimi-K2.6-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 3. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "moonshotai/Kimi-K2.6".
+- `stream` (boolean, optional) Default: false.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "moonshotai/Kimi-K2.6-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 4. POST /tokenize
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `model` (string, required)
+- `prompt` (string, required)
+- `add_special_tokens` (boolean, required)
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/tokenize" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "moonshotai/Kimi-K2.6-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "add_special_tokens": false
+}'
+```
+
+### 5. POST /detokenize
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `model` (string, required)
+- `tokens` (array, required)
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/detokenize" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "moonshotai/Kimi-K2.6-TEE",
+  "tokens": [
+    1
+  ]
+}'
+```
+
+### 6. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "moonshotai/Kimi-K2.6".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: false.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "moonshotai/Kimi-K2.6-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 7. GET /v1/models
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+
+Example call:
+
+```bash
+curl -X GET "https://llm.chutes.ai/v1/models" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+## Model Facts
+
+- Parameters: 1T total
+- Active parameters: 32B per token
+- Architecture: Native multimodal Mixture-of-Experts transformer with Multi-head Latent Attention (MLA) and a 400M-parameter MoonViT vision encoder; 61 layers, 384 experts, 8 selected per token plus 1 shared
+- Context length: 262,144 tokens
+- Modalities: text, image, video in → text out
+- Precision: Native INT4 quantization (upstream), served in a TEE on Chutes
+- License: Modified MIT
+- Released: 2026-04
+- Experts: 384 routed + 1 shared, 8 selected per token
+- Layers: 61 (1 dense)
+- Attention: MLA, 64 heads, hidden dimension 7168
+- Vision encoder: MoonViT, 400M parameters
+- Vocabulary: ~160K tokens
+- Modes: Thinking (default) and Instant, toggled via chat_template_kwargs
+- Hugging Face: https://huggingface.co/moonshotai/Kimi-K2.6
+
+## Recommended Parameters
+
+- `temperature`: 1.0 (model-card recommendation for Thinking mode; use 0.6 for Instant mode)
+- `top_p`: 0.95 (model-card recommendation)
+
+## Best For
+
+- Long-horizon coding tasks: 80.2 on SWE-Bench Verified, 66.7 on Terminal-Bench 2.0 (model card)
+- Coding-driven design: turning prompts and visual inputs into production-ready interfaces with structured layouts and animations
+- Agent swarms: the card reports scaling to 300 sub-agents executing 4,000 coordinated steps
+- Agentic search and browsing: 83.2 on BrowseComp, 54.0 on HLE-Full with tools (model card)
+- Vision-grounded reasoning over images and video: 79.4 on MMMU-Pro
+- Persistent background agents that manage schedules and orchestrate cross-platform operations
+
+Not ideal for:
+
+- Strict-license environments: Modified MIT adds conditions beyond plain MIT, review before redistribution
+- Pure short-form Q&A where a 1T-parameter agentic model is overkill on cost and latency
+- Video output or image generation: it accepts visual input but only produces text
+
+## FAQ
+
+### What context window does Kimi K2.6 support?
+
+262,144 tokens (256K), per the upstream config's max_position_embeddings. Moonshot's own benchmark runs use the full 262,144-token context.
+
+### Does Kimi K2.6 accept images and video?
+
+Yes. It is natively multimodal with a 400M-parameter MoonViT vision encoder, and the model card shows image and video input via OpenAI-style image_url and video_url content parts. Note the card marks video chat as experimental outside Moonshot's official API. Output is text only.
+
+### How do I switch between Thinking and Instant modes?
+
+Thinking mode is the default and returns reasoning content. For Instant mode on vLLM-based deployments like this chute, pass extra_body={"chat_template_kwargs": {"thinking": false}} in your request. Moonshot recommends temperature 1.0 for Thinking and 0.6 for Instant.
+
+### Can I use Kimi K2.6 commercially?
+
+The weights and code are released under a Modified MIT license. It is broadly permissive, but it is not identical to plain MIT, so review the LICENSE file in the Hugging Face repo before redistribution or large-scale commercial deployment.
+
+### What does the TEE suffix mean?
+
+The chute runs inference inside a Trusted Execution Environment, i.e. attested confidential-compute hardware. Prompts and outputs are processed inside the enclave. It is a serving-level property and does not change model outputs.
+
+### How do I call it from the OpenAI SDK?
+
+Point the client at base_url https://llm.chutes.ai/v1 with your Chutes API key and set model to moonshotai/Kimi-K2.6-TEE. Streaming is supported on chat and text completions.
+
+### How good is it at coding, really?
+
+The model card reports 80.2 on SWE-Bench Verified, 58.6 on SWE-Bench Pro (above the GPT-5.4 and Claude Opus 4.6 numbers it cites), 76.7 on SWE-Bench Multilingual, and 66.7 on Terminal-Bench 2.0. Moonshot positions it for long-horizon, end-to-end coding tasks rather than single-file snippets.
+
+### What is preserve_thinking mode?
+
+An option that retains the model's full reasoning content across multi-turn interactions instead of dropping it, which the card says improves coding-agent performance. On vLLM deployments enable it with extra_body={"chat_template_kwargs": {"thinking": true, "preserve_thinking": true}}.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/chutes-moonshotai-kimi-k2-6-tee
+- Source: https://huggingface.co/moonshotai/Kimi-K2.6
+- Source: https://huggingface.co/moonshotai/Kimi-K2.6/raw/main/config.json
+- Source: https://chutes.ai/app/chute/chutes-moonshotai-kimi-k2-6-tee/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

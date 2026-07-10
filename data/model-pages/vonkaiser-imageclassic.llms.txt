@@ -1,0 +1,314 @@
+# imageclassic
+
+> Four classic image models on one chute: FLUX.1-schnell + three SDXL checkpoints
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/vonkaiser-imageclassic
+- Model llms.txt: https://chutes.ai/app/chute/vonkaiser-imageclassic/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/vonkaiser-imageclassic/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `imageclassic`
+- Chute ID: `e36f0212-138c-5395-91fc-12ed21d74cb4`
+- Slug: `vonkaiser-imageclassic`
+- Owner: `vonkaiser`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on its own host (`https://vonkaiser-imageclassic.chutes.ai`). Call the endpoint paths listed below directly.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Playground Notes
+
+- The model field is required on the generic generate endpoint and must stay visible.
+- Flux-style endpoints usually need fewer steps; SDXL-style checkpoints usually benefit from stronger guidance and negative prompts.
+
+## Endpoints
+
+### 1. POST /generate
+
+- Base URL: `https://vonkaiser-imageclassic.chutes.ai`
+- Output content type: `image/jpeg`
+- Playground note: Choose the checkpoint first, then tune prompt, negative prompt, guidance, and steps for that checkpoint.
+
+Request fields:
+
+- `seed` (integer, optional) Default: null.
+- `model` (string, required) Options: flux, dreamshaper, ilustmix, juggernaut.
+- `width` (integer, optional) Default: 1024.
+- `height` (integer, optional) Default: 1024.
+- `prompt` (string, required)
+- `guidance_scale` (number, optional) - Defaults: 3.5 for flux, 7.5 for SDXL Default: null.
+- `negative_prompt` (string, optional) - SDXL only; ignored for flux Default: "".
+- `num_inference_steps` (integer, optional) - Defaults: 4 for flux, 25 for SDXL Default: null.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-imageclassic.chutes.ai/generate" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "flux",
+  "width": 1024,
+  "height": 1024,
+  "prompt": "a serene mountain lake at sunset",
+  "negative_prompt": ""
+}' \
+  --output output.jpg
+```
+
+Playground presets:
+
+- Fast Flux draft
+- SDXL illustration
+
+### 2. POST /image/flux
+
+- Base URL: `https://vonkaiser-imageclassic.chutes.ai`
+- Output content type: `image/jpeg`
+- Playground note: Choose the checkpoint first, then tune prompt, negative prompt, guidance, and steps for that checkpoint.
+
+Request fields:
+
+- `seed` (integer, optional) Default: null.
+- `width` (integer, optional) Default: 1024.
+- `height` (integer, optional) Default: 1024.
+- `prompt` (string, required)
+- `guidance_scale` (number, optional) Default: 3.5.
+- `num_inference_steps` (integer, optional) - FLUX-schnell is optimised for 1-4 steps. Default: 4.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-imageclassic.chutes.ai/image/flux" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "width": 1024,
+  "height": 1024,
+  "prompt": "a serene mountain lake at sunset",
+  "guidance_scale": 3.5,
+  "num_inference_steps": 4
+}' \
+  --output output.jpg
+```
+
+Playground presets:
+
+- Fast Flux draft
+- SDXL illustration
+
+### 3. POST /image/dreamshaper
+
+- Base URL: `https://vonkaiser-imageclassic.chutes.ai`
+- Output content type: `image/jpeg`
+- Playground note: Choose the checkpoint first, then tune prompt, negative prompt, guidance, and steps for that checkpoint.
+
+Request fields:
+
+- `seed` (integer, optional) Default: null.
+- `width` (integer, optional) Default: 1024.
+- `height` (integer, optional) Default: 1024.
+- `prompt` (string, required)
+- `guidance_scale` (number, optional) Default: 7.5.
+- `negative_prompt` (string, optional) - What to avoid in the generated image. Default: "".
+- `num_inference_steps` (integer, optional) Default: 25.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-imageclassic.chutes.ai/image/dreamshaper" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "width": 1024,
+  "height": 1024,
+  "prompt": "a serene mountain lake at sunset",
+  "guidance_scale": 7.5,
+  "negative_prompt": "",
+  "num_inference_steps": 25
+}' \
+  --output output.jpg
+```
+
+Playground presets:
+
+- Fast Flux draft
+- SDXL illustration
+
+### 4. POST /image/ilustmix
+
+- Base URL: `https://vonkaiser-imageclassic.chutes.ai`
+- Output content type: `image/jpeg`
+- Playground note: Choose the checkpoint first, then tune prompt, negative prompt, guidance, and steps for that checkpoint.
+
+Request fields:
+
+- `seed` (integer, optional) Default: null.
+- `width` (integer, optional) Default: 1024.
+- `height` (integer, optional) Default: 1024.
+- `prompt` (string, required)
+- `guidance_scale` (number, optional) Default: 7.5.
+- `negative_prompt` (string, optional) - What to avoid in the generated image. Default: "".
+- `num_inference_steps` (integer, optional) Default: 25.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-imageclassic.chutes.ai/image/ilustmix" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "width": 1024,
+  "height": 1024,
+  "prompt": "a serene mountain lake at sunset",
+  "guidance_scale": 7.5,
+  "negative_prompt": "",
+  "num_inference_steps": 25
+}' \
+  --output output.jpg
+```
+
+Playground presets:
+
+- Fast Flux draft
+- SDXL illustration
+
+### 5. POST /image/juggernaut
+
+- Base URL: `https://vonkaiser-imageclassic.chutes.ai`
+- Output content type: `image/jpeg`
+- Playground note: Choose the checkpoint first, then tune prompt, negative prompt, guidance, and steps for that checkpoint.
+
+Request fields:
+
+- `seed` (integer, optional) Default: null.
+- `width` (integer, optional) Default: 1024.
+- `height` (integer, optional) Default: 1024.
+- `prompt` (string, required)
+- `guidance_scale` (number, optional) Default: 7.5.
+- `negative_prompt` (string, optional) - What to avoid in the generated image. Default: "".
+- `num_inference_steps` (integer, optional) Default: 25.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-imageclassic.chutes.ai/image/juggernaut" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "width": 1024,
+  "height": 1024,
+  "prompt": "a serene mountain lake at sunset",
+  "guidance_scale": 7.5,
+  "negative_prompt": "",
+  "num_inference_steps": 25
+}' \
+  --output output.jpg
+```
+
+Playground presets:
+
+- Fast Flux draft
+- SDXL illustration
+
+## Model Facts
+
+- Architecture: Four independent text-to-image pipelines on one chute: FLUX.1-schnell (rectified-flow transformer) plus three Stable Diffusion XL checkpoints
+- Modalities: text in → image out
+- License: Per bundled model: FLUX.1-schnell Apache-2.0; Dreamshaper XL 1.0 CreativeML OpenRAIL++; iLustMix v80 Fair AI Public License 1.0-SD; Juggernaut XL Ragnarok license not verified
+- FLUX.1-schnell: 12B rectified-flow transformer (per chute readme), 1-4 step generation, no negative prompt; model: flux, POST /image/flux
+- Dreamshaper XL 1.0: SDXL fine-tune by Lykon for general-purpose generation; model: dreamshaper, POST /image/dreamshaper
+- iLustMix v80: Illustrious-XL-based (SDXL family) anime/semi-realistic checkpoint by GZees; model: ilustmix, POST /image/ilustmix
+- Juggernaut XL Ragnarok: RunDiffusion photorealistic SDXL checkpoint; model: juggernaut, POST /image/juggernaut
+- Output format on Chutes: image/jpeg (quality 85), all endpoints
+- Hugging Face (bundled): https://huggingface.co/black-forest-labs/FLUX.1-schnell
+- Hugging Face (bundled): https://huggingface.co/Lykon/dreamshaper-xl-1-0
+- Hugging Face (bundled): https://huggingface.co/John6666/ilustmix-v80-sdxl
+- Hugging Face (bundled): https://huggingface.co/eniora/Juggernaut_XL_Ragnarok
+
+## Recommended Parameters
+
+- `num_inference_steps`: 4 (flux) / 25 (SDXL checkpoints) (chute defaults; FLUX.1-schnell is timestep-distilled for 1-4 steps)
+- `guidance_scale`: 3.5 (flux) / 7.5 (SDXL checkpoints) (chute defaults per model family)
+
+## Best For
+
+- Apps that need multiple image styles behind one endpoint without switching chutes
+- Fast drafts with FLUX.1-schnell (1-4 steps), then style-specific finals on an SDXL checkpoint
+- Photorealistic renders (Juggernaut XL Ragnarok) and portraits/fantasy/sci-fi (Dreamshaper XL)
+- Anime and semi-realistic illustration (iLustMix v80)
+- Drop-in replacement for legacy /generate image clients via the unified endpoint
+
+Not ideal for:
+
+- State-of-the-art prompt adherence or in-image text rendering; newer models like Qwen-Image-2512 and Z-Image Turbo outperform these classic checkpoints there
+- Image editing or image-to-image with reference inputs (text-to-image only)
+- Negative prompting on the flux model; FLUX.1-schnell ignores negative prompts
+
+## FAQ
+
+### How do I pick which model handles my request?
+
+Either set the required model field on POST /generate to flux, dreamshaper, ilustmix, or juggernaut, or call the model-specific endpoint directly (POST /image/flux and so on). The per-model endpoints carry the correct defaults for that checkpoint.
+
+### Which model should I use for what?
+
+flux for fast, high-quality images from simple prompts (1-4 steps); dreamshaper for general-purpose portraits, fantasy, and sci-fi; ilustmix for anime and semi-realistic illustration; juggernaut for photography-style realism. Drafting on flux and finishing on an SDXL checkpoint is a common pattern.
+
+### Do negative prompts work on all four models?
+
+No. negative_prompt applies to the three SDXL checkpoints (dreamshaper, ilustmix, juggernaut) and is ignored for flux. FLUX.1-schnell is distilled for guidance-light sampling, so express exclusions in the positive prompt instead.
+
+### What are the default steps and guidance per model?
+
+flux: 4 steps, guidance 3.5. The SDXL checkpoints: 25 steps, guidance 7.5. On the unified /generate endpoint, omitted guidance_scale and num_inference_steps fall back to these per-family defaults automatically.
+
+### What licenses cover the bundled models?
+
+FLUX.1-schnell is Apache-2.0. Dreamshaper XL 1.0 is CreativeML OpenRAIL++ (commercial use allowed with use-based restrictions). iLustMix v80 is under the Fair AI Public License 1.0-SD. A license for the Juggernaut XL Ragnarok checkpoint could not be verified from its Hugging Face mirror; check RunDiffusion's terms before commercial use.
+
+### What format do I get back?
+
+Every endpoint returns raw image/jpeg bytes at quality 85, not JSON. Save the response body directly as a .jpg file.
+
+### Is there a cold start when switching models?
+
+No. All four pipelines load when the chute starts, so switching the model field between requests does not trigger a reload or redeploy.
+
+### Can I do image-to-image or editing with this chute?
+
+No, all endpoints are text-to-image only with no image input fields. For instruction-based editing use a dedicated edit chute such as Qwen-Image-Edit-2511.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/vonkaiser-imageclassic
+- Source: https://huggingface.co/black-forest-labs/FLUX.1-schnell
+- Source: https://huggingface.co/Lykon/dreamshaper-xl-1-0
+- Source: https://huggingface.co/John6666/ilustmix-v80-sdxl
+- Source: https://huggingface.co/eniora/Juggernaut_XL_Ragnarok
+- Source: https://chutes.ai/app/chute/vonkaiser-imageclassic/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

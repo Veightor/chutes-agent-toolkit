@@ -1,0 +1,509 @@
+# AudioDojo
+
+> One chute, 12 models, 13 endpoints — covering text-to-speech, voice cloning, voice design, transcription, denoising, source separation, speaker verification, VAD, and language detection. Including Kokoro-82M, Qwen3-TTS 1.7B, Whisper large-v3-turbo, NVIDIA C...
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/vonkaiser-audiodojo
+- Model llms.txt: https://chutes.ai/app/chute/vonkaiser-audiodojo/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/vonkaiser-audiodojo/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `AudioDojo`
+- Chute ID: `d6c66e0a-3e04-595b-825c-f3a65e50b2c7`
+- Slug: `vonkaiser-audiodojo`
+- Owner: `vonkaiser`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on its own host (`https://vonkaiser-audiodojo.chutes.ai`). Call the endpoint paths listed below directly.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Playground Notes
+
+- Text-to-speech endpoints return audio directly; speech-to-text and analysis endpoints return JSON.
+- Reference-audio and STT inputs accept common audio formats as base64; large uploads use temporary Blob storage automatically.
+- For cloning, keep the reference sample short and clean unless trim_sample is enabled.
+
+## Endpoints
+
+### 1. POST /speak
+
+- Base URL: `https://vonkaiser-audiodojo.chutes.ai`
+- Output content type: `audio/wav`
+- Playground note: Type your text, tweak the voice settings if you like, then press Run to hear the result.
+
+Request fields:
+
+- `text` (string, required)
+- `speed` (number, optional) - Voice output speed. Default: 1.
+- `voice` (string, optional) - Voice selection for text-to-speech Default: "af_heart". Options: af_heart, af_alloy, af_aoede, af_bella, af_jessica, af_kore, af_nicole, af_nova, af_river, af_sarah, af_sky, am_adam, am_echo, am_eric, am_fenrir, am_liam, am_michael, am_onyx, am_puck, am_santa, bf_alice, bf_emma, bf_isabella, bf_lily, bm_daniel, bm_fable, bm_george, bm_lewis, ef_dora, em_alex, em_santa, ff_siwis, hf_alpha, hf_beta, hm_omega, hm_psi, if_sara, im_nicola, jf_alpha, jf_gongitsune, jf_nezumi, jf_tebukuro, jm_kumo, pf_dora, pm_alex, pm_santa, zf_xiaobei, zf_xiaoni, zf_xiaoxiao, zf_xiaoyi, zm_yunjian, zm_yunxi, zm_yunxia, zm_yunyang.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-audiodojo.chutes.ai/speak" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "text": "Your text here",
+  "speed": 1,
+  "voice": "af_heart"
+}' \
+  --output output.wav
+```
+
+Playground presets:
+
+- Warm Kokoro narration
+
+### 2. POST /tts/kokoro
+
+- Base URL: `https://vonkaiser-audiodojo.chutes.ai`
+- Output content type: `audio/wav`
+- Playground note: Type your text, tweak the voice settings if you like, then press Run to hear the result.
+
+Request fields:
+
+- `text` (string, required)
+- `speed` (number, optional) - Playback speed multiplier (0.1–3.0). Default: 1.
+- `voice` (string, optional) - Built-in voice ID. See KokoroVoice enum for the full list. Default: "af_heart". Options: af_heart, af_alloy, af_aoede, af_bella, af_jessica, af_kore, af_nicole, af_nova, af_river, af_sarah, af_sky, am_adam, am_echo, am_eric, am_fenrir, am_liam, am_michael, am_onyx, am_puck, am_santa, bf_alice, bf_emma, bf_isabella, bf_lily, bm_daniel, bm_fable, bm_george, bm_lewis, ef_dora, em_alex, em_santa, ff_siwis, hf_alpha, hf_beta, hm_omega, hm_psi, if_sara, im_nicola, jf_alpha, jf_gongitsune, jf_nezumi, jf_tebukuro, jm_kumo, pf_dora, pm_alex, pm_santa, zf_xiaobei, zf_xiaoni, zf_xiaoxiao, zf_xiaoyi, zm_yunjian, zm_yunxi, zm_yunxia, zm_yunyang.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-audiodojo.chutes.ai/tts/kokoro" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "text": "Your text here",
+  "speed": 1,
+  "voice": "af_heart"
+}' \
+  --output output.wav
+```
+
+Playground presets:
+
+- Warm Kokoro narration
+
+### 3. POST /tts/qwen3clone
+
+- Base URL: `https://vonkaiser-audiodojo.chutes.ai`
+- Output content type: `audio/wav`
+- Playground note: Upload a short, clean voice sample, type the new text, then press Run.
+
+Request fields:
+
+- `text` (string, required)
+- `language` (string, optional) - Target language name (e.g. 'English', 'Chinese'). Default: "English".
+- `ref_text` (string, optional) - Transcript of the reference audio. If omitted, Whisper auto-transcribes it. Default: "".
+- `trim_sample` (boolean, optional) - If True, automatically trim ref audio to the first 6s. If False and the audio exceeds 6s, the request is rejected with an error. Default: false.
+- `auto_denoise` (boolean, optional) - If True, run MetricGAN+ speech enhancement on the reference audio before cloning. Improves clone quality when the reference recording is noisy. Default: false.
+- `high_fidelity` (boolean, optional) - Controls the voice cloning mode. False (default): speaker-embedding-only mode (xvec). The model extracts a speaker embedding from the reference audio and conditions generation purely on that vector — clean output with no risk of reference audio bleed-through. Recommended for most use cases. True: in-context learning (ICL) mode. The reference audio is prepended as acoustic context so the model can mimic fine-grained prosody and timbre directly. Higher voice similarity is possible, but the last word or syllable of your reference clip may bleed into the start of the generated output if the reference does not end on a clean silence. Default: false.
+- `ref_audio_b64` (string, required) - Base64-encoded reference audio for voice cloning (max 6s).
+
+Example call:
+
+```bash
+# NOTE: replace the ref_audio_b64 placeholder(s) with real base64 data first.
+curl -X POST "https://vonkaiser-audiodojo.chutes.ai/tts/qwen3clone" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "text": "Your text here",
+  "language": "English",
+  "ref_text": "",
+  "trim_sample": false,
+  "auto_denoise": false,
+  "high_fidelity": false,
+  "ref_audio_b64": "<base64-encoded audio>"
+}' \
+  --output output.wav
+```
+
+### 4. POST /tts/qwen3custom
+
+- Base URL: `https://vonkaiser-audiodojo.chutes.ai`
+- Output content type: `audio/wav`
+- Playground note: Type your text, tweak the voice settings if you like, then press Run to hear the result.
+
+Request fields:
+
+- `text` (string, required)
+- `speaker` (string, optional) - Preset speaker identity: Vivian, Serena, Uncle Fu, Dylan, Eric, Ryan, Aiden, Ono Anna, Sohee. Defaults to Ryan. Default: null.
+- `instruct` (string, optional) - Free-text delivery style, e.g. 'Very happy', 'calm husky', 'whispering'. Leave blank for neutral. Default: null.
+- `language` (string, optional) - Target language name. Default: "English".
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-audiodojo.chutes.ai/tts/qwen3custom" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "text": "Your text here",
+  "language": "English"
+}' \
+  --output output.wav
+```
+
+Playground presets:
+
+- Expressive custom speaker
+
+### 5. POST /tts/qwen3design
+
+- Base URL: `https://vonkaiser-audiodojo.chutes.ai`
+- Output content type: `audio/wav`
+- Playground note: Describe the voice you want, type the text to speak, then press Run to hear it.
+
+Request fields:
+
+- `text` (string, required)
+- `instruct` (string, required) - Voice description, e.g. 'A warm, confident male narrator with a slight British accent'.
+- `language` (string, optional) - Target language name. Default: "English".
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-audiodojo.chutes.ai/tts/qwen3design" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "text": "Your text here",
+  "instruct": "example-string",
+  "language": "English"
+}' \
+  --output output.wav
+```
+
+Playground presets:
+
+- Designed voice
+
+### 6. POST /stt/whisper
+
+- Base URL: `https://vonkaiser-audiodojo.chutes.ai`
+- Output content type: `application/json`
+- Playground note: Upload or record the audio to transcribe, then press Run to get the transcript.
+
+Request fields:
+
+- `language` (string, optional) - BCP-47 language code, e.g. 'en', 'fr', 'zh'. Auto-detected if omitted. Default: null.
+- `audio_b64` (string, required) - Base64-encoded audio file (any common format).
+- `return_timestamps` (boolean, optional) - Include word-level timestamp chunks in the response. Default: true.
+
+Example call:
+
+```bash
+# NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
+curl -X POST "https://vonkaiser-audiodojo.chutes.ai/stt/whisper" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "audio_b64": "<base64-encoded audio>",
+  "return_timestamps": true
+}'
+```
+
+Playground presets:
+
+- English transcription
+
+### 7. POST /stt/canary
+
+- Base URL: `https://vonkaiser-audiodojo.chutes.ai`
+- Output content type: `application/json`
+- Playground note: Upload or record the audio to transcribe, then press Run to get the transcript.
+
+Request fields:
+
+- `audio_b64` (string, required) - Base64-encoded audio file.
+- `max_new_tokens` (integer, optional) - Maximum tokens to generate for the transcript. Default: 256.
+
+Example call:
+
+```bash
+# NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
+curl -X POST "https://vonkaiser-audiodojo.chutes.ai/stt/canary" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "audio_b64": "<base64-encoded audio>",
+  "max_new_tokens": 256
+}'
+```
+
+Playground presets:
+
+- English transcription
+
+### 8. POST /stt/parakeet
+
+- Base URL: `https://vonkaiser-audiodojo.chutes.ai`
+- Output content type: `application/json`
+- Playground note: Upload or record the audio to transcribe, then press Run to get the transcript.
+
+Request fields:
+
+- `audio_b64` (string, required) - Base64-encoded audio file.
+- `timestamps` (boolean, optional) - Include word and segment timestamps in the response. Default: true.
+
+Example call:
+
+```bash
+# NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
+curl -X POST "https://vonkaiser-audiodojo.chutes.ai/stt/parakeet" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "audio_b64": "<base64-encoded audio>",
+  "timestamps": true
+}'
+```
+
+Playground presets:
+
+- English transcription
+
+### 9. POST /audio/vad
+
+- Base URL: `https://vonkaiser-audiodojo.chutes.ai`
+- Output content type: `application/json`
+- Playground note: Upload the clip to analyze; results come back as JSON in the output panel.
+
+Request fields:
+
+- `audio_b64` (string, required) - Base64-encoded audio file (any common format).
+
+Example call:
+
+```bash
+# NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
+curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/vad" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "audio_b64": "<base64-encoded audio>"
+}' \
+  --output output.wav
+```
+
+### 10. POST /audio/diarize
+
+- Base URL: `https://vonkaiser-audiodojo.chutes.ai`
+- Output content type: `application/json`
+- Playground note: Upload the clip to analyze; results come back as JSON in the output panel.
+
+Request fields:
+
+- `audio_b64` (string, required) - Base64-encoded audio file (any common format).
+
+Example call:
+
+```bash
+# NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
+curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/diarize" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "audio_b64": "<base64-encoded audio>"
+}' \
+  --output output.wav
+```
+
+### 11. POST /audio/verifyspeaker
+
+- Base URL: `https://vonkaiser-audiodojo.chutes.ai`
+- Output content type: `application/json`
+- Playground note: Upload the clip to analyze; results come back as JSON in the output panel.
+
+Request fields:
+
+- `audio_a_b64` (string, required) - Base64-encoded first audio clip.
+- `audio_b_b64` (string, required) - Base64-encoded second audio clip.
+
+Example call:
+
+```bash
+# NOTE: replace the audio_a_b64, audio_b_b64 placeholder(s) with real base64 data first.
+curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/verifyspeaker" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "audio_a_b64": "<base64-encoded audio>",
+  "audio_b_b64": "<base64-encoded audio>"
+}' \
+  --output output.wav
+```
+
+### 12. POST /audio/denoise
+
+- Base URL: `https://vonkaiser-audiodojo.chutes.ai`
+- Output content type: `audio/wav`
+- Playground note: Upload the recording to clean up; the processed audio appears in the output panel.
+
+Request fields:
+
+- `audio_b64` (string, required) - Base64-encoded audio file (any common format).
+
+Example call:
+
+```bash
+# NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
+curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/denoise" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "audio_b64": "<base64-encoded audio>"
+}' \
+  --output output.wav
+```
+
+### 13. POST /audio/separate
+
+- Base URL: `https://vonkaiser-audiodojo.chutes.ai`
+- Output content type: `audio/wav`
+- Playground note: Upload the recording to clean up; the processed audio appears in the output panel.
+
+Request fields:
+
+- `audio_b64` (string, required) - Base64-encoded audio file (any common format).
+
+Example call:
+
+```bash
+# NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
+curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/separate" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "audio_b64": "<base64-encoded audio>"
+}' \
+  --output output.wav
+```
+
+### 14. POST /audio/detectlanguage
+
+- Base URL: `https://vonkaiser-audiodojo.chutes.ai`
+- Output content type: `application/json`
+- Playground note: Upload the clip to analyze; results come back as JSON in the output panel.
+
+Request fields:
+
+- `audio_b64` (string, required) - Base64-encoded audio file (any common format).
+
+Example call:
+
+```bash
+# NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
+curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/detectlanguage" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "audio_b64": "<base64-encoded audio>"
+}' \
+  --output output.wav
+```
+
+## Model Facts
+
+- Architecture: Multi-model audio toolkit: 12 models behind 14 REST paths on one chute, all resident in GPU memory
+- Modalities: text, audio in → audio, text out
+- License: Mixed per model: Apache-2.0 (Kokoro, Qwen3-TTS, SpeechBrain), MIT (Whisper large-v3-turbo, Silero VAD), CC-BY-4.0 (NVIDIA Canary, Parakeet)
+- TTS: Kokoro-82M (54 voices), Qwen3-TTS 1.7B (clone, custom speakers, voice design)
+- STT: Whisper large-v3-turbo (multilingual), Canary-Qwen 2.5B (English), Parakeet TDT 0.6B v3 (25 European languages)
+- Audio processing: Silero VAD, MetricGAN+ denoise, SepFormer separation, ECAPA-TDNN speaker verification, Whisper language detection, diarization
+- Cold starts: None between endpoints; every model stays loaded in GPU memory (per chute readme)
+- Hugging Face (bundled): https://huggingface.co/hexgrad/Kokoro-82M
+- Hugging Face (bundled): https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base
+- Hugging Face (bundled): https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice
+- Hugging Face (bundled): https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign
+- Hugging Face (bundled): https://huggingface.co/openai/whisper-large-v3-turbo
+- Hugging Face (bundled): https://huggingface.co/nvidia/canary-qwen-2.5b
+- Hugging Face (bundled): https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
+- Hugging Face (bundled): https://huggingface.co/onnx-community/silero-vad
+- Hugging Face (bundled): https://huggingface.co/speechbrain/metricgan-plus-voicebank
+- Hugging Face (bundled): https://huggingface.co/speechbrain/spkrec-ecapa-voxceleb
+
+## Best For
+
+- Full audio pipelines (denoise, transcribe, verify, synthesize) against a single host and API key
+- Zero-shot voice cloning from a 3-6 second reference clip (Qwen3-TTS Base)
+- Voice design from a plain-English description, no reference audio (Qwen3-TTS VoiceDesign)
+- Multilingual transcription with word timestamps (Whisper large-v3-turbo, 99 languages)
+- High-accuracy or real-time English ASR (Canary-Qwen 2.5B, Parakeet TDT 0.6B v3)
+- Migrating from the standalone chutes/kokoro chute: /speak is a drop-in alias
+
+Not ideal for:
+
+- Single-model workloads at maximum scale, where a dedicated chute for that one model is simpler to reason about
+- Music generation or singing synthesis: all TTS models here are speech models
+- Non-European-language ASR with timestamps beyond what Whisper covers
+
+## FAQ
+
+### Which model serves which endpoint?
+
+TTS: /speak and /tts/kokoro use Kokoro-82M; /tts/qwen3clone, /tts/qwen3custom, and /tts/qwen3design use Qwen3-TTS 1.7B (Base, CustomVoice, and VoiceDesign checkpoints respectively). STT: /stt/whisper is Whisper large-v3-turbo, /stt/canary is NVIDIA Canary-Qwen 2.5B, /stt/parakeet is NVIDIA Parakeet TDT 0.6B v3. Processing: /audio/vad is Silero VAD, /audio/denoise is MetricGAN+, /audio/separate is SepFormer, /audio/verifyspeaker is ECAPA-TDNN, /audio/detectlanguage is Whisper, and /audio/diarize is a diarization pipeline (model unnamed in the chute readme).
+
+### How does voice cloning work and what reference audio do I need?
+
+POST to /tts/qwen3clone with ref_audio_b64 (a base64 reference clip of up to 6 seconds), the text to speak, and optionally ref_text (its transcript; Whisper auto-transcribes if omitted). Set trim_sample true to auto-trim longer clips, auto_denoise true to clean noisy references with MetricGAN+, and high_fidelity true for ICL mode, which mimics prosody more closely but can bleed the reference's last syllable into the output.
+
+### Which STT endpoint should I pick?
+
+Whisper large-v3-turbo for multilingual audio (99 languages) with optional word timestamps. Canary-Qwen 2.5B for the highest-accuracy English transcription, especially complex or domain-specific audio; it is English-only. Parakeet TDT 0.6B v3 for fast transcription of 25 European languages with word and segment timestamps and automatic punctuation.
+
+### What formats do requests and responses use?
+
+All requests are flat JSON. Audio inputs are base64 strings in fields like audio_b64 and ref_audio_b64, accepting common audio formats. TTS endpoints (/speak, /tts/*) and the denoise/separate endpoints return raw audio/wav bytes; STT, VAD, diarization, speaker verification, and language detection return JSON.
+
+### Is /speak compatible with the old standalone Kokoro chute?
+
+Yes, by design. It keeps the same request and response contract (text, voice, speed in, audio/wav at 24 kHz out) and runs the identical Kokoro-82M pipeline as /tts/kokoro. Migrating from chutes-kokoro means changing only the base URL to https://vonkaiser-audiodojo.chutes.ai.
+
+### Can I use the outputs commercially?
+
+Licenses vary per bundled model: Kokoro, Qwen3-TTS, MetricGAN+, and ECAPA-TDNN are Apache-2.0; Whisper large-v3-turbo is MIT; NVIDIA's Canary-Qwen and Parakeet are CC-BY-4.0 (commercial use permitted with attribution, per their model cards). Check the license of the specific model behind the endpoint you use.
+
+### Do models cold-start when I switch endpoints?
+
+No. The chute readme states all 12 models are loaded in GPU memory at all times, so any endpoint responds without a model-load delay. This is the main operational advantage over running 12 separate single-model deployments.
+
+### What languages does Qwen3-TTS support?
+
+Ten, per the Qwen3-TTS model cards: Chinese, English, Japanese, Korean, German, French, Russian, Portuguese, Spanish, and Italian, plus several dialect voice profiles. Pass the target language name in the endpoint's language field (default English).
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/vonkaiser-audiodojo
+- Source: https://chutes.ai/app/chute/vonkaiser-audiodojo/llms.txt
+- Source: https://huggingface.co/hexgrad/Kokoro-82M
+- Source: https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base
+- Source: https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice
+- Source: https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign
+- Source: https://huggingface.co/openai/whisper-large-v3-turbo
+- Source: https://huggingface.co/nvidia/canary-qwen-2.5b
+- Source: https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
+- Source: https://huggingface.co/onnx-community/silero-vad
+- Source: https://huggingface.co/speechbrain/metricgan-plus-voicebank
+- Source: https://huggingface.co/speechbrain/spkrec-ecapa-voxceleb
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

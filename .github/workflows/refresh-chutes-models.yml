@@ -29,14 +29,20 @@ jobs:
       - name: Validate generated JSON
         run: python3 -m json.tool data/chutes-models.json >/dev/null
 
+      - name: Rebuild full-modality model-page catalog
+        run: python3 scripts/build_model_pages.py
+
+      - name: Validate model-page catalog JSON
+        run: python3 -m json.tool data/chutes-model-pages.json >/dev/null
+
       - name: Commit and push if changed
         run: |
-          if git diff --quiet -- data/chutes-models.json docs/known-models.md plugins/chutes-ai/skills/chutes-ai/references/known-models.md; then
+          if git diff --quiet -- data/chutes-models.json docs/known-models.md plugins/chutes-ai/skills/chutes-ai/references/known-models.md data/chutes-model-pages.json docs/model-pages.md; then
             echo "No model snapshot changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/chutes-models.json docs/known-models.md plugins/chutes-ai/skills/chutes-ai/references/known-models.md
+          git add data/chutes-models.json docs/known-models.md plugins/chutes-ai/skills/chutes-ai/references/known-models.md data/chutes-model-pages.json docs/model-pages.md
           git commit -m "chore: refresh Chutes model snapshot"
           git push

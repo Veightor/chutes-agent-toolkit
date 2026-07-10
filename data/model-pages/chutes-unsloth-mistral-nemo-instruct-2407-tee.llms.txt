@@ -1,0 +1,291 @@
+# unsloth/Mistral-Nemo-Instruct-2407-TEE
+
+> unsloth/Mistral-Nemo-Instruct-2407
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/chutes-unsloth-mistral-nemo-instruct-2407-tee
+- Model llms.txt: https://chutes.ai/app/chute/chutes-unsloth-mistral-nemo-instruct-2407-tee/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/chutes-unsloth-mistral-nemo-instruct-2407-tee/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `unsloth/Mistral-Nemo-Instruct-2407-TEE`
+- Chute ID: `7725a31d-28df-5bb7-9d29-c23b49df5472`
+- Slug: `chutes-unsloth-mistral-nemo-instruct-2407-tee`
+- Owner: `chutes`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on the shared OpenAI-compatible gateway. Set the request `model` field to the exact Name above (`unsloth/Mistral-Nemo-Instruct-2407-TEE`), and use base URL `https://llm.chutes.ai/v1`.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Endpoints
+
+### 1. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "unsloth/Mistral-Nemo-Instruct-2407".
+- `stream` (boolean, optional) Default: true.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "unsloth/Mistral-Nemo-Instruct-2407-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": true,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 2. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "unsloth/Mistral-Nemo-Instruct-2407".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: true.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "unsloth/Mistral-Nemo-Instruct-2407-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 3. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "unsloth/Mistral-Nemo-Instruct-2407".
+- `stream` (boolean, optional) Default: false.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "unsloth/Mistral-Nemo-Instruct-2407-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 4. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "unsloth/Mistral-Nemo-Instruct-2407".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: false.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "unsloth/Mistral-Nemo-Instruct-2407-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 5. GET /v1/models
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+
+Example call:
+
+```bash
+curl -X GET "https://llm.chutes.ai/v1/models" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+## Model Facts
+
+- Parameters: 12B (12.25B safetensors)
+- Architecture: Dense transformer (MistralForCausalLM), 40 layers, GQA with 32 query heads and 8 KV heads, trained by Mistral AI with NVIDIA
+- Context length: 131,072 tokens
+- Modalities: text in → text out
+- License: Apache-2.0
+- Released: 2024-07
+- Context: Trained with a 128k window; config max_position_embeddings 131,072
+- Tokenizer: Tekken, ~128k vocabulary (2^17)
+- Hidden size: 5120, head dim 128
+- Training data: Large proportion of multilingual and code data (model card)
+- Serving on Chutes: TEE (confidential compute), served from the unsloth mirror of the Mistral AI weights
+- Hugging Face: https://huggingface.co/unsloth/Mistral-Nemo-Instruct-2407
+
+## Recommended Parameters
+
+- `temperature`: 0.3 (Mistral card: unlike previous Mistral models, Nemo requires smaller temperatures; 0.3 is recommended (card examples use up to 0.35))
+
+## Best For
+
+- General chat and instruction following in a compact 12B footprint
+- Multilingual applications; the card publishes multilingual MMLU results across nine languages
+- Code-adjacent tasks, given the large proportion of code in training data
+- Function calling via the Mistral tool-call format, demonstrated in the model card
+- Drop-in upgrades from Mistral 7B: the card positions it as a direct replacement
+
+Not ideal for:
+
+- Deep multi-step reasoning; this is a 2024-era 12B instruct model with no thinking mode
+- Vision or audio inputs; text only
+- Prompts approaching the full 128k window where newer long-context models score better
+
+## FAQ
+
+### What context window does Mistral Nemo support?
+
+It was trained with a 128k context window and config.json sets max_position_embeddings to 131,072. Both prompt and completion share that budget.
+
+### What temperature should I use?
+
+0.3. The Mistral card states explicitly that, unlike previous Mistral models, Nemo requires smaller temperatures, and its own examples use 0.3 to 0.35. The chute default is 0.7, so pass temperature explicitly for card-recommended behavior.
+
+### Is the unsloth repo different from the Mistral AI original?
+
+No functional difference: unsloth/Mistral-Nemo-Instruct-2407 carries the same MistralForCausalLM architecture, the same 12.25B safetensors parameter count, and the same Apache-2.0 license as mistralai/Mistral-Nemo-Instruct-2407. The unsloth mirror exists mainly to pair with their fine-tuning notebooks.
+
+### Does it support function calling?
+
+Yes. The model card demonstrates tool use through the Mistral function-calling format, defining tools with JSON schemas and parsing structured tool-call output. Via the OpenAI-compatible endpoint you can send standard tools fields where supported.
+
+### How do I call it from the OpenAI SDK?
+
+Use base_url https://llm.chutes.ai/v1 with your Chutes API key and set model to unsloth/Mistral-Nemo-Instruct-2407-TEE. Chat completions with streaming work unchanged.
+
+### What does the TEE suffix mean?
+
+The chute runs inside a Trusted Execution Environment: attested confidential-compute hardware that keeps prompts and outputs protected in memory during inference. It is a serving property of this chute, not a change to the model.
+
+### Can I use it commercially?
+
+Yes. Mistral-Nemo-Instruct-2407 is released under Apache-2.0, which permits commercial use, modification, and redistribution with attribution. Chutes endpoint usage is billed separately through your account.
+
+### Is it multilingual?
+
+Yes. It was trained on a large proportion of multilingual and code data, uses the Tekken tokenizer designed for efficient multilingual compression, and the card publishes multilingual MMLU scores for French, German, Spanish, Italian, Portuguese, Russian, Chinese, and Japanese.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/chutes-unsloth-mistral-nemo-instruct-2407-tee
+- Source: https://huggingface.co/unsloth/Mistral-Nemo-Instruct-2407
+- Source: https://huggingface.co/mistralai/Mistral-Nemo-Instruct-2407
+- Source: https://huggingface.co/unsloth/Mistral-Nemo-Instruct-2407/raw/main/config.json
+- Source: https://chutes.ai/app/chute/chutes-unsloth-mistral-nemo-instruct-2407-tee/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

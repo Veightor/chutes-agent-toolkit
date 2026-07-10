@@ -1,0 +1,296 @@
+# Qwen/Qwen3.5-397B-A17B-TEE
+
+> Qwen/Qwen3.5-397B-A17B-FP8
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/chutes-qwen-qwen3-5-397b-a17b-tee
+- Model llms.txt: https://chutes.ai/app/chute/chutes-qwen-qwen3-5-397b-a17b-tee/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/chutes-qwen-qwen3-5-397b-a17b-tee/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `Qwen/Qwen3.5-397B-A17B-TEE`
+- Chute ID: `51a4284a-a5a0-5e44-a9cc-6af5a2abfbcf`
+- Slug: `chutes-qwen-qwen3-5-397b-a17b-tee`
+- Owner: `chutes`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on the shared OpenAI-compatible gateway. Set the request `model` field to the exact Name above (`Qwen/Qwen3.5-397B-A17B-TEE`), and use base URL `https://llm.chutes.ai/v1`.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Endpoints
+
+### 1. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "Qwen/Qwen3.5-397B-A17B-FP8".
+- `stream` (boolean, optional) Default: true.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "Qwen/Qwen3.5-397B-A17B-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": true,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 2. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "Qwen/Qwen3.5-397B-A17B-FP8".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: true.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "Qwen/Qwen3.5-397B-A17B-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 3. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "Qwen/Qwen3.5-397B-A17B-FP8".
+- `stream` (boolean, optional) Default: false.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "Qwen/Qwen3.5-397B-A17B-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 4. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "Qwen/Qwen3.5-397B-A17B-FP8".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: false.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "Qwen/Qwen3.5-397B-A17B-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 5. GET /v1/models
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+
+Example call:
+
+```bash
+curl -X GET "https://llm.chutes.ai/v1/models" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+## Model Facts
+
+- Parameters: 397B total
+- Active parameters: 17B per token
+- Architecture: Hybrid vision-language MoE: Gated DeltaNet linear attention interleaved with gated attention (layout 15 x (3 x (Gated DeltaNet -> MoE) -> 1 x (Gated Attention -> MoE))), 512 experts, plus a vision encoder with early-fusion multimodal training
+- Context length: 262,144 tokens
+- Modalities: text, image, video in → text out
+- Precision: FP8 (as served on Chutes; upstream weights BF16)
+- License: Apache-2.0
+- Released: 2026-02
+- Experts: 512 total; 10 routed + 1 shared activated per token
+- Layers / hidden size: 60 / 4096
+- Context extension: 262,144 native, extensible up to 1,010,000 tokens
+- Languages: 201 languages and dialects
+- Vocabulary: 248,320 tokens (padded)
+- Hugging Face: https://huggingface.co/Qwen/Qwen3.5-397B-A17B
+
+## Recommended Parameters
+
+- `temperature`: 0.6 (generation_config.json default; model card recommendation for thinking mode (0.7 for non-thinking))
+- `top_p`: 0.95 (generation_config.json default; thinking mode (0.8 for non-thinking))
+- `top_k`: 20 (generation_config.json default and model card recommendation)
+- `presence_penalty`: 0-2 (card suggests raising to reduce endless repetition; high values can cause language mixing)
+- `max_tokens`: 32768 (card-recommended output length for most queries; 81,920 for competition-grade math and coding)
+
+## Best For
+
+- Multimodal reasoning: images and documents in the same conversation as text
+- Agentic workflows: RL-trained across million-agent environments for tool-use robustness
+- Multilingual products: 201 languages and dialects
+- Long-context tasks with 262K native window
+- High-throughput serving: only 17B of 397B parameters activate per token, with linear-attention efficiency at long context
+
+Not ideal for:
+
+- Audio input or speech output: vision-language only
+- Image generation: it consumes images but only emits text
+- Bit-exact reproduction of full-precision outputs: this chute serves the FP8 build
+
+## FAQ
+
+### What does 397B-A17B mean?
+
+397B total parameters with 17B activated per token. It is a sparse Mixture-of-Experts model: each MoE layer holds 512 experts but routes each token through only 10 routed plus 1 shared expert, so you get large-model quality at a fraction of the per-token compute.
+
+### Can it process images?
+
+Yes. Qwen3.5 is a unified vision-language model with a vision encoder trained by early fusion, and its card reports results on visual reasoning and video benchmarks. Send OpenAI-style multimodal content parts (image_url) in your chat messages.
+
+### What context window does it support?
+
+262,144 tokens natively, extensible up to 1,010,000 per the model card. The chute's default max_tokens is 1,024; the card recommends 32,768-token outputs for most queries and up to 81,920 for hard math and coding.
+
+### What sampling settings should I use?
+
+For thinking mode: temperature 0.6, top_p 0.95, top_k 20, min_p 0 (also the generation_config.json defaults). For non-thinking mode: temperature 0.7, top_p 0.8, top_k 20. presence_penalty between 0 and 2 reduces endless repetition, at some risk of language mixing.
+
+### Can I use it commercially?
+
+Yes. The model is released under the Apache-2.0 license, which permits commercial use, modification, and redistribution.
+
+### What does the TEE suffix mean?
+
+TEE stands for Trusted Execution Environment. Inference runs inside attested confidential-compute hardware, so your prompts and the model's outputs are processed within a hardware-isolated enclave rather than on an open host.
+
+### How do I call it from the OpenAI SDK?
+
+Set base_url to https://llm.chutes.ai/v1 with your Chutes API key and model to Qwen/Qwen3.5-397B-A17B-TEE. Chat completions, raw completions, and streaming work through the standard SDK methods.
+
+### Should I keep thinking content in multi-turn history?
+
+No. The model card's best practices say historical turns should contain only the final output, not the thinking content. The official chat template handles this automatically; if you manage history yourself, strip reasoning blocks before resending.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/chutes-qwen-qwen3-5-397b-a17b-tee
+- Source: https://huggingface.co/Qwen/Qwen3.5-397B-A17B
+- Source: https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8
+- Source: https://chutes.ai/app/chute/chutes-qwen-qwen3-5-397b-a17b-tee/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

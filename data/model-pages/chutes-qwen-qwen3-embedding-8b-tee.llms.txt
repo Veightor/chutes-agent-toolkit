@@ -1,0 +1,144 @@
+# Qwen/Qwen3-Embedding-8B-TEE
+
+> Qwen/Qwen3-Embedding-8B
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/chutes-qwen-qwen3-embedding-8b-tee
+- Model llms.txt: https://chutes.ai/app/chute/chutes-qwen-qwen3-embedding-8b-tee/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/chutes-qwen-qwen3-embedding-8b-tee/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `Qwen/Qwen3-Embedding-8B-TEE`
+- Chute ID: `21822836-bfa6-5426-b27e-dd5fdda1249e`
+- Slug: `chutes-qwen-qwen3-embedding-8b-tee`
+- Owner: `chutes`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on its own host (`https://chutes-qwen-qwen3-embedding-8b-tee.chutes.ai`). Call the endpoint paths listed below directly.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Endpoints
+
+### 1. POST /v1/embeddings
+
+- Base URL: `https://chutes-qwen-qwen3-embedding-8b-tee.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `input` (string, required)
+- `model` (string, optional) Default: null.
+
+Example call:
+
+```bash
+curl -X POST "https://chutes-qwen-qwen3-embedding-8b-tee.chutes.ai/v1/embeddings" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "input": "Your text here",
+  "model": "Qwen/Qwen3-Embedding-8B-TEE",
+  "encoding_format": "float"
+}'
+```
+
+### 2. GET /v1/models
+
+- Base URL: `https://chutes-qwen-qwen3-embedding-8b-tee.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+
+Example call:
+
+```bash
+curl -X GET "https://chutes-qwen-qwen3-embedding-8b-tee.chutes.ai/v1/models" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+## Model Facts
+
+- Parameters: 8B (7.57B in safetensors)
+- Architecture: Dense Qwen3 causal transformer used as a text embedding model (36 layers, hidden size 4096, last-token pooling)
+- Context length: 40,960 tokens
+- Modalities: text in → embedding out
+- License: Apache-2.0
+- Released: 2025-06
+- Embedding dimension: Up to 4096; user-definable from 32 to 4096 (MRL support)
+- Sequence length (model card): 32K tokens
+- Languages: 100+ (including programming languages)
+- Instruction aware: Yes; task instructions on the query side improve retrieval by 1-5% per the model card
+- MTEB multilingual: 70.58 mean (task), No.1 on the leaderboard as of June 5, 2025, per model card
+- Hugging Face: https://huggingface.co/Qwen/Qwen3-Embedding-8B
+
+## Best For
+
+- Multilingual semantic search and RAG retrieval across 100+ languages
+- Code retrieval and cross-lingual retrieval
+- Text classification and clustering pipelines built on embeddings
+- Reranking-adjacent pipelines paired with Qwen3-Reranker models
+- Confidential workloads: embedding proprietary documents inside a TEE
+
+Not ideal for:
+
+- Text generation or chat: this is an embedding model, it returns vectors, not tokens
+- Latency-critical edge deployments where a 0.6B or 4B embedding model is sufficient
+- Image or audio embedding: input is text only
+
+## FAQ
+
+### How many dimensions do the embeddings have?
+
+Up to 4096. The model supports user-defined output dimensions from 32 to 4096 (MRL support per the model card), so you can truncate vectors to fit your vector database and latency budget with modest quality loss.
+
+### What is the maximum input length?
+
+The Hugging Face config sets max_position_embeddings to 40,960 tokens, and the model card lists a 32K sequence length. For retrieval quality, chunking long documents into passages is still standard practice.
+
+### Do I need to add an instruction to my inputs?
+
+For queries, yes, ideally: format them as 'Instruct: <one-sentence task description>\nQuery: <query>'. The model card reports a 1-5% retrieval improvement from query-side instructions. Documents should be embedded as-is without an instruction.
+
+### Can I call it with the OpenAI SDK?
+
+Yes. Point the SDK at base_url https://chutes-qwen-qwen3-embedding-8b-tee.chutes.ai/v1 with your Chutes API key and call client.embeddings.create(model="Qwen/Qwen3-Embedding-8B-TEE", input="..."). The endpoint follows the OpenAI embeddings contract.
+
+### What does the TEE suffix mean?
+
+The model runs inside a Trusted Execution Environment: confidential-compute hardware that keeps prompts and outputs encrypted in memory and attestable. It is a serving-level property and does not change the embeddings the model produces.
+
+### What license is Qwen3-Embedding-8B under? Can I use it commercially?
+
+Apache-2.0, per the Hugging Face repo Qwen/Qwen3-Embedding-8B. Apache-2.0 permits commercial use, modification, and redistribution with attribution and license notice.
+
+### How good is it compared to other embedding models?
+
+Its model card reports 70.58 mean task score on MTEB multilingual (No.1 on the leaderboard as of June 5, 2025), 75.22 on MTEB English v2, and 73.84 on C-MTEB Chinese, ahead of gte-Qwen2-7B-instruct, NV-Embed-v2, and text-embedding-3-large in the card's comparison tables.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/chutes-qwen-qwen3-embedding-8b-tee
+- Source: https://huggingface.co/Qwen/Qwen3-Embedding-8B
+- Source: https://chutes.ai/app/chute/chutes-qwen-qwen3-embedding-8b-tee/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

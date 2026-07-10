@@ -1,0 +1,201 @@
+# LTX-23-Video
+
+> Lightricks LTX 2.3 distilled-1.1 FP8 on RTX 6000 Pro — cinematic T2V, I2V, and keyframe interpolation with 8-step inference, synchronized audio, and GPU prompt enhancement.
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/vonkaiser-ltx-23-video
+- Model llms.txt: https://chutes.ai/app/chute/vonkaiser-ltx-23-video/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/vonkaiser-ltx-23-video/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `LTX-23-Video`
+- Chute ID: `77711d2c-c0ec-5378-90a9-41823591058b`
+- Slug: `vonkaiser-ltx-23-video`
+- Owner: `vonkaiser`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on its own host (`https://vonkaiser-ltx-23-video.chutes.ai`). Call the endpoint paths listed below directly.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Endpoints
+
+### 1. POST /generate
+
+- Base URL: `https://vonkaiser-ltx-23-video.chutes.ai`
+- Output content type: `text/plain`
+
+Request fields:
+
+- `fps` (number, optional) - Output frame rate (8–50). Default 24. Default: null.
+- `seed` (integer, optional) Default: null.
+- `width` (integer, optional) Default: 768.
+- `frames` (integer, optional) - Alias for num frames. Default: null.
+- `height` (integer, optional) Default: 512.
+- `prompt` (string, required)
+- `duration` (number, optional) - Target clip length in seconds. With default 24 fps, derives frame count. If frames are set but fps omitted, fps is derived from duration for the output MP4. Default: null.
+- `keyframes` (array, optional) - List of 2+ keyframes for multi-image interpolation. Each entry: {image b64, frame idx, strength?, crf?}. At least one keyframe must have frame idx=0. Takes precedence over input image b64 when provided. Default: null.
+- `num_frames` (integer, optional) - Frame count (snapped to N×8+1). Omit to derive from duration×fps. Default: null.
+- `return_json` (boolean, optional) Default: false.
+- `video_format` (string, optional) Default: "mp4". Options: mp4, webm.
+- `enhance_prompt` (boolean, optional) - Expand the prompt before generation with Llama 3.2 3B Instruct on GPU (SGLang); for I2V/keyframe also runs Florence-2 image captioning on the first image. Off by default — adds 1–3 s of latency. Default: false.
+- `generate_audio` (boolean, optional) Default: true.
+- `guidance_scale` (number, optional) Default: 3.1.
+- `input_image_b64` (string, optional) - Base64 image for legacy single-image I2V (PNG/JPEG). Use keyframes instead for multi-image interpolation. Default: null.
+- `negative_prompt` (string, optional) Default: "shaky, glitchy, low quality, worst quality, deformed, distorted".
+- `use_random_seed` (boolean, optional) Default: true.
+- `num_inference_steps` (integer, optional) - Ignored — always 8 for the pre-distilled model. Any value provided is silently overridden to 8. Default: 8.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-ltx-23-video.chutes.ai/generate" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "width": 768,
+  "height": 512,
+  "prompt": "a serene mountain lake at sunset",
+  "return_json": false,
+  "video_format": "mp4",
+  "enhance_prompt": false,
+  "generate_audio": true,
+  "guidance_scale": 3.1,
+  "negative_prompt": "shaky, glitchy, low quality, worst quality, deformed, distorted",
+  "use_random_seed": true,
+  "num_inference_steps": 8
+}' \
+  --output output.bin
+```
+
+### 2. GET /health
+
+- Base URL: `https://vonkaiser-ltx-23-video.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+
+Example call:
+
+```bash
+curl -X GET "https://vonkaiser-ltx-23-video.chutes.ai/health" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### 3. GET /models
+
+- Base URL: `https://vonkaiser-ltx-23-video.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+
+Example call:
+
+```bash
+curl -X GET "https://vonkaiser-ltx-23-video.chutes.ai/models" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+## Model Facts
+
+- Parameters: 22B (per Lightricks checkpoint naming, ltx-2.3-22b)
+- Architecture: DiT-based joint audio-video foundation model; this deployment runs the distilled-1.1 checkpoint (8 steps, CFG=1) with an x2 spatial upscaler and a Gemma text encoder
+- Modalities: text, image in → video, audio out
+- Precision: FP8 transformer + BF16 VAE/text-projection/upscaler (as served on Chutes)
+- License: LTX-2 Community License Agreement
+- Released: 2026-03
+- Modes: Text-to-video, image-to-video, multi-keyframe interpolation
+- Synchronized audio: Yes, generated jointly with video (generate_audio, default true)
+- Inference steps: Fixed at 8 (distilled); any requested value is overridden
+- Max resolution: Up to 3840x2160; width/height snapped to multiples of 64 on this chute
+- Max duration: ~20 s at 480p-1080p, ~10 s at 1440p, ~5 s at 4K width
+- Frame rate: 8-50 fps, default 24; frame count snapped to Nx8+1
+- Prompt enhancement: Optional on-GPU Llama 3.2 3B rewrite (+Florence-2 captioning for I2V), off by default
+- Hugging Face: https://huggingface.co/Lightricks/LTX-2.3
+
+## Recommended Parameters
+
+- `guidance_scale`: 3.1 (chute default; chute readme documents range 1.0-5.1)
+- `num_inference_steps`: 8 (fixed for the distilled-1.1 checkpoint; the endpoint silently overrides other values)
+- `width/height`: multiples of 64 (the chute snaps dimensions (e.g. 1920x1080 becomes 1920x1088); upstream card requires divisibility by 32)
+
+## Best For
+
+- Cinematic text-to-video clips with synchronized sound in one call
+- Image-to-video: animating a single frame with matching audio
+- Multi-keyframe interpolation: smooth transitions through 2+ anchor images
+- Short high-resolution renders up to 4K width
+- Fast iteration: 8-step distilled inference keeps latency low for a 22B video model
+
+Not ideal for:
+
+- Clips longer than ~20 seconds (hard duration caps that shrink with resolution)
+- Fine step-count or CFG experimentation: steps are fixed at 8 on this deployment
+- Factual or text-heavy content; like all video diffusion models it does not render reliable information
+
+## FAQ
+
+### Does LTX 2.3 really generate audio with the video?
+
+Yes. LTX-2 is a joint audio-visual foundation model, and this chute has generate_audio: true by default, so the returned MP4 includes a synchronized soundtrack. Lightricks notes audio without speech can be lower quality. Set generate_audio: false for silent output.
+
+### Can I change the number of inference steps or use CFG like the full model?
+
+No. This deployment runs the distilled-1.1 checkpoint, which is trained for exactly 8 steps at CFG=1; the endpoint silently overrides any num_inference_steps you send. You can still tune guidance_scale (default 3.1, range 1.0-5.1 per the chute readme).
+
+### How does keyframe interpolation work?
+
+Pass a keyframes array of 2 or more entries, each with a base64 image and a frame index (optionally strength and crf); at least one must have frame index 0. The model generates coherent motion through the anchors. keyframes takes precedence over input_image_b64.
+
+### What resolutions and durations are supported?
+
+Width and height snap to multiples of 64, from 256x256 up to 3840x2160. Duration caps scale with resolution: roughly 20 seconds at 480p-1080p, 10 seconds at 1440p, and 5 seconds at 4K width. Frame counts snap to Nx8+1 and fps runs 8-50 (default 24).
+
+### How do I call the API?
+
+POST a flat JSON body to https://vonkaiser-ltx-23-video.chutes.ai/generate with Authorization: Bearer $CHUTES_API_KEY. Only prompt is required. The response is raw video bytes (mp4 by default, webm optional); set return_json: true to get JSON instead.
+
+### Can I use the output commercially?
+
+The weights are under the LTX-2 Community License Agreement, not a standard OSI license. Review the license at github.com/Lightricks/LTX-2/blob/main/LICENSE for the permitted-use terms that apply to your case.
+
+### What does enhance_prompt do and should I use it?
+
+It expands your prompt on-GPU with Llama 3.2 3B Instruct before generation, and for I2V/keyframe jobs also captions the first image with Florence-2 so the rewrite matches your input. It is off by default and adds 1-3 seconds. Use it for terse prompts; skip it when you have already written a detailed prompt.
+
+### Why did my 1920x1080 request come back as 1920x1088?
+
+The chute snaps dimensions to multiples of 64, so 1080 rounds to 1088. Either accept the snap or request dimensions that are already multiples of 64.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/vonkaiser-ltx-23-video
+- Source: https://huggingface.co/Lightricks/LTX-2.3
+- Source: https://huggingface.co/Kijai/LTX2.3_comfy
+- Source: https://huggingface.co/Lightricks/LTX-2
+- Source: https://chutes.ai/app/chute/vonkaiser-ltx-23-video/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

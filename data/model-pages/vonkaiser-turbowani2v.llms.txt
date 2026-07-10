@@ -1,0 +1,152 @@
+# turbowani2v
+
+> TurboDiffusion I2V: Wan2.2-A14B-720P, 4-step distilled, SLA
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/vonkaiser-turbowani2v
+- Model llms.txt: https://chutes.ai/app/chute/vonkaiser-turbowani2v/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/vonkaiser-turbowani2v/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `turbowani2v`
+- Chute ID: `7794b47d-068d-5756-b150-cc10152da867`
+- Slug: `vonkaiser-turbowani2v`
+- Owner: `vonkaiser`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on its own host (`https://vonkaiser-turbowani2v.chutes.ai`). Call the endpoint paths listed below directly.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Playground Notes
+
+- Short, physical motion descriptions usually work better than broad cinematic prompts.
+- Use a clear source image; blurry or low-contrast images produce less stable motion.
+
+## Endpoints
+
+### 1. POST /generate
+
+- Base URL: `https://vonkaiser-turbowani2v.chutes.ai`
+- Output content type: `video/mp4`
+- Playground note: Upload a strong first frame and describe motion, camera movement, and duration cues in the prompt.
+
+Request fields:
+
+- `prompt` (string, optional) Default: "A cat wearing sunglasses sits on a surfboard, the ocean waves gently rocking it".
+- `image_b64` (string, optional) Default: "".
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-turbowani2v.chutes.ai/generate" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "prompt": "a serene mountain lake at sunset",
+  "ode": true,
+  "seed": 42,
+  "boundary": 0.9,
+  "sla_topk": 0.1,
+  "num_steps": 4,
+  "sigma_max": 200,
+  "resolution": "480p",
+  "aspect_ratio": "16:9",
+  "adaptive_resolution": true
+}' \
+  --output output.mp4
+```
+
+Playground presets:
+
+- Subtle product motion
+- Animated scene
+
+## Model Facts
+
+- Parameters: 27B total (two 14B experts)
+- Active parameters: 14B per denoising step
+- Architecture: Wan2.2 two-expert MoE video diffusion transformer (high-noise expert for early layout, low-noise expert for late detail), accelerated by TurboDiffusion: rCM step distillation plus SLA sparse-linear attention
+- Modalities: text, image in → video out
+- License: Apache-2.0
+- Released: 2025-12
+- Sampling steps: 4 (rCM distilled; chute default num_steps 4)
+- Attention: Official SLA block-sparse (Triton) with proj_l linear branch; chute default sla_topk 0.1
+- Speedup: TurboDiffusion paper reports 100-200x acceleration over the undistilled pipeline
+- Resolutions: 720P checkpoint; chute example uses resolution 480p with adaptive_resolution true
+- Output format: video/mp4 (raw bytes)
+- Hugging Face: https://huggingface.co/TurboDiffusion/TurboWan2.2-I2V-A14B-720P
+
+## Recommended Parameters
+
+- `num_steps`: 4 (the model is rCM-distilled for 4-step sampling; this is the chute default)
+- `resolution`: 480p or 720p (chute example default is 480p with adaptive_resolution true; the checkpoint is the 720P variant)
+- `prompt`: short, physical motion description (per the chute's playground notes, concrete motion beats broad cinematic prompts)
+
+## Best For
+
+- Fast image-to-video: animating a product shot, illustration, or photo in seconds-scale latency
+- Subtle product motion and looping hero animations from a single strong frame
+- High-volume I2V pipelines where 4-step inference keeps per-clip cost low
+- Prototyping motion ideas before committing to a slower, higher-step video model
+
+Not ideal for:
+
+- Text-to-video without a source image: this deployment is image-to-video
+- Maximum-fidelity cinematic renders; 4-step distillation trades some detail for speed
+- Clips requiring synchronized audio (output is silent MP4)
+
+## FAQ
+
+### Is this text-to-video or image-to-video?
+
+Image-to-video. You provide a source image as base64 in image_b64 plus a text prompt describing the motion. The model animates the image; TurboDiffusion also publishes separate T2V checkpoints, but this chute serves the I2V-A14B-720P model.
+
+### Why only 4 sampling steps?
+
+The checkpoint is distilled with rCM (score-regularized continuous-time consistency), which trains the model to produce in 4 steps what the base Wan2.2 needs a full sampling schedule for. Combined with SLA sparse attention, the TurboDiffusion paper reports 100-200x end-to-end acceleration.
+
+### What resolution and aspect ratio can I generate?
+
+The checkpoint is the 720P variant of Wan2.2 I2V-A14B (the base model supports 480P and 720P). The chute's example call uses resolution "480p" with aspect_ratio "16:9" and adaptive_resolution true, which adapts output dimensions to the source image.
+
+### How do I call it? Is there an OpenAI-compatible endpoint?
+
+No, this is not an LLM gateway model. POST a flat JSON body to https://vonkaiser-turbowani2v.chutes.ai/generate with Authorization: Bearer $CHUTES_API_KEY. The response body is the MP4 file itself, so save the raw bytes (curl --output, response.content in Python).
+
+### Can I use the output commercially?
+
+The TurboDiffusion checkpoint and the base Wan2.2-I2V-A14B are both Apache-2.0 licensed, which permits commercial use. Check your own content and input-image rights as usual.
+
+### How do I get consistent results across runs?
+
+Pass a fixed seed integer in the request body (the endpoint example uses seed 42). Same seed, prompt, image, and settings reproduce the same clip.
+
+### Does the video include audio?
+
+No. Output is a silent MP4. If you need synchronized audio, use a joint audio-video model such as LTX 2.3 on Chutes instead.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/vonkaiser-turbowani2v
+- Source: https://huggingface.co/TurboDiffusion/TurboWan2.2-I2V-A14B-720P
+- Source: https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B
+- Source: https://chutes.ai/app/chute/vonkaiser-turbowani2v/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

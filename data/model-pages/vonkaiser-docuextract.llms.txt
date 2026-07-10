@@ -1,0 +1,261 @@
+# docuextract
+
+> Document OCR and structured extraction from PDFs and images
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/vonkaiser-docuextract
+- Model llms.txt: https://chutes.ai/app/chute/vonkaiser-docuextract/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/vonkaiser-docuextract/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `docuextract`
+- Chute ID: `aea729aa-0b49-50ae-8843-b33f42d60886`
+- Slug: `vonkaiser-docuextract`
+- Owner: `vonkaiser`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on its own host (`https://vonkaiser-docuextract.chutes.ai`). Call the endpoint paths listed below directly.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Playground Notes
+
+- Use image_b64 for screenshots or single-page images; use pdf_b64 for PDFs.
+- Keep max_pages low while testing, then raise it once the extraction shape looks right.
+- Template generation and extraction endpoints are designed to be chained: create a template, then pass it into extract.
+
+## Endpoints
+
+### 1. POST /ocr/lighton/markdown
+
+- Base URL: `https://vonkaiser-docuextract.chutes.ai`
+- Output content type: `application/json`
+- Playground note: Use one document input at a time, then tune extraction depth only when the default output misses structure.
+
+Request fields:
+
+- `dpi` (integer, optional) Default: 200.
+- `pdf_b64` (string, optional) Default: null.
+- `image_b64` (string, optional) Default: null.
+- `max_pages` (integer, optional) Default: 10.
+- `temperature` (number, optional) - Sampling temperature; defaults to 0.0 (markdown) or 0.2 (extract) Default: null.
+- `max_new_tokens` (integer, optional) - Cap generation length; defaults to model maximum safe for input size Default: null.
+- `enable_thinking` (boolean, optional) - NuExtract reasoning mode (slower, higher quality on hard documents) Default: false.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-docuextract.chutes.ai/ocr/lighton/markdown" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "dpi": 200,
+  "max_pages": 10,
+  "temperature": 0.7,
+  "enable_thinking": false
+}'
+```
+
+Playground presets:
+
+- Fast image OCR
+
+### 2. POST /ocr/nuextract/markdown
+
+- Base URL: `https://vonkaiser-docuextract.chutes.ai`
+- Output content type: `application/json`
+- Playground note: Use one document input at a time, then tune extraction depth only when the default output misses structure.
+
+Request fields:
+
+- `dpi` (integer, optional) Default: 200.
+- `mode` (string, optional) Default: "markdown". Options: markdown, content.
+- `pdf_b64` (string, optional) Default: null.
+- `image_b64` (string, optional) Default: null.
+- `max_pages` (integer, optional) Default: 10.
+- `temperature` (number, optional) - Sampling temperature; defaults to 0.0 (markdown) or 0.2 (extract) Default: null.
+- `instructions` (string, optional) Default: null.
+- `max_new_tokens` (integer, optional) - Cap generation length; defaults to model maximum safe for input size Default: null.
+- `enable_thinking` (boolean, optional) - NuExtract reasoning mode (slower, higher quality on hard documents) Default: false.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-docuextract.chutes.ai/ocr/nuextract/markdown" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "dpi": 200,
+  "mode": "markdown",
+  "max_pages": 10,
+  "temperature": 0.7,
+  "enable_thinking": false
+}'
+```
+
+Playground presets:
+
+- Fast image OCR
+
+### 3. POST /ocr/nuextract/extract
+
+- Base URL: `https://vonkaiser-docuextract.chutes.ai`
+- Output content type: `application/json`
+- Playground note: Use one document input at a time, then tune extraction depth only when the default output misses structure.
+
+Request fields:
+
+- `dpi` (integer, optional) Default: 200.
+- `text` (string, optional) Default: null.
+- `pdf_b64` (string, optional) Default: null.
+- `examples` (array, optional) Default: null.
+- `template` (object, required)
+- `image_b64` (string, optional) Default: null.
+- `max_pages` (integer, optional) Default: 10.
+- `temperature` (number, optional) - Sampling temperature; defaults to 0.0 (markdown) or 0.2 (extract) Default: null.
+- `instructions` (string, optional) Default: null.
+- `max_new_tokens` (integer, optional) - Cap generation length; defaults to model maximum safe for input size Default: null.
+- `enable_thinking` (boolean, optional) - NuExtract reasoning mode (slower, higher quality on hard documents) Default: false.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-docuextract.chutes.ai/ocr/nuextract/extract" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "dpi": 200,
+  "text": "Your text here",
+  "template": {},
+  "max_pages": 10,
+  "temperature": 0.7,
+  "enable_thinking": false
+}'
+```
+
+Playground presets:
+
+- Structured invoice extraction
+
+### 4. POST /ocr/nuextract/template
+
+- Base URL: `https://vonkaiser-docuextract.chutes.ai`
+- Output content type: `application/json`
+- Playground note: Use one document input at a time, then tune extraction depth only when the default output misses structure.
+
+Request fields:
+
+- `dpi` (integer, optional) Default: 200.
+- `pdf_b64` (string, optional) Default: null.
+- `image_b64` (string, optional) Default: null.
+- `max_pages` (integer, optional) Default: 1.
+- `description` (string, required)
+- `temperature` (number, optional) - Sampling temperature; defaults to 0.0 (markdown) or 0.2 (extract) Default: null.
+- `max_new_tokens` (integer, optional) - Cap generation length; defaults to model maximum safe for input size Default: null.
+- `enable_thinking` (boolean, optional) - NuExtract reasoning mode (slower, higher quality on hard documents) Default: false.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-docuextract.chutes.ai/ocr/nuextract/template" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "dpi": 200,
+  "max_pages": 1,
+  "description": "example-string",
+  "temperature": 0.7,
+  "enable_thinking": false
+}'
+```
+
+## Model Facts
+
+- Parameters: 1B (LightOnOCR-2) + 4B (NuExtract3)
+- Architecture: Two vision-language models on dual vLLM: LightOnOCR-2-1B (Qwen3-based VLM, RLVR-refined) for fast page OCR and NuExtract3 (Qwen3.5-4B-based reasoning VLM) for structured extraction
+- Modalities: image, text in → text out
+- License: Apache-2.0 (both models)
+- LightOnOCR-2-1B: 1.01B params; text context 16,384 tokens; SOTA on OlmOCR-Bench per card; 5.71 pages/s on one H100
+- NuExtract3: 4.54B params (safetensors); text context 262,144 tokens; reasoning and non-reasoning modes; base model Qwen3.5-4B
+- Inputs: base64 PDF (pdf_b64) or image (image_b64); NuExtract extract also accepts plain text
+- Serving: Dual vLLM on one pro_6000 GPU, concurrency 1, TEE-safe PDF rendering (per chute readme)
+- Hugging Face (bundled): https://huggingface.co/lightonai/LightOnOCR-2-1B
+- Hugging Face (bundled): https://huggingface.co/numind/NuExtract3
+
+## Recommended Parameters
+
+- `temperature`: 0.2 (LightOnOCR-2 generation_config.json default (with top_p 0.9); the chute defaults to 0.0 for markdown and 0.2 for extract)
+- `enable_thinking`: false (chute default; set true for NuExtract3 reasoning mode, slower but higher quality on hard documents)
+
+## Best For
+
+- Converting PDFs and scans to clean markdown (tables, forms, multi-column layouts, math notation)
+- Structured JSON extraction from invoices, receipts, contracts, and forms via templates
+- Template generation: describe the fields you want and get a reusable extraction template back
+- RAG preprocessing: page markdown as chunk-ready text
+- Extract-only workflows over text you already have (NuExtract3 accepts plain text input)
+
+Not ideal for:
+
+- High-concurrency bulk processing: the chute runs at concurrency 1 on a single GPU
+- Handwriting-heavy or free-form visual question answering beyond OCR and extraction
+- Documents longer than max_pages allows in one call (default 10 pages; batch client-side)
+
+## FAQ
+
+### When should I use the LightOn endpoint versus the NuExtract endpoints?
+
+Use /ocr/lighton/markdown when you just need fast, accurate page-to-markdown conversion; LightOnOCR-2's card reports 5.71 pages/s on an H100 and state-of-the-art OlmOCR-Bench results. Use the NuExtract endpoints when you need structured JSON out, template generation, extraction from plain text, or its reasoning mode on hard documents.
+
+### How does template-based extraction work?
+
+Two calls. First POST /ocr/nuextract/template with a description of the fields you want (optionally with a sample document) to get a JSON template. Then POST /ocr/nuextract/extract with that template plus your pdf_b64, image_b64, or text; the response is JSON structured to the template. Templates are reusable across documents of the same type.
+
+### What inputs does it accept?
+
+Base64-encoded PDFs (pdf_b64) or images (image_b64), one document input per call. The extract endpoint additionally accepts a plain text field for extract-only requests where you already have the text. PDF pages are rendered at a configurable dpi, default 200.
+
+### What does enable_thinking do?
+
+It turns on NuExtract3's reasoning mode: the model thinks before answering, which is slower but higher quality on hard documents, per the request field description. It is off by default. NuMind benchmarked NuExtract3 with reasoning enabled at temperature 0.25 in its model card evaluation.
+
+### How many pages can I process per call?
+
+max_pages defaults to 10 (1 for template generation) and is configurable per request. The chute's playground notes recommend keeping max_pages low while testing, then raising it once the extraction shape looks right. For long documents, batch pages client-side across calls.
+
+### What temperature should I use?
+
+The chute defaults to 0.0 for markdown endpoints and 0.2 for extraction, which is close to LightOnOCR-2's generation config (temperature 0.2, top_p 0.9). For OCR and extraction you want near-deterministic output; only raise temperature if you see repetition artifacts.
+
+### Can I use it commercially?
+
+Yes. Both lightonai/LightOnOCR-2-1B and numind/NuExtract3 are Apache-2.0 licensed per their Hugging Face repos, which permits commercial use with attribution and license notice.
+
+### Is my document data isolated?
+
+The chute readme states PDF rendering is TEE-safe and the deployment runs at concurrency 1 on a single pro_6000 GPU, meaning requests are processed one at a time. Standard Chutes API-key auth applies; send documents as base64 over HTTPS.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/vonkaiser-docuextract
+- Source: https://huggingface.co/lightonai/LightOnOCR-2-1B
+- Source: https://huggingface.co/numind/NuExtract3
+- Source: https://chutes.ai/app/chute/vonkaiser-docuextract/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

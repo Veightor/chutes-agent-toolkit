@@ -1,0 +1,289 @@
+# zai-org/GLM-5.1-TEE
+
+> GLM-5.1 is a large language model optimized for agentic tasks and coding that excels at sustained problem-solving over long horizons through iterative reasoning and tool use.
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/chutes-zai-org-glm-5-1-tee
+- Model llms.txt: https://chutes.ai/app/chute/chutes-zai-org-glm-5-1-tee/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/chutes-zai-org-glm-5-1-tee/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `zai-org/GLM-5.1-TEE`
+- Chute ID: `b048fe26-0352-5c46-acf7-335e527e7f3d`
+- Slug: `chutes-zai-org-glm-5-1-tee`
+- Owner: `chutes`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on the shared OpenAI-compatible gateway. Set the request `model` field to the exact Name above (`zai-org/GLM-5.1-TEE`), and use base URL `https://llm.chutes.ai/v1`.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Endpoints
+
+### 1. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "zai-org/GLM-5.1-FP8".
+- `stream` (boolean, optional) Default: true.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "zai-org/GLM-5.1-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": true,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 2. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "zai-org/GLM-5.1-FP8".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: true.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "zai-org/GLM-5.1-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 3. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "zai-org/GLM-5.1-FP8".
+- `stream` (boolean, optional) Default: false.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "zai-org/GLM-5.1-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 4. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "zai-org/GLM-5.1-FP8".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: false.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "zai-org/GLM-5.1-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 5. GET /v1/models
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+
+Example call:
+
+```bash
+curl -X GET "https://llm.chutes.ai/v1/models" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+## Model Facts
+
+- Parameters: 754B total (safetensors count; same architecture and size as GLM-5, listed as 744B on the GLM-5 card)
+- Active parameters: 40B per token (identical configuration to GLM-5)
+- Architecture: Mixture-of-Experts transformer with DeepSeek Sparse Attention (DSA); 78 layers, 256 routed + 1 shared experts, 8 routed experts per token
+- Context length: 202,752 tokens
+- Modalities: text in → text out
+- Precision: FP8 (as served on Chutes; upstream weights BF16)
+- License: MIT
+- Released: 2026-04
+- Experts: 256 routed + 1 shared, 8 routed active per token
+- Layers / hidden size: 78 / 6144
+- SWE-Bench Pro: 58.4 (model card; state-of-the-art at release)
+- Terminal-Bench 2.0 (Terminus-2): 63.5 (model card)
+- CyberGym: 68.7 (model card)
+- Hugging Face: https://huggingface.co/zai-org/GLM-5.1
+
+## Recommended Parameters
+
+- `temperature`: 1.0 (generation_config.json default)
+- `top_p`: 0.95 (generation_config.json default)
+
+## Best For
+
+- Agentic engineering: long autonomous coding sessions with hundreds of iterations and thousands of tool calls
+- Repository generation and large refactors (42.7 NL2Repo, well ahead of GLM-5's 35.9)
+- Real-world terminal automation (63.5 Terminal-Bench 2.0 Terminus-2; 69.0 in Claude Code)
+- Security and vulnerability research workflows (68.7 CyberGym)
+- Web research agents (68.0 BrowseComp, 79.3 with context management)
+
+Not ideal for:
+
+- Image, audio, or video inputs: text-only model
+- Quick one-shot completions where its long-horizon strengths go unused
+- Contexts beyond ~200K tokens: GLM-5.2 offers a 1M-token window
+
+## FAQ
+
+### How is GLM-5.1 different from GLM-5?
+
+Same architecture and size, retrained for agentic engineering. It reaches 58.4 on SWE-Bench Pro (state-of-the-art at release) and improves sharply on NL2Repo (42.7 vs 35.9) and Terminal-Bench 2.0 (63.5 vs 56.2). Most importantly, it stays productive over much longer autonomous sessions instead of plateauing early.
+
+### What context window does GLM-5.1 support?
+
+The config.json sets max_position_embeddings to 202,752 tokens, roughly 200K. The chute's default max_tokens is 1,024, so raise it for long outputs.
+
+### Does GLM-5.1 support function calling and tool use?
+
+Yes. Long-horizon tool use is the model's design focus: Z.ai reports it sustaining thousands of tool calls per session, and it scores 71.8 on MCP-Atlas and 40.7 on Tool-Decathlon. Pass OpenAI-style tools in your chat completion request.
+
+### What does the TEE suffix mean?
+
+TEE stands for Trusted Execution Environment. Inference runs inside attested confidential-compute hardware, so your prompts and the model's outputs are processed within a hardware-isolated enclave rather than on an open host.
+
+### Can I use GLM-5.1 commercially?
+
+Yes. GLM-5.1 is released under the MIT license, which permits commercial use, modification, and redistribution.
+
+### How do I call it from the OpenAI SDK?
+
+Set base_url to https://llm.chutes.ai/v1 with your Chutes API key and model to zai-org/GLM-5.1-TEE. Chat completions, raw completions, and streaming work through the standard SDK methods.
+
+### What sampling settings should I use?
+
+The upstream generation_config.json defaults to temperature 1.0 and top_p 0.95. The chute's own default temperature is 0.7 with max_tokens 1024; for agent workloads, raise max_tokens well above the default.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/chutes-zai-org-glm-5-1-tee
+- Source: https://huggingface.co/zai-org/GLM-5.1
+- Source: https://huggingface.co/zai-org/GLM-5.1-FP8
+- Source: https://chutes.ai/app/chute/chutes-zai-org-glm-5-1-tee/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

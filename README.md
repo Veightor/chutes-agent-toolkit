@@ -235,7 +235,7 @@ Standard machine-readable interfaces:
 - **Create accounts** — register on Chutes.ai with proper credential handling and backup
 - **Manage API keys** — create, list, and delete `cpk_` prefixed keys
 - **Secure credential store** — save keys to the OS keychain and read them back in future sessions
-- **Discover models** — browse the live catalog with real-time pricing from `/v1/models`; `docs/known-models.md` and `data/chutes-models.json` are auto-refreshed daily by GitHub Actions from that public endpoint. TTFT/TPS comes from `/invocations/stats/llm`, not the models list
+- **Discover models** — browse the live catalog with real-time pricing from `/v1/models`; `docs/known-models.md` and `data/chutes-models.json` are auto-refreshed daily by GitHub Actions from that public endpoint. TTFT/TPS comes from `/invocations/stats/llm`, not the models list. For non-chat chutes (embedding, image, video, audio, guard-classifier, segmentation) that `/v1/models` never returns, see the full-modality [`docs/model-pages.md`](docs/model-pages.md) catalog
 - **Make inference calls** — OpenAI-compatible request/response API; authenticate with `Authorization: Bearer cpk_...` everywhere
 - **Model routing** — failover, latency-optimized, or throughput-optimized multi-model pools
 - **Model aliases** — stable semantic handles like `interactive-fast` that survive model churn
@@ -406,7 +406,8 @@ chutes-agent-toolkit/
 ├── site/                                  # draft chutes.ai pages promoting agent use
 │   ├── README.md                          # page map + widget specs
 │   └── pages/ (agents, connect-your-agent, private-inference, + per-client deep-dive/recipes pairs for claude, codex, hermes)
-├── data/ (chutes-models.json, agent-use-cases.json)   # daily model snapshot + site/demo use-case feed
+├── data/ (chutes-models.json, chutes-model-pages.json, agent-use-cases.json, model-pages/)   # LLM snapshot + full-modality model-page catalog + use-case feed
+├── docs/model-pages.md                     # full-modality catalog (build_model_pages.py)
 ├── docs/site-agent-growth-kit.md          # site-builder source material (pairs with the use-case feed)
 ├── llms.txt                               # agent-facing index of this repo
 ├── evals/ (evals.json, README.md)
@@ -442,6 +443,11 @@ Model snapshot automation:
 - `scripts/update_chutes_models.py` fetches `https://llm.chutes.ai/v1/models` with no auth headers.
 - `.github/workflows/refresh-chutes-models.yml` runs it once per day and on manual dispatch.
 - Generated outputs: `data/chutes-models.json`, `docs/known-models.md`, and `plugins/chutes-ai/skills/chutes-ai/references/known-models.md`.
+
+Full-modality model-page catalog:
+
+- `scripts/build_model_pages.py` parses the per-model `llms.txt` pages vendored under `data/model-pages/` (embedding, image, video, audio, guard-classifier, segmentation chutes — the ones `/v1/models` never lists).
+- Generated outputs: `data/chutes-model-pages.json` and `docs/model-pages.md`. Chat LLMs are keyed off `data/chutes-models.json`, so this catalog never fights the daily snapshot refresh.
 
 ## Contributing
 

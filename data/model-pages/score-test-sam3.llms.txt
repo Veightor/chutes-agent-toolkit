@@ -1,0 +1,86 @@
+# sam3
+
+> Segment Anything Model (SAM3)
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/score-test-sam3
+- Model llms.txt: https://chutes.ai/app/chute/score-test-sam3/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/score-test-sam3/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `sam3`
+- Chute ID: `e97a02fe-1932-5f43-84b5-5dced5443012`
+- Slug: `score-test-sam3`
+- Owner: `score_test`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on its own host (`https://score-test-sam3.chutes.ai`). Call the endpoint paths listed below directly.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Endpoints
+
+### 1. POST /health
+
+- Base URL: `https://score-test-sam3.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+
+Example call:
+
+```bash
+curl -X POST "https://score-test-sam3.chutes.ai/health" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+### 2. POST /sam3/segment
+
+- Base URL: `https://score-test-sam3.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `data` (object, required)
+
+Example call:
+
+```bash
+curl -X POST "https://score-test-sam3.chutes.ai/sam3/segment" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "data": {
+    "image": {
+      "type": "example-string",
+      "value": "example-string"
+    },
+    "prompts": [
+      {
+        "text": "Your text here",
+        "type": "example-string"
+      }
+    ]
+  }
+}'
+```
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

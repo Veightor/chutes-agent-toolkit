@@ -1,0 +1,295 @@
+# MiniMaxAI/MiniMax-M2.5-TEE
+
+> MiniMax-M2.5 is a frontier-class LLM excelling at coding, agentic tool use, and office automation tasks, with state-of-the-art performance on benchmarks like SWE-Bench while being dramatically more cost-effective than competitors.
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/chutes-minimaxai-minimax-m2-5-tee
+- Model llms.txt: https://chutes.ai/app/chute/chutes-minimaxai-minimax-m2-5-tee/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/chutes-minimaxai-minimax-m2-5-tee/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `MiniMaxAI/MiniMax-M2.5-TEE`
+- Chute ID: `ce6a92e4-5c2f-5681-9742-c80a4447bbdf`
+- Slug: `chutes-minimaxai-minimax-m2-5-tee`
+- Owner: `chutes`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on the shared OpenAI-compatible gateway. Set the request `model` field to the exact Name above (`MiniMaxAI/MiniMax-M2.5-TEE`), and use base URL `https://llm.chutes.ai/v1`.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Endpoints
+
+### 1. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "MiniMaxAI/MiniMax-M2.5".
+- `stream` (boolean, optional) Default: true.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "MiniMaxAI/MiniMax-M2.5-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": true,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 2. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "MiniMaxAI/MiniMax-M2.5".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: true.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "MiniMaxAI/MiniMax-M2.5-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 3. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "MiniMaxAI/MiniMax-M2.5".
+- `stream` (boolean, optional) Default: false.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "MiniMaxAI/MiniMax-M2.5-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 4. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "MiniMaxAI/MiniMax-M2.5".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: false.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "MiniMaxAI/MiniMax-M2.5-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 5. GET /v1/models
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+
+Example call:
+
+```bash
+curl -X GET "https://llm.chutes.ai/v1/models" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+## Model Facts
+
+- Parameters: 229B total (safetensors weight count)
+- Architecture: Mixture-of-Experts transformer (MiniMax-M2 family); 62 layers, 256 experts, 8 active per token
+- Context length: 196,608 tokens
+- Modalities: text in → text out
+- Precision: FP8 (e4m3 block-quantized upstream weights), served in a TEE on Chutes
+- License: Modified MIT
+- Released: 2026-02
+- Experts: 256 local experts, 8 active per token
+- Layers: 62
+- Hidden size: 3072
+- Attention heads: 48
+- Vocabulary: 200,064 tokens
+- Training: RL across hundreds of thousands of real-world environments (200K+ coding environments, 10+ languages)
+- Hugging Face: https://huggingface.co/MiniMaxAI/MiniMax-M2.5
+
+## Recommended Parameters
+
+- `temperature`: 1.0 (model-card recommendation; matches generation_config)
+- `top_p`: 0.95 (model-card recommendation; matches generation_config)
+- `top_k`: 40 (model-card recommendation; matches generation_config)
+
+## Best For
+
+- Coding agents: 80.2% SWE-Bench Verified and 51.3% Multi-SWE-Bench per the model card, with strong cross-harness generalization (79.7 on Droid, 76.1 on OpenCode)
+- Agentic search and browsing: 76.3% BrowseComp with context management
+- Office-work automation: Word, PowerPoint, and Excel financial modeling, trained with domain experts
+- Full-lifecycle software development across 10+ languages, from system design to code review
+- High-volume agent fleets where cost per task dominates: MiniMax positions M2.5 at a fraction of frontier-model cost
+
+Not ideal for:
+
+- Vision or audio input: text-only model
+- Deep frontier math/knowledge reasoning: card-reported AIME25 86.3 and HLE-without-tools 19.4 trail the largest frontier models
+- Strict-license environments: Modified MIT needs review before redistribution
+
+## FAQ
+
+### What context window does MiniMax M2.5 support?
+
+196,608 tokens (192K), per max_position_embeddings in the upstream config. That is enough for repository-scale code context or long agent trajectories.
+
+### How good is MiniMax M2.5 at coding?
+
+The model card reports 80.2% on SWE-Bench Verified, 51.3% on Multi-SWE-Bench, and strong cross-harness results (79.7 on Droid, 76.1 on OpenCode). It was trained on 200,000+ real-world coding environments across 10+ languages, covering the full development lifecycle rather than just bug fixing.
+
+### Does it support function calling and tool use?
+
+Yes. Agentic tool use is a core training target: MiniMax reports 76.3% on BrowseComp with context management and publishes a dedicated tool-calling guide in the repository. Send OpenAI-style tools through the gateway's chat completions endpoint.
+
+### Can I use MiniMax M2.5 commercially?
+
+The weights are released under a Modified MIT license (see the LICENSE file in the MiniMax-M2.5 GitHub repository). It is broadly permissive, but review the modifications before redistribution or large-scale commercial deployment.
+
+### What does the TEE suffix mean?
+
+The chute runs inference inside a Trusted Execution Environment, i.e. attested confidential-compute hardware. Prompts and outputs are processed inside the enclave. It is a serving-level property and does not change model outputs.
+
+### How do I call it from the OpenAI SDK?
+
+Point the client at base_url https://llm.chutes.ai/v1 with your Chutes API key and set model to MiniMaxAI/MiniMax-M2.5-TEE. Streaming is supported on chat and text completions.
+
+### What sampling settings should I use?
+
+MiniMax recommends temperature 1.0, top_p 0.95, and top_k 40, which match the repo's generation_config. The chute default temperature is 0.7, so pass the recommended values explicitly for reference behavior.
+
+### Is M2.5 the same as M2.5-Lightning?
+
+MiniMax describes M2.5 and M2.5-Lightning as identical in capability, differing only in serving speed and price on MiniMax's own platform. This chute serves the open-weights MiniMax-M2.5 release; throughput on Chutes is determined by Chutes' own serving infrastructure.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/chutes-minimaxai-minimax-m2-5-tee
+- Source: https://huggingface.co/MiniMaxAI/MiniMax-M2.5
+- Source: https://huggingface.co/MiniMaxAI/MiniMax-M2.5/raw/main/config.json
+- Source: https://huggingface.co/MiniMaxAI/MiniMax-M2.5/raw/main/generation_config.json
+- Source: https://chutes.ai/app/chute/chutes-minimaxai-minimax-m2-5-tee/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

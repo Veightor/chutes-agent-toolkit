@@ -1,0 +1,297 @@
+# google/gemma-4-31B-turbo-TEE
+
+> Gemma-4-31B-IT NVFP4 with DFlash speculative decoding
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/chutes-google-gemma-4-31b-turbo-tee
+- Model llms.txt: https://chutes.ai/app/chute/chutes-google-gemma-4-31b-turbo-tee/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/chutes-google-gemma-4-31b-turbo-tee/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `google/gemma-4-31B-turbo-TEE`
+- Chute ID: `42ee92ba-a537-5a73-8741-876067750db7`
+- Slug: `chutes-google-gemma-4-31b-turbo-tee`
+- Owner: `chutes`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on the shared OpenAI-compatible gateway. Set the request `model` field to the exact Name above (`google/gemma-4-31B-turbo-TEE`), and use base URL `https://llm.chutes.ai/v1`.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Endpoints
+
+### 1. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "nvidia/Gemma-4-31B-IT-NVFP4".
+- `stream` (boolean, optional) Default: true.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "google/gemma-4-31B-turbo-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": true,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 2. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "nvidia/Gemma-4-31B-IT-NVFP4".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: true.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "google/gemma-4-31B-turbo-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 3. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "nvidia/Gemma-4-31B-IT-NVFP4".
+- `stream` (boolean, optional) Default: false.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "google/gemma-4-31B-turbo-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 4. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "nvidia/Gemma-4-31B-IT-NVFP4".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: false.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "google/gemma-4-31B-turbo-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 5. GET /v1/models
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+
+Example call:
+
+```bash
+curl -X GET "https://llm.chutes.ai/v1/models" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+## Model Facts
+
+- Parameters: 30.7B (dense)
+- Architecture: Dense transformer (Gemma4ForConditionalGeneration) with hybrid attention: local sliding-window (1024 tokens) interleaved with full global attention, unified KV in global layers, Proportional RoPE; ~550M vision encoder
+- Context length: 262,144 tokens
+- Modalities: text, image in → text out
+- Precision: NVFP4 (NVIDIA ModelOpt quantization, as served on Chutes)
+- License: Apache-2.0 (Gemma 4)
+- Released: 2026-03
+- Layers: 60, GQA 32Q/16KV, head dim 256
+- Vocabulary: 262,144 tokens
+- Thinking: Configurable: enabled by placing <|think|> at the start of the system prompt
+- Languages: 140+ (model card)
+- Benchmarks (card): MMLU Pro 85.2, LiveCodeBench v6 80.0, GPQA Diamond 84.3, MMMU Pro 76.9
+- Serving on Chutes: TEE, NVFP4 quantized weights (nvidia/Gemma-4-31B-IT-NVFP4), DFlash speculative decoding
+- Hugging Face: https://huggingface.co/google/gemma-4-31B-it
+
+## Recommended Parameters
+
+- `temperature`: 1.0 (model card recommendation; matches generation_config.json)
+- `top_p`: 0.95 (model card recommendation)
+- `top_k`: 64 (model card recommendation)
+
+## Best For
+
+- Reasoning with configurable thinking: card reports 89.2 AIME 2026 (no tools) and 84.3 GPQA Diamond
+- Coding: 80.0 LiveCodeBench v6 and 2150 Codeforces ELO per the card
+- Multimodal understanding: image input with variable aspect ratios; 76.9 MMMU Pro
+- Agentic workflows with native function calling and system-role support
+- Multilingual applications across 140+ languages
+- Long-context tasks up to 256K tokens
+
+Not ideal for:
+
+- Audio input: the 31B model has no audio encoder (only Gemma 4 E2B/E4B do)
+- Workloads requiring bit-exact parity with the BF16 upstream weights, since this chute serves an NVFP4 quantization
+- Including prior thinking content in multi-turn history; the card says previous thoughts must not be re-added
+
+## FAQ
+
+### What does turbo mean in this model's name?
+
+It is a serving configuration, not a different Google model. The chute runs NVIDIA's NVFP4 quantization of Gemma 4 31B IT (nvidia/Gemma-4-31B-IT-NVFP4, built with TensorRT Model Optimizer) plus DFlash speculative decoding, trading a small amount of numerical precision for substantially faster, cheaper inference.
+
+### How do I enable thinking mode?
+
+Gemma 4 enables reasoning when the <|think|> control token appears at the start of the system prompt; remove it to disable thinking. When enabled, the model emits its reasoning before the final answer. Do not feed previous turns' thinking content back into the conversation history.
+
+### What context window does it support?
+
+256K tokens per the model card; config.json sets max_position_embeddings to 262,144. The hybrid local/global attention design with p-RoPE is what keeps memory usage manageable at that length.
+
+### Can it process images?
+
+Yes. Gemma 4 31B accepts text and image input with variable aspect ratio and resolution support, and scores 76.9 on MMMU Pro per the card. It does not accept audio; only the smaller E2B and E4B family members have audio encoders.
+
+### What sampling settings does Google recommend?
+
+Temperature 1.0, top_p 0.95, top_k 64, which match the shipped generation_config.json. The chute's own default temperature is 0.7, so pass temperature explicitly if you want the card-recommended behavior.
+
+### How do I call it from the OpenAI SDK?
+
+Set base_url to https://llm.chutes.ai/v1 with your Chutes API key and model to google/gemma-4-31B-turbo-TEE. Chat completions and streaming work as with any OpenAI-compatible endpoint.
+
+### Is Gemma 4 licensed for commercial use?
+
+Yes. Google released Gemma 4 under an Apache 2.0 license (see the Gemma 4 license page linked from the model card), and NVIDIA's NVFP4 quantization page states the model is ready for commercial and non-commercial use. Chutes billing is separate from the license.
+
+### What does the TEE suffix mean?
+
+The chute runs inside a Trusted Execution Environment: attested confidential-compute hardware that keeps prompts and outputs protected while being processed. It is a deployment guarantee on Chutes and does not change the model.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/chutes-google-gemma-4-31b-turbo-tee
+- Source: https://huggingface.co/google/gemma-4-31B-it
+- Source: https://huggingface.co/nvidia/Gemma-4-31B-IT-NVFP4
+- Source: https://huggingface.co/google/gemma-4-31B-it/raw/main/config.json
+- Source: https://huggingface.co/google/gemma-4-31B-it/raw/main/generation_config.json
+- Source: https://chutes.ai/app/chute/chutes-google-gemma-4-31b-turbo-tee/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

@@ -1,0 +1,149 @@
+# Qwen-Image-Edit-2511
+
+> Qwen/Qwen-Image-Edit-2511
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/vonkaiser-qwen-image-edit-2511
+- Model llms.txt: https://chutes.ai/app/chute/vonkaiser-qwen-image-edit-2511/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/vonkaiser-qwen-image-edit-2511/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `Qwen-Image-Edit-2511`
+- Chute ID: `968bd316-f8da-52f0-a314-c985467934d6`
+- Slug: `vonkaiser-qwen-image-edit-2511`
+- Owner: `vonkaiser`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on its own host (`https://vonkaiser-qwen-image-edit-2511.chutes.ai`). Call the endpoint paths listed below directly.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Playground Notes
+
+- Large reference images are uploaded through temporary Blob storage automatically.
+- Keep width and height at 1024 while testing; larger values cost more and may be slower.
+
+## Endpoints
+
+### 1. POST /generate
+
+- Base URL: `https://vonkaiser-qwen-image-edit-2511.chutes.ai`
+- Output content type: `image/jpeg`
+- Playground note: Upload one to three reference images, then describe the exact edit rather than the whole final image.
+
+Request fields:
+
+- `prompt` (string, optional) Default: "make the background a tropical beach scene".
+
+Example call:
+
+```bash
+# NOTE: replace the image_b64s placeholder(s) with real base64 data first.
+curl -X POST "https://vonkaiser-qwen-image-edit-2511.chutes.ai/generate" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "prompt": "a serene mountain lake at sunset",
+  "seed": 42,
+  "width": 1024,
+  "height": 1024,
+  "image_b64s": [
+    "<base64-encoded image>"
+  ],
+  "true_cfg_scale": 1,
+  "negative_prompt": "",
+  "num_inference_steps": 4
+}' \
+  --output output.jpg
+```
+
+Playground presets:
+
+- Product background swap
+- Precise color edit
+
+## Model Facts
+
+- Architecture: QwenImageTransformer2DModel diffusion transformer (60 layers, 24 heads, head dim 128) with a Qwen vision-language text encoder; diffusers QwenImageEditPlusPipeline
+- Modalities: text, image in → image out
+- License: Apache-2.0
+- Released: 2025-12
+- Task: Instruction-based image editing (image-to-image)
+- Reference images: 1-3 input images per request on this chute
+- Languages: English and Chinese editing instructions
+- Improvements over 2509: Reduced image drift, better character and multi-person consistency, built-in popular LoRA effects, industrial design and geometric reasoning (per model card)
+- Output format on Chutes: image/jpeg
+- Hugging Face: https://huggingface.co/Qwen/Qwen-Image-Edit-2511
+
+## Recommended Parameters
+
+- `true_cfg_scale`: 4.0 (model-card example setting; the chute defaults to 1 for its fast 4-step serving profile)
+- `num_inference_steps`: 40 (model-card example; the chute defaults to 4 steps for low latency)
+
+## Best For
+
+- Instruction-based edits: change backgrounds, materials, colors, or lighting while preserving the subject
+- Identity-preserving character edits and multi-person composites from separate photos
+- Product and industrial design variations (material swaps, batch design mockups)
+- E-commerce imagery: background swaps and precise color edits from reference shots
+- Bilingual (English/Chinese) edit instructions
+
+Not ideal for:
+
+- Pure text-to-image generation from scratch (use Qwen-Image-2512 or Z-Image Turbo instead)
+- Pixel-exact edits with hard guarantees that untouched regions stay byte-identical; diffusion editing regenerates the whole frame
+- Very high step-count quality sweeps on this chute; it is tuned as a fast 4-step serving profile
+
+## FAQ
+
+### How many input images can I send?
+
+One to three reference images per request, as raw base64 strings in the image_b64s array. Multi-image input is how you compose subjects from separate photos, such as merging two portraits into one group shot.
+
+### Why does the chute default to 4 steps when the model card uses 40?
+
+The chute is configured as a low-latency serving profile: 4 inference steps with true_cfg_scale 1. The model card's example uses 40 steps with true_cfg_scale 4.0. Both fields are request parameters, so you can raise them for higher-fidelity edits at the cost of latency and compute.
+
+### Does it keep the parts of the image I didn't ask to change?
+
+That is the design goal, and the 2511 release specifically targets reduced image drift and improved consistency versus 2509. It is still a generative model, though: the whole frame is regenerated, so untouched regions are visually preserved rather than byte-identical.
+
+### What license is Qwen-Image-Edit-2511 under?
+
+Apache-2.0, per the model card's license section and the Hugging Face repo metadata. Commercial use, modification, and redistribution are permitted under standard Apache terms.
+
+### Can I write edit instructions in Chinese?
+
+Yes. The model is trained for English and Chinese instructions, and the model card demonstrates bilingual editing.
+
+### How do I call it from code?
+
+POST flat JSON to https://vonkaiser-qwen-image-edit-2511.chutes.ai/generate with an Authorization: Bearer header. Base64-encode your input image(s) into image_b64s, set prompt to the edit instruction, and save the response body as a JPEG.
+
+### Is this a text-to-image model?
+
+No, it is an editing model: it expects at least one reference image and an instruction describing the change. For generation from scratch use a text-to-image chute such as Qwen-Image-2512 or Z-Image Turbo.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/vonkaiser-qwen-image-edit-2511
+- Source: https://huggingface.co/Qwen/Qwen-Image-Edit-2511
+- Source: https://chutes.ai/app/chute/vonkaiser-qwen-image-edit-2511/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

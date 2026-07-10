@@ -1,0 +1,154 @@
+# z-image-turbo
+
+> Z-Image Turbo: fast text-to-image generation
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/vonkaiser-z-image-turbo
+- Model llms.txt: https://chutes.ai/app/chute/vonkaiser-z-image-turbo/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/vonkaiser-z-image-turbo/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `z-image-turbo`
+- Chute ID: `2cc39ac2-4e9f-50de-849f-e99e45729396`
+- Slug: `vonkaiser-z-image-turbo`
+- Owner: `vonkaiser`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on its own host (`https://vonkaiser-z-image-turbo.chutes.ai`). Call the endpoint paths listed below directly.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Playground Notes
+
+- Use short negative prompts for obvious exclusions rather than long lists.
+- Keep dimensions moderate while iterating, then increase quality settings for final runs.
+
+## Endpoints
+
+### 1. POST /generate
+
+- Base URL: `https://vonkaiser-z-image-turbo.chutes.ai`
+- Output content type: `image/png`
+- Playground note: Start with a concrete subject, style, composition, lighting, and output constraints.
+
+Request fields:
+
+- `seed` (integer, optional) Default: null.
+- `shift` (number, optional) Default: 3.
+- `width` (integer, optional) Default: 1024.
+- `height` (integer, optional) Default: 1024.
+- `prompt` (string, required)
+- `guidance_scale` (number, optional) Default: 0.
+- `max_sequence_length` (integer, optional) Default: 512.
+- `num_inference_steps` (integer, optional) Default: 9.
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-z-image-turbo.chutes.ai/generate" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "shift": 3,
+  "width": 1024,
+  "height": 1024,
+  "prompt": "a serene mountain lake at sunset",
+  "guidance_scale": 0,
+  "max_sequence_length": 512,
+  "num_inference_steps": 9
+}' \
+  --output output.png
+```
+
+Playground presets:
+
+- Clean product render
+- Editorial illustration
+
+## Model Facts
+
+- Parameters: 6B
+- Architecture: Scalable Single-Stream Diffusion Transformer (S3-DiT) with a Qwen3 text encoder and flow-matching scheduler
+- Modalities: text in → image out
+- License: Apache-2.0
+- Released: 2025-11
+- Transformer: 30 layers, hidden dim 3840, 30 attention heads
+- Distillation: 8 NFEs (function evaluations); CFG disabled
+- Scheduler: FlowMatchEulerDiscreteScheduler
+- Text rendering: Bilingual (English and Chinese), per model card
+- Output format on Chutes: image/png
+- Hugging Face: https://huggingface.co/Tongyi-MAI/Z-Image-Turbo
+
+## Recommended Parameters
+
+- `num_inference_steps`: 8 (model card: Turbo is distilled to 8 NFEs; the chute defaults to 9 steps)
+- `guidance_scale`: 0 (CFG is baked out by distillation (model card marks CFG as off for Turbo); chute default is 0)
+
+## Best For
+
+- Fast photorealistic text-to-image with sub-second-class latency budgets
+- Rendering legible English and Chinese text inside images
+- High-volume generation pipelines where per-image cost and speed matter
+- Prompt-faithful product renders and editorial illustration from concrete prompts
+- Interactive UIs that need quick draft-to-final iteration
+
+Not ideal for:
+
+- Image editing or image-to-image tasks (use an edit model such as Qwen-Image-Edit; Z-Image-Turbo is generation-only)
+- Workflows that rely on strong negative prompting or CFG sweeps — the Turbo distillation disables CFG
+- Maximum output diversity across seeds; the model card rates Turbo's diversity as low relative to base Z-Image
+
+## FAQ
+
+### How many inference steps should I use with Z-Image Turbo?
+
+The model is distilled for 8 function evaluations, and the chute defaults to 9 steps. Stick close to the default; unlike standard diffusion models, raising the step count substantially does not buy proportional quality because the distillation targets a fixed short schedule.
+
+### Why is guidance_scale 0, and can I use a negative prompt?
+
+Turbo is distilled with classifier-free guidance baked out, so the chute defaults guidance_scale to 0 and exposes no negative prompt field. Express exclusions inside the positive prompt. If you need CFG and negative prompting, the non-distilled base Z-Image model supports both.
+
+### What license is Z-Image Turbo under? Can I use it commercially?
+
+Apache-2.0, per the Hugging Face repo Tongyi-MAI/Z-Image-Turbo. Apache-2.0 permits commercial use, modification, and redistribution with attribution and license notice.
+
+### How do I call this chute from code?
+
+POST a flat JSON body to https://vonkaiser-z-image-turbo.chutes.ai/generate with an Authorization: Bearer header carrying your Chutes API key. The response body is the PNG image itself, not JSON, so write it straight to a file or blob.
+
+### Can it render text inside images?
+
+Yes. Bilingual text rendering (English and Chinese) is one of the model card's headline capabilities. Quote the exact text you want in the prompt and keep it short for best fidelity.
+
+### What image sizes does it support?
+
+The chute defaults to 1024x1024 and accepts width and height fields. Keep dimensions moderate while iterating; larger canvases cost more compute and take longer.
+
+### Is Z-Image Turbo an editing model?
+
+No, it is text-to-image only. The Z-Image family includes a separate Z-Image-Edit variant for instruction-based editing, and Chutes hosts dedicated edit models such as Qwen-Image-Edit-2511.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/vonkaiser-z-image-turbo
+- Source: https://huggingface.co/Tongyi-MAI/Z-Image-Turbo
+- Source: https://chutes.ai/app/chute/vonkaiser-z-image-turbo/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

@@ -1,0 +1,294 @@
+# Nemotron-3-Nano-Omni-30B-TEE
+
+> Multimodal reasoning: video, audio, image, and text → answers, summaries, and tools
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/vonkaiser-nemotron-3-nano-omni-30b-tee
+- Model llms.txt: https://chutes.ai/app/chute/vonkaiser-nemotron-3-nano-omni-30b-tee/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/vonkaiser-nemotron-3-nano-omni-30b-tee/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `Nemotron-3-Nano-Omni-30B-TEE`
+- Chute ID: `2ead5dca-9b87-54e2-a4ef-4c9fab259d1c`
+- Slug: `vonkaiser-nemotron-3-nano-omni-30b-tee`
+- Owner: `vonkaiser`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on the shared OpenAI-compatible gateway. Set the request `model` field to the exact Name above (`Nemotron-3-Nano-Omni-30B-TEE`), and use base URL `https://llm.chutes.ai/v1`.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Endpoints
+
+### 1. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16".
+- `stream` (boolean, optional) Default: true.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "Nemotron-3-Nano-Omni-30B-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": true,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 2. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: true.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "Nemotron-3-Nano-Omni-30B-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 3. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16".
+- `stream` (boolean, optional) Default: false.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "Nemotron-3-Nano-Omni-30B-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 4. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: false.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "Nemotron-3-Nano-Omni-30B-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 5. GET /v1/models
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+
+Example call:
+
+```bash
+curl -X GET "https://llm.chutes.ai/v1/models" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+## Model Facts
+
+- Parameters: 31B total (33.0B in safetensors including vision and audio encoders)
+- Active parameters: ~3B per token
+- Architecture: Mamba2-Transformer hybrid MoE language backbone (52 layers, 128 routed + 1 shared experts, 6 experts per token) with a C-RADIOv4-H vision encoder and a Parakeet-style conformer audio encoder
+- Context length: 131,072 tokens
+- Modalities: text, image, video, audio in → text out
+- Precision: BF16 (as served on Chutes)
+- License: NVIDIA Open Model License Agreement
+- Released: 2026-04
+- Upstream max context: Up to 256K tokens per model card (config max_position_embeddings 262,144); this chute serves 131,072
+- Reasoning: Thinking mode on by default; toggle via enable_thinking / chat template
+- Tool calling: Yes (this deployment uses the qwen3_coder tool-call parser)
+- Language support: English only, per NVIDIA model card
+- Hybrid layer pattern: Mamba2 (M) and MoE MLP (E) blocks with sparse attention (*) layers interleaved
+- Hugging Face: https://huggingface.co/nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16
+
+## Recommended Parameters
+
+- `temperature`: 0.6 (model card recommendation for thinking mode (0.2 with top_k 1 for instruct mode); chute default is 0.7)
+- `top_p`: 0.95 (model card recommendation for thinking mode; matches generation_config.json)
+- `max_tokens`: 20480 (model card thinking-mode budget: 16,384 reasoning tokens plus grace period; chute default is 1024, so raise it for reasoning tasks)
+
+## Best For
+
+- Video plus speech understanding: meeting recordings, training videos, media assets
+- Visual Q&A and document intelligence with figures, tables, and OCR-style content
+- Audio transcription-style prompts and summarization of spoken content
+- Multimodal agents that need one model for sight, sound, and text with tool calling
+- Long-document understanding within the 131K-token context
+- Confidential workloads that need TEE-attested inference
+
+Not ideal for:
+
+- Non-English inputs (the model card states English-only support)
+- Image, audio, or video generation: output is text only
+- Maximum-quality frontier reasoning; ~3B active parameters trades depth for speed and cost
+
+## FAQ
+
+### What input types does Nemotron 3 Nano Omni accept on Chutes?
+
+Text, images (image_url), video (video_url), and audio (audio_url), combined freely in one chat request using standard OpenAI-style content arrays. Output is always text, optionally with reasoning_content thinking blocks. The model card states language support is English only.
+
+### What is the context window?
+
+This chute serves 131,072 tokens (SGLang --context-length). The upstream model supports up to 256K tokens per NVIDIA's model card, with max_position_embeddings of 262,144 in the config.
+
+### Does it support function calling and streaming?
+
+Yes to both. Tool calls are parsed with the qwen3_coder parser and returned in the standard OpenAI tool_calls format, and both /v1/chat/completions and /v1/completions support streaming.
+
+### How do I call it from the OpenAI SDK?
+
+Set base_url to https://llm.chutes.ai/v1, api_key to your Chutes API key, and model to Nemotron-3-Nano-Omni-30B-TEE. Everything else is standard chat completions, including multimodal content arrays.
+
+### What does the TEE suffix mean?
+
+The model runs inside a Trusted Execution Environment: attested confidential-compute hardware that processes your prompts and outputs in an encrypted enclave. The model weights and behavior are unchanged; TEE is a serving-level security property.
+
+### How do I control or disable the reasoning mode?
+
+Reasoning (thinking) is on by default and the deployment uses the nemotron_3 reasoning parser. You can disable it via the chat template's enable_thinking switch as documented in NVIDIA's model card. For reasoning tasks, NVIDIA recommends temperature 0.6, top_p 0.95, and a generous max_tokens (their thinking-mode budget is 20,480).
+
+### Can I use it commercially?
+
+Yes. The model ships under the NVIDIA Open Model License Agreement and NVIDIA's card explicitly states it is available for commercial use. Review the license text on the Hugging Face repo for redistribution terms.
+
+### Why does the chute default to max_tokens 1024?
+
+That is just the endpoint default. Because reasoning mode emits thinking tokens before the answer, set max_tokens much higher (NVIDIA's thinking-mode reference is 20,480 total) or long analyses will truncate.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/vonkaiser-nemotron-3-nano-omni-30b-tee
+- Source: https://huggingface.co/nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16
+- Source: https://chutes.ai/app/chute/vonkaiser-nemotron-3-nano-omni-30b-tee/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

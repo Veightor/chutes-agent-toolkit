@@ -1,0 +1,291 @@
+# deepseek-ai/DeepSeek-V3.2-TEE
+
+> DeepSeek-V3.2 is an open-source LLM optimized for efficient reasoning and agent tasks through sparse attention and reinforcement learning, useful for complex problem-solving and tool-use applications.
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/chutes-deepseek-ai-deepseek-v3-2-tee
+- Model llms.txt: https://chutes.ai/app/chute/chutes-deepseek-ai-deepseek-v3-2-tee/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/chutes-deepseek-ai-deepseek-v3-2-tee/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `deepseek-ai/DeepSeek-V3.2-TEE`
+- Chute ID: `398651e1-5f85-5e50-a513-7c5324e8e839`
+- Slug: `chutes-deepseek-ai-deepseek-v3-2-tee`
+- Owner: `chutes`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on the shared OpenAI-compatible gateway. Set the request `model` field to the exact Name above (`deepseek-ai/DeepSeek-V3.2-TEE`), and use base URL `https://llm.chutes.ai/v1`.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Endpoints
+
+### 1. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "deepseek-ai/DeepSeek-V3.2".
+- `stream` (boolean, optional) Default: true.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "deepseek-ai/DeepSeek-V3.2-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": true,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 2. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+- Streaming: yes
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "deepseek-ai/DeepSeek-V3.2".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: true.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "deepseek-ai/DeepSeek-V3.2-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 3. POST /v1/chat/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "deepseek-ai/DeepSeek-V3.2".
+- `stream` (boolean, optional) Default: false.
+- `messages` (array, optional) Default: [{"role":"user","content":""}].
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "deepseek-ai/DeepSeek-V3.2-TEE",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ],
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7
+}'
+```
+
+### 4. POST /v1/completions
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+- `seed` (integer, optional) Default: 42.
+- `model` (string, optional) Default: "deepseek-ai/DeepSeek-V3.2".
+- `prompt` (string, required)
+- `stream` (boolean, optional) Default: false.
+- `max_tokens` (integer, optional) Default: 1024.
+- `temperature` (number, optional) Default: 0.7.
+
+Example call:
+
+```bash
+curl -X POST "https://llm.chutes.ai/v1/completions" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "seed": 42,
+  "model": "deepseek-ai/DeepSeek-V3.2-TEE",
+  "prompt": "a serene mountain lake at sunset",
+  "stream": false,
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "min_p": 0,
+  "top_k": -1,
+  "top_p": 1,
+  "logprobs": false,
+  "ignore_eos": false,
+  "min_tokens": 0,
+  "top_logprobs": 0,
+  "length_penalty": 1,
+  "use_beam_search": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "repetition_penalty": 1,
+  "skip_special_tokens": true,
+  "include_stop_str_in_output": false,
+  "spaces_between_special_tokens": true
+}'
+```
+
+### 5. GET /v1/models
+
+- Base URL: `https://llm.chutes.ai`
+- Output content type: `application/json`
+
+Request fields:
+
+
+Example call:
+
+```bash
+curl -X GET "https://llm.chutes.ai/v1/models" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+## Model Facts
+
+- Parameters: 685B total (safetensors weight count)
+- Architecture: Mixture-of-Experts transformer with DeepSeek Sparse Attention (DSA); 61 layers, 256 routed experts plus 1 shared, 8 experts active per token
+- Context length: 163,840 tokens
+- Modalities: text in → text out
+- Precision: FP8 (e4m3 block-quantized upstream weights), served in a TEE on Chutes
+- License: MIT
+- Released: 2025-12
+- Experts: 256 routed + 1 shared, 8 active per token
+- Layers: 61
+- Hidden size: 7168
+- Attention heads: 128
+- Sparse attention top-k: 2048 tokens indexed per query (index_topk)
+- Vocabulary: 129,280 tokens
+- Base model: deepseek-ai/DeepSeek-V3.2-Exp-Base (finetune)
+- Hugging Face: https://huggingface.co/deepseek-ai/DeepSeek-V3.2
+
+## Recommended Parameters
+
+- `temperature`: 1.0 (model-card recommendation for local deployment; also the generation_config default)
+- `top_p`: 0.95 (model-card recommendation; matches generation_config)
+
+## Best For
+
+- Agentic tool-use loops with interleaved reasoning (the chat template supports thinking with tools)
+- Long-context tasks where sparse attention keeps cost down at 100K+ token inputs
+- Competition-grade math and code reasoning (the model card reports gold-medal results at IMO 2025 and IOI 2025)
+- Complex multi-step problem solving where an RL-post-trained reasoner outperforms plain instruct models
+- Search-agent pipelines, via the dedicated developer role in the chat template
+
+Not ideal for:
+
+- Vision or audio input: text-only model
+- Latency-critical short completions where a smaller dense model is cheaper and faster
+- Applications that require the high-compute Speciale variant's tool calling: Speciale is reasoning-only and is a different chute anyway
+
+## FAQ
+
+### What context window does DeepSeek-V3.2 support?
+
+163,840 tokens (max_position_embeddings in the upstream config). DeepSeek Sparse Attention is specifically designed to keep long-context inference efficient, so the model remains practical near the top of that window.
+
+### Does DeepSeek-V3.2 support function calling and tool use?
+
+Yes. This generation introduces a revised tool-calling format and a thinking-with-tools mode in its chat template, and the model was post-trained on large-scale synthesized agentic tasks. Send OpenAI-style tools in your chat completion request via the gateway.
+
+### Can I use DeepSeek-V3.2 commercially?
+
+Yes. Both the repository and the model weights are released under the MIT license, which permits commercial use, modification, and redistribution.
+
+### What does the TEE suffix mean?
+
+The chute runs inference inside a Trusted Execution Environment, i.e. attested confidential-compute hardware. Prompts and outputs are processed inside the enclave. It is a serving-level property and does not change the model's behavior or output quality.
+
+### How do I call it from the OpenAI SDK?
+
+Point the client at base_url https://llm.chutes.ai/v1 with your Chutes API key, and set model to deepseek-ai/DeepSeek-V3.2-TEE. Both chat completions and legacy completions work, and streaming is supported.
+
+### What sampling settings should I use?
+
+DeepSeek recommends temperature 1.0 and top_p 0.95, which also match the repo's generation_config. The chute default is temperature 0.7, so pass the recommended values explicitly if you want reference behavior.
+
+### Is DeepSeek-V3.2 a reasoning model?
+
+Yes, it is post-trained with reinforcement learning for reasoning and emits thinking content via its chat template. DeepSeek reports performance comparable to GPT-5, with the separate high-compute Speciale variant going further on pure reasoning (but without tool calling).
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/chutes-deepseek-ai-deepseek-v3-2-tee
+- Source: https://huggingface.co/deepseek-ai/DeepSeek-V3.2
+- Source: https://huggingface.co/deepseek-ai/DeepSeek-V3.2/raw/main/config.json
+- Source: https://huggingface.co/deepseek-ai/DeepSeek-V3.2/raw/main/generation_config.json
+- Source: https://chutes.ai/app/chute/chutes-deepseek-ai-deepseek-v3-2-tee/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

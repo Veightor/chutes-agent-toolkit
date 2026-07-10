@@ -1,0 +1,127 @@
+# kokoro
+
+> Text-to-speech with hexgrad/Kokoro-82M
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/chutes-kokoro
+- Model llms.txt: https://chutes.ai/app/chute/chutes-kokoro/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/chutes-kokoro/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `kokoro`
+- Chute ID: `4be47dee-7bee-53a4-a208-32a66f47a0b0`
+- Slug: `chutes-kokoro`
+- Owner: `chutes`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on its own host (`https://chutes-kokoro.chutes.ai`). Call the endpoint paths listed below directly.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Endpoints
+
+### 1. POST /speak
+
+- Base URL: `https://chutes-kokoro.chutes.ai`
+- Output content type: `audio/wav`
+
+Request fields:
+
+- `text` (string, required)
+- `speed` (number, optional) - Voice output speed. Default: 1.
+- `voice` (string, optional) - Voice selection for text-to-speech Default: "af_heart". Options: af_heart, af_alloy, af_aoede, af_bella, af_jessica, af_kore, af_nicole, af_nova, af_river, af_sarah, af_sky, am_adam, am_echo, am_eric, am_fenrir, am_liam, am_michael, am_onyx, am_puck, am_santa, bf_alice, bf_emma, bf_isabella, bf_lily, bm_daniel, bm_fable, bm_george, bm_lewis, ef_dora, em_alex, em_santa, ff_siwis, hf_alpha, hf_beta, hm_omega, hm_psi, if_sara, im_nicola, jf_alpha, jf_gongitsune, jf_nezumi, jf_tebukuro, jm_kumo, pf_dora, pm_alex, pm_santa, zf_xiaobei, zf_xiaoni, zf_xiaoxiao, zf_xiaoyi, zm_yunjian, zm_yunxi, zm_yunxia, zm_yunyang.
+
+Example call:
+
+```bash
+curl -X POST "https://chutes-kokoro.chutes.ai/speak" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "text": "Your text here",
+  "speed": 1,
+  "voice": "af_heart"
+}' \
+  --output output.wav
+```
+
+## Model Facts
+
+- Parameters: 82M
+- Architecture: StyleTTS 2 + ISTFTNet text-to-speech; decoder-only release (no diffusion, no encoder)
+- Modalities: text in → audio out
+- License: Apache-2.0
+- Released: 2025-01
+- Voices: 54 built-in voices across 8 languages (v1.0, per model card)
+- Output: audio/wav at 24 kHz
+- Training data: A few hundred hours of permissive/non-copyrighted audio; ~1000 A100-hours total
+- G2P: misaki grapheme-to-phoneme library
+- Hugging Face: https://huggingface.co/hexgrad/Kokoro-82M
+
+## Best For
+
+- Low-latency TTS for chat assistants, notifications, and IVR-style prompts
+- High-volume narration where per-character cost matters
+- Multilingual voice output: English (US/UK), Spanish, French, Hindi, Italian, Japanese, Portuguese, Chinese voices
+- Simple integrations: one required field, WAV bytes back
+- Prototyping voice features without managing GPU infrastructure
+
+Not ideal for:
+
+- Voice cloning or custom voice design: Kokoro only ships fixed preset voices (see the AudioDojo chute's Qwen3-TTS endpoints for cloning)
+- Fine-grained emotion or style control via instructions; there is no instruct field
+- Languages outside the 8 covered by the built-in voice packs
+
+## FAQ
+
+### What audio format does the chute return?
+
+Raw audio/wav bytes at 24 kHz, returned directly as the response body. There is no JSON envelope and no base64 encoding; save the body to a .wav file or pipe it into playback.
+
+### Which voices are available and how do I pick one?
+
+54 preset voices, enumerated in the chute's llms.txt. IDs encode language and gender: af_/am_ American English female/male, bf_/bm_ British English, ef_/em_ Spanish, ff_ French, hf_/hm_ Hindi, if_/im_ Italian, jf_/jm_ Japanese, pf_/pm_ Portuguese, zf_/zm_ Chinese. The default is af_heart.
+
+### Can Kokoro clone my voice or follow style instructions?
+
+No. Kokoro only offers fixed preset voices with a speed control. For zero-shot voice cloning, preset speakers with emotion instructions, or voice design from a text description on Chutes, use the AudioDojo chute's Qwen3-TTS endpoints; its /speak endpoint is also a drop-in replacement for this chute.
+
+### What does the speed parameter do?
+
+It is a playback speed multiplier with a default of 1. Values below 1 slow the voice down, values above 1 speed it up. It is the only synthesis control besides voice selection.
+
+### What license is Kokoro under? Can I use the audio commercially?
+
+The weights are Apache-2.0, per the hexgrad/Kokoro-82M Hugging Face repo. The model card explicitly welcomes deployment in commercial APIs and real use cases. Apache-2.0 permits commercial use with attribution and license notice.
+
+### How large is the model and why does that matter?
+
+82 million parameters, tiny by TTS standards. That footprint is what makes it fast and cheap to serve; the model card cites market pricing under $1 per million characters of input, roughly $0.06 per hour of generated audio.
+
+### How do I call it from code?
+
+POST flat JSON to https://chutes-kokoro.chutes.ai/speak with an Authorization: Bearer header carrying your Chutes API key, e.g. {"text": "Hello", "voice": "af_heart", "speed": 1}. Write the binary response body to a .wav file.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/chutes-kokoro
+- Source: https://huggingface.co/hexgrad/Kokoro-82M
+- Source: https://chutes.ai/app/chute/chutes-kokoro/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

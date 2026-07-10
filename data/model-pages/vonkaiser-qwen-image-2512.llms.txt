@@ -1,0 +1,150 @@
+# Qwen-Image-2512
+
+> Qwen/Qwen-Image-2512
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/vonkaiser-qwen-image-2512
+- Model llms.txt: https://chutes.ai/app/chute/vonkaiser-qwen-image-2512/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/vonkaiser-qwen-image-2512/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `Qwen-Image-2512`
+- Chute ID: `700fee6b-2cf1-519f-9222-634e8b41601a`
+- Slug: `vonkaiser-qwen-image-2512`
+- Owner: `vonkaiser`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on its own host (`https://vonkaiser-qwen-image-2512.chutes.ai`). Call the endpoint paths listed below directly.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Playground Notes
+
+- Use short negative prompts for obvious exclusions rather than long lists.
+- Keep dimensions moderate while iterating, then increase quality settings for final runs.
+
+## Endpoints
+
+### 1. POST /generate
+
+- Base URL: `https://vonkaiser-qwen-image-2512.chutes.ai`
+- Output content type: `image/jpeg`
+- Playground note: Start with a concrete subject, style, composition, lighting, and output constraints.
+
+Request fields:
+
+- `prompt` (string, optional) Default: "a beautiful mountain landscape".
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-qwen-image-2512.chutes.ai/generate" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "prompt": "a serene mountain lake at sunset",
+  "seed": 42,
+  "width": 1024,
+  "height": 1024,
+  "true_cfg_scale": 4,
+  "negative_prompt": "",
+  "num_inference_steps": 30
+}' \
+  --output output.jpg
+```
+
+Playground presets:
+
+- Clean product render
+- Editorial illustration
+
+## Model Facts
+
+- Architecture: QwenImageTransformer2DModel diffusion transformer (60 layers, 24 heads, head dim 128) with a Qwen text encoder; diffusers text-to-image pipeline
+- Modalities: text in → image out
+- License: Apache-2.0
+- Released: 2025-12
+- Task: Text-to-image generation
+- Languages: English and Chinese prompts
+- Improvements over base Qwen-Image: Enhanced human realism, finer natural detail, improved in-image text rendering (per model card)
+- Benchmark: Model card reports strongest open-source model on AI Arena blind T2I evaluations (10,000+ rounds)
+- Output format on Chutes: image/jpeg
+- Hugging Face: https://huggingface.co/Qwen/Qwen-Image-2512
+
+## Recommended Parameters
+
+- `true_cfg_scale`: 4.0 (model-card example setting; chute default is 4)
+- `num_inference_steps`: 50 (model-card example; the chute defaults to 30 for lower latency)
+- `width/height`: 1328x1328 (1:1), 1664x928 (16:9), 1472x1104 (4:3) (aspect-ratio presets from the model card; chute default is 1024x1024)
+
+## Best For
+
+- Photorealistic human subjects with reduced 'AI-generated' look (headline improvement of the 2512 release)
+- Fine natural detail: landscapes, water, foliage, animal fur
+- Accurate in-image text rendering and text+image layout composition
+- Bilingual English/Chinese prompting
+- Quality-first generation where 30-50 step latency is acceptable
+
+Not ideal for:
+
+- Latency-critical or high-volume cheap generation (a distilled model like Z-Image Turbo is faster per image)
+- Image editing with reference inputs (use Qwen-Image-Edit-2511)
+- Reproducing the model card's arena rankings as guarantees; they are the vendor's own blind-evaluation results
+
+## FAQ
+
+### What's new in Qwen-Image-2512 versus the original Qwen-Image?
+
+Per the model card: markedly better human realism (less 'AI look', better skin, hair, and aged features), finer natural detail in landscapes and fur, and more accurate in-image text rendering and layout. The card reports it as the top open-source model in 10,000+ blind AI Arena comparisons at release.
+
+### What settings should I use?
+
+The chute defaults to 30 steps and true_cfg_scale 4 at 1024x1024, which is a reasonable speed/quality balance. The model card's reference example uses 50 steps, true_cfg_scale 4.0, and larger aspect-ratio presets like 1328x1328 or 1664x928; move toward those for final-quality renders.
+
+### Does it support negative prompts?
+
+Yes. The chute exposes negative_prompt (default empty). The model card itself uses a negative prompt targeting low resolution, deformed hands, over-saturation, waxy skin, and blurry text. Keep yours short and specific.
+
+### Can it render text inside images?
+
+Yes, improved text rendering is one of the release's three headline upgrades, covering accuracy, layout, and combined text+image composition. Quote the exact wording you want in the prompt.
+
+### What license applies and can I use outputs commercially?
+
+Apache-2.0, per the Hugging Face repo Qwen/Qwen-Image-2512. That permits commercial use, modification, and redistribution with attribution and license notice.
+
+### How do I call this chute from code?
+
+POST a flat JSON body to https://vonkaiser-qwen-image-2512.chutes.ai/generate with an Authorization: Bearer header carrying your Chutes API key. The response body is the JPEG image itself; write it straight to a file.
+
+### Can I use it to edit an existing image?
+
+No, this chute is text-to-image only and accepts no image input. For instruction-based editing with reference images, use the Qwen-Image-Edit-2511 chute.
+
+### Does it understand Chinese prompts?
+
+Yes. The model is tagged for English and Chinese, and the model card's own examples include Chinese negative prompts. Both prompt and negative_prompt can be written in either language.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/vonkaiser-qwen-image-2512
+- Source: https://huggingface.co/Qwen/Qwen-Image-2512
+- Source: https://chutes.ai/app/chute/vonkaiser-qwen-image-2512/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.

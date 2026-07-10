@@ -1,0 +1,147 @@
+# nsfw-classifier
+
+> NSFW check for images and text
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/vonkaiser-nsfw-classifier
+- Model llms.txt: https://chutes.ai/app/chute/vonkaiser-nsfw-classifier/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/vonkaiser-nsfw-classifier/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `nsfw-classifier`
+- Chute ID: `49e41e9c-275e-5877-bd61-30c7bef0cf47`
+- Slug: `vonkaiser-nsfw-classifier`
+- Owner: `vonkaiser`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on its own host (`https://vonkaiser-nsfw-classifier.chutes.ai`). Call the endpoint paths listed below directly.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Endpoints
+
+### 1. POST /image
+
+- Base URL: `https://vonkaiser-nsfw-classifier.chutes.ai`
+- Output content type: `application/json`
+- Playground note: Submit an image or text sample and inspect the returned label plus confidence.
+
+Request fields:
+
+- `image_b64` (string, required)
+
+Example call:
+
+```bash
+# NOTE: replace the image_b64 placeholder(s) with real base64 data first.
+curl -X POST "https://vonkaiser-nsfw-classifier.chutes.ai/image" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "image_b64": "<base64-encoded image>"
+}'
+```
+
+### 2. POST /text
+
+- Base URL: `https://vonkaiser-nsfw-classifier.chutes.ai`
+- Output content type: `application/json`
+- Playground note: Submit an image or text sample and inspect the returned label plus confidence.
+
+Request fields:
+
+- `text` (string, required)
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-nsfw-classifier.chutes.ai/text" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "text": "Your text here"
+}'
+```
+
+## Model Facts
+
+- Parameters: 85.8M (image classifier) + ~125M (text classifier)
+- Architecture: Two classifiers on one chute: a fine-tuned ViT (google/vit-base-patch16-224-in21k) for images and Detoxify (RoBERTa-based unbiased checkpoint) for text
+- Modalities: image, text in → text out
+- License: Apache-2.0 (both models)
+- Image labels: normal, nsfw (Falconsai/nsfw_image_detection config)
+- Image input resolution: 224x224 (ViT base, patch 16)
+- Text score categories: toxicity, severe_toxicity, obscene, identity_attack, insult, threat, sexual_explicit (live API response; matches Detoxify unbiased / unitary/unbiased-toxic-roberta)
+- Text max input: 512 tokens (encoder position limit)
+- Image training data: 80,000 images across normal/nsfw classes, per model card
+- Hugging Face (bundled): https://huggingface.co/Falconsai/nsfw_image_detection
+- Hugging Face (bundled): https://huggingface.co/unitary/unbiased-toxic-roberta
+
+## Best For
+
+- Pre-moderation of user-uploaded images before display or storage
+- Filtering user-generated text for toxicity, threats, insults, and obscenity
+- Gating AI-generated images in generation pipelines
+- Cheap, fast safety checks: both models are small encoder classifiers, not LLMs
+- One-call integration: single host handles both image and text checks
+
+Not ideal for:
+
+- Fine-grained content policy categories (violence, drugs, self-harm): the image model is binary normal/nsfw
+- Non-English text moderation: the Detoxify checkpoint was trained on English Jigsaw data
+- Legally definitive content decisions; classifier scores need human review at the boundary
+
+## FAQ
+
+### What does the image endpoint return?
+
+A JSON body with the predicted label and its confidence, per the chute's playground notes. The underlying Falconsai/nsfw_image_detection model is binary: its config defines exactly two classes, normal and nsfw.
+
+### What toxicity categories does the text endpoint cover?
+
+The endpoint returns an overall label plus a scores object with seven per-category 0-1 scores: toxicity, severe_toxicity, obscene, identity_attack, insult, threat, and sexual_explicit. That label set matches Detoxify's unbiased checkpoint (unitary/unbiased-toxic-roberta), trained on the Jigsaw challenges including Unintended Bias.
+
+### How do I send an image?
+
+Base64-encode the image bytes and POST them as the image_b64 field in a flat JSON body to https://vonkaiser-nsfw-classifier.chutes.ai/image with your Bearer API key. Common image formats work; the ViT model internally resizes to 224x224.
+
+### Does the text classifier work in languages other than English?
+
+Not reliably. The Detoxify checkpoint behind the endpoint (its label set matches unitary/unbiased-toxic-roberta) was trained on English Jigsaw data. Unitary publishes a separate multilingual Detoxify model, but that is not what the live label set indicates, so validate on your target language before trusting non-English scores.
+
+### Can I use this commercially?
+
+Yes. Both upstream models, Falconsai/nsfw_image_detection and Unitary's Detoxify checkpoints (including unitary/unbiased-toxic-roberta), are Apache-2.0 licensed per their Hugging Face repos, which permits commercial use with attribution and license notice.
+
+### How accurate is it, and should I trust it unsupervised?
+
+The image model card reports fine-tuning on 80,000 images but publishes no benchmark table, and toxicity models are known to carry biases from their training data (the Detoxify authors flag this explicitly). Use score thresholds with a human-review band rather than a single hard cutoff for consequential decisions.
+
+### How fast and expensive is it compared to using an LLM as a moderator?
+
+Much cheaper. Both models are compact (~86M and ~125M parameter) encoder classifiers doing a single forward pass, not autoregressive generation, so you can afford to run them on every upload or message rather than sampling traffic.
+
+
+## Model Guide & Sources
+
+- Full model guide: https://chutes.ai/docs/models/vonkaiser-nsfw-classifier
+- Source: https://huggingface.co/Falconsai/nsfw_image_detection
+- Source: https://huggingface.co/unitary/unbiased-toxic-roberta
+- Source: https://chutes.ai/app/chute/vonkaiser-nsfw-classifier/llms.txt
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.
