@@ -6,7 +6,7 @@
       "chute_id": "ac059e33-eb27-541c-b9a9-24b214036475",
       "confidential_compute": true,
       "context_length": 40960,
-      "created": 1783684918,
+      "created": 1783765915,
       "id": "Qwen/Qwen3-32B-TEE",
       "input_modalities": [
         "text"
@@ -21,15 +21,15 @@
       "parent": null,
       "price": {
         "input": {
-          "tao": 0.00048627693752136225,
+          "tao": 0.0004907709114418047,
           "usd": 0.104
         },
         "input_cache_read": {
-          "tao": 0.00024313846876068113,
+          "tao": 0.00024538545572090235,
           "usd": 0.052
         },
         "output": {
-          "tao": 0.001945107750085449,
+          "tao": 0.001963083645767219,
           "usd": 0.416
         }
       },
@@ -61,7 +61,7 @@
       "chute_id": "42ee92ba-a537-5a73-8741-876067750db7",
       "confidential_compute": true,
       "context_length": 131072,
-      "created": 1783684920,
+      "created": 1783765915,
       "id": "google/gemma-4-31B-turbo-TEE",
       "input_modalities": [
         "text",
@@ -77,15 +77,15 @@
       "parent": null,
       "price": {
         "input": {
-          "tao": 0.0005610887740631103,
+          "tao": 0.0005662741285866978,
           "usd": 0.12
         },
         "input_cache_read": {
-          "tao": 0.00028054438703155516,
+          "tao": 0.0002831370642933489,
           "usd": 0.06
         },
         "output": {
-          "tao": 0.0017300237200279236,
+          "tao": 0.0017460118964756515,
           "usd": 0.37
         }
       },
@@ -117,7 +117,7 @@
       "chute_id": "51a4284a-a5a0-5e44-a9cc-6af5a2abfbcf",
       "confidential_compute": true,
       "context_length": 262144,
-      "created": 1783684919,
+      "created": 1783765914,
       "id": "Qwen/Qwen3.5-397B-A17B-TEE",
       "input_modalities": [
         "text",
@@ -133,15 +133,15 @@
       "parent": null,
       "price": {
         "input": {
-          "tao": 0.002104082902736664,
+          "tao": 0.002123527982200117,
           "usd": 0.45
         },
         "input_cache_read": {
-          "tao": 0.001052041451368332,
+          "tao": 0.0010617639911000584,
           "usd": 0.225
         },
         "output": {
-          "tao": 0.014027219351577759,
+          "tao": 0.014156853214667444,
           "usd": 3.0
         }
       },
@@ -173,7 +173,7 @@
       "chute_id": "7aa5e899-c0ba-5482-af48-d3f31d635c9f",
       "confidential_compute": true,
       "context_length": 262144,
-      "created": 1783684918,
+      "created": 1783765915,
       "id": "Qwen/Qwen3.6-27B-TEE",
       "input_modalities": [
         "text",
@@ -189,15 +189,15 @@
       "parent": null,
       "price": {
         "input": {
-          "tao": 0.0014027219351577759,
+          "tao": 0.0014156853214667444,
           "usd": 0.3
         },
         "input_cache_read": {
-          "tao": 0.0007013609675788879,
+          "tao": 0.0007078426607333722,
           "usd": 0.15
         },
         "output": {
-          "tao": 0.009351479567718505,
+          "tao": 0.00943790214311163,
           "usd": 2.0
         }
       },
@@ -226,10 +226,65 @@
       ]
     },
     {
+      "chute_id": "b048fe26-0352-5c46-acf7-335e527e7f3d",
+      "confidential_compute": true,
+      "context_length": 202752,
+      "created": 1783765916,
+      "id": "zai-org/GLM-5.1-TEE",
+      "input_modalities": [
+        "text"
+      ],
+      "max_model_len": 202752,
+      "max_output_length": 65535,
+      "object": "model",
+      "output_modalities": [
+        "text"
+      ],
+      "owned_by": "sglang",
+      "parent": null,
+      "price": {
+        "input": {
+          "tao": 0.004624572050124698,
+          "usd": 0.98
+        },
+        "input_cache_read": {
+          "tao": 0.002312286025062349,
+          "usd": 0.49
+        },
+        "output": {
+          "tao": 0.01453436930039191,
+          "usd": 3.08
+        }
+      },
+      "pricing": {
+        "completion": 3.08,
+        "input_cache_read": 0.49,
+        "prompt": 0.98
+      },
+      "quantization": "fp8",
+      "root": "zai-org/GLM-5.1-FP8",
+      "supported_features": [
+        "json_mode",
+        "structured_outputs",
+        "tools",
+        "reasoning"
+      ],
+      "supported_sampling_parameters": [
+        "temperature",
+        "top_p",
+        "top_k",
+        "repetition_penalty",
+        "frequency_penalty",
+        "presence_penalty",
+        "stop",
+        "seed"
+      ]
+    },
+    {
       "chute_id": "398651e1-5f85-5e50-a513-7c5324e8e839",
       "confidential_compute": true,
       "context_length": 131072,
-      "created": 1783684919,
+      "created": 1783765915,
       "id": "deepseek-ai/DeepSeek-V3.2-TEE",
       "input_modalities": [
         "text"
@@ -244,15 +299,15 @@
       "parent": null,
       "price": {
         "input": {
-          "tao": 0.004675739783859253,
+          "tao": 0.004718951071555815,
           "usd": 1.0
         },
         "input_cache_read": {
-          "tao": 0.0023378698919296263,
+          "tao": 0.0023594755357779075,
           "usd": 0.5
         },
         "output": {
-          "tao": 0.004675739783859253,
+          "tao": 0.004718951071555815,
           "usd": 1.0
         }
       },
@@ -284,7 +339,7 @@
       "chute_id": "08901219-159f-55a7-87cf-9d0d02744668",
       "confidential_compute": true,
       "context_length": 1048576,
-      "created": 1783684918,
+      "created": 1783765914,
       "id": "zai-org/GLM-5.2-TEE",
       "input_modalities": [
         "text"
@@ -299,15 +354,15 @@
       "parent": null,
       "price": {
         "input": {
-          "tao": 0.0065460356974029535,
+          "tao": 0.00660653150017814,
           "usd": 1.4
         },
         "input_cache_read": {
-          "tao": 0.0032730178487014767,
+          "tao": 0.00330326575008907,
           "usd": 0.7
         },
         "output": {
-          "tao": 0.020573255048980714,
+          "tao": 0.02076338471484559,
           "usd": 4.4
         }
       },
@@ -336,65 +391,10 @@
       ]
     },
     {
-      "chute_id": "b048fe26-0352-5c46-acf7-335e527e7f3d",
-      "confidential_compute": true,
-      "context_length": 202752,
-      "created": 1783684918,
-      "id": "zai-org/GLM-5.1-TEE",
-      "input_modalities": [
-        "text"
-      ],
-      "max_model_len": 202752,
-      "max_output_length": 65535,
-      "object": "model",
-      "output_modalities": [
-        "text"
-      ],
-      "owned_by": "sglang",
-      "parent": null,
-      "price": {
-        "input": {
-          "tao": 0.004582224988182068,
-          "usd": 0.98
-        },
-        "input_cache_read": {
-          "tao": 0.002291112494091034,
-          "usd": 0.49
-        },
-        "output": {
-          "tao": 0.014401278534286499,
-          "usd": 3.08
-        }
-      },
-      "pricing": {
-        "completion": 3.08,
-        "input_cache_read": 0.49,
-        "prompt": 0.98
-      },
-      "quantization": "fp8",
-      "root": "zai-org/GLM-5.1-FP8",
-      "supported_features": [
-        "json_mode",
-        "structured_outputs",
-        "tools",
-        "reasoning"
-      ],
-      "supported_sampling_parameters": [
-        "temperature",
-        "top_p",
-        "top_k",
-        "repetition_penalty",
-        "frequency_penalty",
-        "presence_penalty",
-        "stop",
-        "seed"
-      ]
-    },
-    {
       "chute_id": "aac09863-35b4-5d9b-9b67-6e6a9d54273a",
       "confidential_compute": true,
       "context_length": 262144,
-      "created": 1783684918,
+      "created": 1783765915,
       "id": "moonshotai/Kimi-K2.6-TEE",
       "input_modalities": [
         "text",
@@ -417,9 +417,9 @@
           "allow_sampling": true,
           "allow_search_indices": false,
           "allow_view": true,
-          "created": 1783684918,
+          "created": 1783765915,
           "group": null,
-          "id": "modelperm-92d57ad6344a3776",
+          "id": "modelperm-882ebaaf617b5863",
           "is_blocking": false,
           "object": "model_permission",
           "organization": "*"
@@ -427,15 +427,15 @@
       ],
       "price": {
         "input": {
-          "tao": 0.0030859882573471067,
+          "tao": 0.0031145077072268377,
           "usd": 0.66
         },
         "input_cache_read": {
-          "tao": 0.0015429941286735534,
+          "tao": 0.0015572538536134189,
           "usd": 0.33
         },
         "output": {
-          "tao": 0.016365089243507384,
+          "tao": 0.016516328750445352,
           "usd": 3.5
         }
       },
@@ -467,7 +467,7 @@
       "chute_id": "ce6a92e4-5c2f-5681-9742-c80a4447bbdf",
       "confidential_compute": true,
       "context_length": 196608,
-      "created": 1783684919,
+      "created": 1783765915,
       "id": "MiniMaxAI/MiniMax-M2.5-TEE",
       "input_modalities": [
         "text"
@@ -482,15 +482,15 @@
       "parent": null,
       "price": {
         "input": {
-          "tao": 0.0007013609675788879,
+          "tao": 0.0007078426607333722,
           "usd": 0.15
         },
         "input_cache_read": {
-          "tao": 0.00035068048378944397,
+          "tao": 0.0003539213303666861,
           "usd": 0.075
         },
         "output": {
-          "tao": 0.0056108877406311035,
+          "tao": 0.0056627412858669774,
           "usd": 1.2
         }
       },
@@ -519,81 +519,10 @@
       ]
     },
     {
-      "chute_id": "21d129e5-8426-5c29-a6be-844e0f5f5e30",
-      "confidential_compute": true,
-      "context_length": 262144,
-      "created": 1783684918,
-      "id": "Qwen/Qwen3-235B-A22B-Thinking-2507-TEE",
-      "input_modalities": [
-        "text"
-      ],
-      "max_model_len": 262144,
-      "max_output_length": 262144,
-      "object": "model",
-      "output_modalities": [
-        "text"
-      ],
-      "owned_by": "vllm",
-      "parent": null,
-      "permission": [
-        {
-          "allow_create_engine": false,
-          "allow_fine_tuning": false,
-          "allow_logprobs": true,
-          "allow_sampling": true,
-          "allow_search_indices": false,
-          "allow_view": true,
-          "created": 1783684918,
-          "group": null,
-          "id": "modelperm-beec420f734c0d7c",
-          "is_blocking": false,
-          "object": "model_permission",
-          "organization": "*"
-        }
-      ],
-      "price": {
-        "input": {
-          "tao": 0.0013975786213955305,
-          "usd": 0.2989
-        },
-        "input_cache_read": {
-          "tao": 0.0006987893106977653,
-          "usd": 0.14945
-        },
-        "output": {
-          "tao": 0.005590782059560508,
-          "usd": 1.1957
-        }
-      },
-      "pricing": {
-        "completion": 1.1957,
-        "input_cache_read": 0.14945,
-        "prompt": 0.2989
-      },
-      "quantization": "bf16",
-      "root": "Qwen/Qwen3-235B-A22B-Thinking-2507",
-      "supported_features": [
-        "json_mode",
-        "structured_outputs",
-        "tools",
-        "reasoning"
-      ],
-      "supported_sampling_parameters": [
-        "temperature",
-        "top_p",
-        "top_k",
-        "repetition_penalty",
-        "frequency_penalty",
-        "presence_penalty",
-        "stop",
-        "seed"
-      ]
-    },
-    {
       "chute_id": "2ff25e81-4586-5ec8-b892-3a6f342693d7",
       "confidential_compute": true,
       "context_length": 262144,
-      "created": 1783684918,
+      "created": 1783764714,
       "id": "moonshotai/Kimi-K2.5-TEE",
       "input_modalities": [
         "text",
@@ -610,15 +539,15 @@
       "parent": null,
       "price": {
         "input": {
-          "tao": 0.0020573255048980713,
+          "tao": 0.002064423139180593,
           "usd": 0.44
         },
         "input_cache_read": {
-          "tao": 0.0010286627524490357,
+          "tao": 0.0010322115695902965,
           "usd": 0.22
         },
         "output": {
-          "tao": 0.009351479567718505,
+          "tao": 0.009383741541729967,
           "usd": 2.0
         }
       },
@@ -647,40 +576,81 @@
       ]
     },
     {
-      "chute_id": "7725a31d-28df-5bb7-9d29-c23b49df5472",
+      "chute_id": "21d129e5-8426-5c29-a6be-844e0f5f5e30",
       "confidential_compute": true,
-      "created": 1783684918,
-      "id": "unsloth/Mistral-Nemo-Instruct-2407-TEE",
-      "max_model_len": 131072,
+      "context_length": 262144,
+      "created": 1783765915,
+      "id": "Qwen/Qwen3-235B-A22B-Thinking-2507-TEE",
+      "input_modalities": [
+        "text"
+      ],
+      "max_model_len": 262144,
+      "max_output_length": 262144,
       "object": "model",
-      "owned_by": "sglang",
+      "output_modalities": [
+        "text"
+      ],
+      "owned_by": "vllm",
       "parent": null,
+      "permission": [
+        {
+          "allow_create_engine": false,
+          "allow_fine_tuning": false,
+          "allow_logprobs": true,
+          "allow_sampling": true,
+          "allow_search_indices": false,
+          "allow_view": true,
+          "created": 1783765915,
+          "group": null,
+          "id": "modelperm-8460fdf626a77f14",
+          "is_blocking": false,
+          "object": "model_permission",
+          "organization": "*"
+        }
+      ],
       "price": {
         "input": {
-          "tao": 0.0001145556247045517,
-          "usd": 0.0245
+          "tao": 0.001410494475288033,
+          "usd": 0.2989
         },
         "input_cache_read": {
-          "tao": 5.727781235227585e-05,
-          "usd": 0.01225
+          "tao": 0.0007052472376440165,
+          "usd": 0.14945
         },
         "output": {
-          "tao": 0.0004572873508614349,
-          "usd": 0.0978
+          "tao": 0.005642449796259288,
+          "usd": 1.1957
         }
       },
       "pricing": {
-        "completion": 0.0978,
-        "input_cache_read": 0.01225,
-        "prompt": 0.0245
+        "completion": 1.1957,
+        "input_cache_read": 0.14945,
+        "prompt": 0.2989
       },
-      "root": "unsloth/Mistral-Nemo-Instruct-2407"
+      "quantization": "bf16",
+      "root": "Qwen/Qwen3-235B-A22B-Thinking-2507",
+      "supported_features": [
+        "json_mode",
+        "structured_outputs",
+        "tools",
+        "reasoning"
+      ],
+      "supported_sampling_parameters": [
+        "temperature",
+        "top_p",
+        "top_k",
+        "repetition_penalty",
+        "frequency_penalty",
+        "presence_penalty",
+        "stop",
+        "seed"
+      ]
     },
     {
       "chute_id": "e51e818e-fa63-570d-9f68-49d7d1b4d12f",
       "confidential_compute": true,
       "context_length": 202752,
-      "created": 1783684920,
+      "created": 1783765914,
       "id": "zai-org/GLM-5-TEE",
       "input_modalities": [
         "text"
@@ -695,15 +665,15 @@
       "parent": null,
       "price": {
         "input": {
-          "tao": 0.00444195279466629,
+          "tao": 0.0044830035179780235,
           "usd": 0.95
         },
         "input_cache_read": {
-          "tao": 0.002220976397333145,
+          "tao": 0.0022415017589890117,
           "usd": 0.475
         },
         "output": {
-          "tao": 0.011923136448841094,
+          "tao": 0.012033325232467328,
           "usd": 2.55
         }
       },
@@ -730,9 +700,39 @@
         "stop",
         "seed"
       ]
+    },
+    {
+      "chute_id": "7725a31d-28df-5bb7-9d29-c23b49df5472",
+      "confidential_compute": true,
+      "created": 1783765915,
+      "id": "unsloth/Mistral-Nemo-Instruct-2407-TEE",
+      "max_model_len": 131072,
+      "object": "model",
+      "owned_by": "sglang",
+      "parent": null,
+      "price": {
+        "input": {
+          "tao": 0.00011561430125311747,
+          "usd": 0.0245
+        },
+        "input_cache_read": {
+          "tao": 5.7807150626558736e-05,
+          "usd": 0.01225
+        },
+        "output": {
+          "tao": 0.0004615134147981587,
+          "usd": 0.0978
+        }
+      },
+      "pricing": {
+        "completion": 0.0978,
+        "input_cache_read": 0.01225,
+        "prompt": 0.0245
+      },
+      "root": "unsloth/Mistral-Nemo-Instruct-2407"
     }
   ],
-  "fetched_at": "2026-07-10T12:08:51Z",
+  "fetched_at": "2026-07-11T10:34:45Z",
   "object": "list",
   "source": "https://llm.chutes.ai/v1/models"
 }
