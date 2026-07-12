@@ -3,7 +3,7 @@
 This file is generated from the public Chutes OpenAI-compatible model endpoint. Do not edit it by hand; run `python3 scripts/update_chutes_models.py` instead.
 
 Source: `GET https://llm.chutes.ai/v1/models` (no auth headers sent)
-Last updated: 2026-07-11 10:34 UTC
+Last updated: 2026-07-12 10:43 UTC
 
 ## Summary
 
