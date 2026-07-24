@@ -7,8 +7,8 @@ Unlike [`known-models.md`](known-models.md) (auto-refreshed from `GET /v1/models
 ## Summary
 
 - Model pages catalogued: **31**
-- Chat LLMs (also in `known-models.md`): **13**
-- Non-chat / full-modality chutes: **18**
+- Chat LLMs (also in `known-models.md`): **14**
+- Non-chat / full-modality chutes: **17**
 
 Every model exposes an agent-facing `llms.txt` at `https://chutes.ai/app/chute/<slug>/llms.txt` and a callable OpenAPI spec at `.../openapi.json`.
 
@@ -21,6 +21,7 @@ Every model exposes an agent-facing `llms.txt` at `https://chutes.ai/app/chute/<
 | [`MiniMaxAI/MiniMax-M2.5-TEE`](https://chutes.ai/app/chute/chutes-minimaxai-minimax-m2-5-tee) | chutes | text in → text out | MiniMax-M2.5 is a frontier-class LLM excelling at coding, agentic tool use, and office ... |
 | [`moonshotai/Kimi-K2.5-TEE`](https://chutes.ai/app/chute/chutes-moonshotai-kimi-k2-5-tee) | chutes | text, image in → text out | Kimi K2.5 with DFlash speculative decoding |
 | [`moonshotai/Kimi-K2.6-TEE`](https://chutes.ai/app/chute/chutes-moonshotai-kimi-k2-6-tee) | chutes | text, image, video in → text out | moonshotai/Kimi-K2.6 |
+| [`Nemotron-3-Nano-Omni-30B-TEE`](https://chutes.ai/app/chute/vonkaiser-nemotron-3-nano-omni-30b-tee) | vonkaiser | text, image, video, audio in → text out | Multimodal reasoning: video, audio, image, and text → answers, summaries, and tools |
 | [`Qwen/Qwen3-235B-A22B-Thinking-2507-TEE`](https://chutes.ai/app/chute/chutes-qwen-qwen3-235b-a22b-thinking-2507-tee) | chutes | text in → text out | Qwen/Qwen3-235B-A22B-Thinking-2507-TEE model on Chutes. |
 | [`Qwen/Qwen3-32B-TEE`](https://chutes.ai/app/chute/chutes-qwen-qwen3-32b-tee) | chutes | text in → text out | Qwen/Qwen3-32B, FP8 precision with DFLASH speculative decoding |
 | [`Qwen/Qwen3.5-397B-A17B-TEE`](https://chutes.ai/app/chute/chutes-qwen-qwen3-5-397b-a17b-tee) | chutes | text, image, video in → text out | Qwen/Qwen3.5-397B-A17B-FP8 |
@@ -35,7 +36,6 @@ Every model exposes an agent-facing `llms.txt` at `https://chutes.ai/app/chute/<
 | Model | Owner | Modalities | What it is |
 |---|---|---|---|
 | [`docuextract`](https://chutes.ai/app/chute/vonkaiser-docuextract) | vonkaiser | image, text in → text out | Document OCR and structured extraction from PDFs and images |
-| [`Nemotron-3-Nano-Omni-30B-TEE`](https://chutes.ai/app/chute/vonkaiser-nemotron-3-nano-omni-30b-tee) | vonkaiser | text, image, video, audio in → text out | Multimodal reasoning: video, audio, image, and text → answers, summaries, and tools |
 | [`nsfw-classifier`](https://chutes.ai/app/chute/vonkaiser-nsfw-classifier) | vonkaiser | image, text in → text out | NSFW check for images and text |
 
 ## Embeddings

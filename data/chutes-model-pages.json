@@ -471,10 +471,10 @@
       "tagline": "Lightricks LTX 2.3 distilled-1.1 FP8 on RTX 6000 Pro \u2014 cinematic T2V, I2V, and keyframe interpolation with 8-step inference, synchronized audio, and GPU prompt enhancement."
     },
     {
-      "category": "vision-understanding",
-      "chat_llm": false,
+      "category": "chat-llm",
+      "chat_llm": true,
       "chute_id": "2ead5dca-9b87-54e2-a4ef-4c9fab259d1c",
-      "in_v1_models_snapshot": false,
+      "in_v1_models_snapshot": true,
       "input_modalities": [
         "text",
         "image",
