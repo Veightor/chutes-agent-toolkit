@@ -105,10 +105,10 @@
       "tagline": "Text-to-speech with hexgrad/Kokoro-82M"
     },
     {
-      "category": "chat-llm",
-      "chat_llm": true,
+      "category": "other",
+      "chat_llm": false,
       "chute_id": "ce6a92e4-5c2f-5681-9742-c80a4447bbdf",
-      "in_v1_models_snapshot": true,
+      "in_v1_models_snapshot": false,
       "input_modalities": [
         "text"
       ],
@@ -124,10 +124,10 @@
       "tagline": "MiniMax-M2.5 is a frontier-class LLM excelling at coding, agentic tool use, and office automation tasks, with state-of-the-art performance on benchmarks like SWE-Bench while being dramatically more cost-effective than competitors."
     },
     {
-      "category": "chat-llm",
-      "chat_llm": true,
+      "category": "vision-understanding",
+      "chat_llm": false,
       "chute_id": "2ff25e81-4586-5ec8-b892-3a6f342693d7",
-      "in_v1_models_snapshot": true,
+      "in_v1_models_snapshot": false,
       "input_modalities": [
         "text",
         "image"
@@ -321,10 +321,10 @@
       "tagline": "nvidia/GLM-5.2-NVFP4"
     },
     {
-      "category": "chat-llm",
-      "chat_llm": true,
+      "category": "other",
+      "chat_llm": false,
       "chute_id": "e51e818e-fa63-570d-9f68-49d7d1b4d12f",
-      "in_v1_models_snapshot": true,
+      "in_v1_models_snapshot": false,
       "input_modalities": [
         "text"
       ],
