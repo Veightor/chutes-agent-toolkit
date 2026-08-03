@@ -3,15 +3,15 @@
 This file is generated from the public Chutes OpenAI-compatible model endpoint. Do not edit it by hand; run `python3 scripts/update_chutes_models.py` instead.
 
 Source: `GET https://llm.chutes.ai/v1/models` (no auth headers sent)
-Last updated: 2026-08-02 10:50 UTC
+Last updated: 2026-08-03 12:36 UTC
 
 ## Summary
 
-- Models returned: **12**
-- TEE/confidential-compute models: **12/12** — the hosted gateway is currently TEE-only.
-- Models advertising `tools`: **10**
-- Models advertising `json_mode`: **10**
-- Models advertising `structured_outputs`: **10**
+- Models returned: **13**
+- TEE/confidential-compute models: **13/13** — the hosted gateway is currently TEE-only.
+- Models advertising `tools`: **11**
+- Models advertising `json_mode`: **11**
+- Models advertising `structured_outputs`: **11**
 - The models endpoint carries pricing and capability metadata, but not TTFT/TPS latency stats. For live latency/throughput data, use `GET https://api.chutes.ai/invocations/stats/llm` or the `default:latency` / `default:throughput` routing aliases.
 
 ## Live model table (USD per 1M tokens)
@@ -28,6 +28,7 @@ Last updated: 2026-08-02 10:50 UTC
 | `deepseek-ai/DeepSeek-V3.2-TEE` | 1 | 1 | 0.5 | 131k | fp8 | sglang | yes | text | json_mode, tools, reasoning, structured_outputs |
 | `Qwen/Qwen3-32B-TEE` | 0.104 | 0.416 | 0.052 | 41k | fp8 | sglang | yes | text | json_mode, tools, structured_outputs, reasoning |
 | `google/gemma-4-31B-turbo-TEE` | 0.12 | 0.37 | 0.06 | 131k | fp4 | sglang | yes | text+image | json_mode, tools, structured_outputs, reasoning |
+| `deepseek-ai/DeepSeek-V4-Flash-0731-TEE` | 0.14 | 0.28 | 0.07 | 1049k | fp8 | sglang | yes | text | json_mode, structured_outputs, tools, reasoning |
 | `Nemotron-3-Nano-Omni-30B-TEE` | 0.0245 | 0.0978 | 0.01225 | 131k | — | sglang | yes | text | — |
 | `unsloth/Mistral-Nemo-Instruct-2407-TEE` | 0.0245 | 0.0978 | 0.01225 | 131k | — | sglang | yes | text | — |
 
@@ -47,17 +48,17 @@ Last updated: 2026-08-02 10:50 UTC
 
 ### Largest context windows
 
+- `deepseek-ai/DeepSeek-V4-Flash-0731-TEE` ($0.14/$0.28, context 1049k, text)
 - `moonshotai/Kimi-K3-TEE` ($3/$15, context 1049k, text+image+video)
 - `zai-org/GLM-5.2-TEE` ($1.25/$3.95, context 1049k, text)
-- `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE` ($0.2989/$1.1957, context 262k, text)
 
 ### Tool-capable examples
 
 - `Qwen/Qwen3-32B-TEE` ($0.104/$0.416, context 41k, text)
 - `Qwen/Qwen3.5-397B-A17B-TEE` ($0.45/$3, context 262k, text+image)
 - `google/gemma-4-31B-turbo-TEE` ($0.12/$0.37, context 131k, text+image)
-- `zai-org/GLM-5.1-TEE` ($0.98/$3.08, context 203k, text)
 - `deepseek-ai/DeepSeek-V3.2-TEE` ($1/$1, context 131k, text)
+- `zai-org/GLM-5.1-TEE` ($0.98/$3.08, context 203k, text)
 
 ## Routing aliases
 
