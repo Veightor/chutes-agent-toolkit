@@ -242,6 +242,14 @@ for chunk in stream:
 
 **Vision** — send image parts in `content` to models whose `input_modalities` include `"image"` (e.g. `google/gemma-4-31B-turbo-TEE`, `Qwen/Qwen3.6-27B-TEE`, the Kimi-K2 line). Kimi also accepts `"video"`.
 
+**Media chutes (video / image / audio generation)** — these never appear on the gateway; each runs on its own host (`https://<slug>.chutes.ai`) and takes a flat JSON body on `POST /generate`, returning raw media bytes (see the [full-modality catalog](model-pages.md)). Three things bite agents here:
+
+- **Renders are synchronous, and the public edge times out at ~600 s.** The connection stays open for the whole generation. Chute code may reference an 1800 s cord limit, but the public ingress (nginx behind a Google LB) returns **HTTP 504 at the 10-minute mark** — measured live 2026-08-06: an 8 s / 30-step video render 504'd at exactly 600.2 s, while a minimum-size render (5 s @ 20 steps) completed in 272 s. **Queue time counts**: instances serialize renders on a per-GPU semaphore, and two concurrent minimum-size requests both 504'd — send media requests one at a time. And **check the HTTP status and `Content-Type`** — on 504 you get a tiny HTML error page with curl still exiting 0, so "exit code 0 + output file exists" does not mean you have media.
+- **The published schema may be incomplete.** Some community chutes' llms.txt/openapi document only `prompt` while the deployed code accepts more (image conditioning, duration, seed, …). The authoritative contract is the chute's source: `GET https://api.chutes.ai/chutes/code/{chute_id}` — read the pydantic `*Input` class. (`GET /openapi.json` on the chute host itself just proxies to the management API; it does not describe the chute.)
+- **Billing is per compute-second** at the chute's GPU rate (`x-chutes.pricing.usdPerHour` in its model-page openapi.json), so a video render costs dimes, not the micro-cents of a chat call.
+
+Runnable example: [`cookbook/python/08_video_generation.py`](../cookbook/python/08_video_generation.py).
+
 > Before sending exotic sampling params (`top_k`, `repetition_penalty`, …), check the model's `supported_sampling_parameters`. `sglang` and `vllm` engines accept different knobs.
 
 ---

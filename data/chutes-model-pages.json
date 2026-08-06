@@ -1,5 +1,5 @@
 {
-  "count": 31,
+  "count": 32,
   "data": [
     {
       "category": "other",
@@ -469,6 +469,27 @@
       "owner": "vonkaiser",
       "slug": "vonkaiser-ltx-23-video",
       "tagline": "Lightricks LTX 2.3 distilled-1.1 FP8 on RTX 6000 Pro \u2014 cinematic T2V, I2V, and keyframe interpolation with 8-step inference, synchronized audio, and GPU prompt enhancement."
+    },
+    {
+      "category": "audio",
+      "chat_llm": false,
+      "chute_id": "947976b4-834d-5522-816e-c4d8cf3fe81b",
+      "in_v1_models_snapshot": false,
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "llms_txt": "https://chutes.ai/app/chute/vonkaiser-minimaxh3fl2va/llms.txt",
+      "modalities": "text, image in \u2192 video, audio out",
+      "model_page": "https://chutes.ai/app/chute/vonkaiser-minimaxh3fl2va",
+      "name": "minimaxh3fl2va",
+      "output_modalities": [
+        "video",
+        "audio"
+      ],
+      "owner": "vonkaiser",
+      "slug": "vonkaiser-minimaxh3fl2va",
+      "tagline": "MiniMax H3 FL2VA \u2014 text/image-to-video+audio, GPU-resident NVFP4 transformer + NVFP4 text encoder, FA4 attention, 768p short-side, 4-10s with native 32 kHz stereo audio. Supports text-to-video, first-frame, last-frame, and first+last."
     },
     {
       "category": "chat-llm",

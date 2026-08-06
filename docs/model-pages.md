@@ -6,9 +6,9 @@ Unlike [`known-models.md`](known-models.md) (auto-refreshed from `GET /v1/models
 
 ## Summary
 
-- Model pages catalogued: **31**
+- Model pages catalogued: **32**
 - Chat LLMs (also in `known-models.md`): **11**
-- Non-chat / full-modality chutes: **20**
+- Non-chat / full-modality chutes: **21**
 
 Every model exposes an agent-facing `llms.txt` at `https://chutes.ai/app/chute/<slug>/llms.txt` and a callable OpenAPI spec at `.../openapi.json`.
 
@@ -65,6 +65,7 @@ Every model exposes an agent-facing `llms.txt` at `https://chutes.ai/app/chute/<
 | [`AudioDojo`](https://chutes.ai/app/chute/vonkaiser-audiodojo) | vonkaiser | text, audio in → audio, text out | One chute, 12 models, 13 endpoints — covering text-to-speech, voice cloning, voice desi... |
 | [`kokoro`](https://chutes.ai/app/chute/chutes-kokoro) | chutes | text in → audio out | Text-to-speech with hexgrad/Kokoro-82M |
 | [`LTX-23-Video`](https://chutes.ai/app/chute/vonkaiser-ltx-23-video) | vonkaiser | text, image in → video, audio out | Lightricks LTX 2.3 distilled-1.1 FP8 on RTX 6000 Pro — cinematic T2V, I2V, and keyframe... |
+| [`minimaxh3fl2va`](https://chutes.ai/app/chute/vonkaiser-minimaxh3fl2va) | vonkaiser | text, image in → video, audio out | MiniMax H3 FL2VA — text/image-to-video+audio, GPU-resident NVFP4 transformer + NVFP4 te... |
 
 ## Guard classifiers, scoring & segmentation
 

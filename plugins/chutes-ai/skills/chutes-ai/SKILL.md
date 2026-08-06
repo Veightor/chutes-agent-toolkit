@@ -174,6 +174,14 @@ As of 2026-06-11 the catalog is **13 LLMs, all TEE** (`confidential_compute: tru
 
 Chutes hosts more than LLMs: **image, video, TTS (54 voices / 9 languages), STT, music, moderation, and custom inference.**
 
+**Calling media chutes (video / image / audio generation)** — verified live 2026-08-06 on `vonkaiser-minimaxh3fl2va` (text/image-to-video + native audio). They are not on the gateway; each runs on its own host (`https://<slug>.chutes.ai`) and takes a flat JSON body on `POST /generate`, returning raw media bytes. Three gotchas:
+
+1. Renders are synchronous and the public edge 504s at ~600 s — and instance GPU-queue time counts against it (two concurrent renders both 504'd; solo, the same config took 272 s). Send one request at a time and check HTTP status + `Content-Type` (a 504 returns a tiny HTML page while curl exits 0).
+2. A community chute's published llms.txt/openapi may document only `prompt`. The real contract is the deployed source: `GET https://api.chutes.ai/chutes/code/{chute_id}` — read the pydantic `*Input` class (that's how the undocumented `first_image_b64` image-to-video field was found and verified).
+3. Billing is per compute-second at the chute's GPU rate (`x-chutes.pricing.usdPerHour` in its model-page openapi.json) — dimes per video, not micro-cents.
+
+Full guide: [`docs/endpoint-guide.md` §7](../../../../docs/endpoint-guide.md); runnable example: [`cookbook/python/08_video_generation.py`](../../../../cookbook/python/08_video_generation.py).
+
 Quick static reference: `references/known-models.md`. Always query the live endpoint for authoritative data.
 
 When helping users choose (live catalog as of 2026-06-11):

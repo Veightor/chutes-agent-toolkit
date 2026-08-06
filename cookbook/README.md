@@ -30,6 +30,7 @@ export CHUTES_API_KEY="$(python plugins/chutes-ai/skills/chutes-ai/scripts/manag
 | [`python/05_routing_failover.py`](python/05_routing_failover.py) | Inline multi-model pool + `:latency` strategy | 3-model pool |
 | [`python/06_vision.py`](python/06_vision.py) | Image input | Qwen3.6-27B |
 | [`python/07_mini_agent.py`](python/07_mini_agent.py) | **A complete tool-calling agent loop in ~100 lines** | MiniMax-M2.5 |
+| [`python/08_video_generation.py`](python/08_video_generation.py) | Video+audio generation on a media chute (direct host, not the gateway) | MiniMax H3 FL2VA |
 
 ## JavaScript
 
@@ -47,8 +48,9 @@ export CHUTES_API_KEY="$(python plugins/chutes-ai/skills/chutes-ai/scripts/manag
 
 Labels follow the repo's [BETA policy](../docs/roadmap.md#beta-labeling-policy): each example is marked in its docstring header as **[VERIFIED <date>]** (ran live against the paid API) or **[BETA]** (syntax-checked, not yet exercised live).
 
-**All 8 examples were run live on 2026-06-11** against the paid API (key from the toolkit keychain, total spend well under $0.01). Findings from that run, preserved as gotchas:
+**Examples 01–07 (+ chat.mjs) were run live on 2026-06-11** against the paid API (key from the toolkit keychain, total spend well under $0.01); **08 was run live on 2026-08-06** (media chutes bill per compute-second — that render cost roughly $0.15). Findings from those runs, preserved as gotchas:
 
 - `05_routing_failover.py` — both the plain pool and the `:latency` strategy returned HTTP 200; `resp.model` reports the pool member that actually served the request.
 - `06_vision.py` — remote image URLs are fetched **server-side by Chutes**, and some hosts (Wikimedia returned 403) block that fetcher. The example now ships a data-URI test image; the model described it correctly.
 - `07_mini_agent.py` — MiniMax-M2.5 completed the two-tool chain (calculator → letter count) in two turns with no retries.
+- `08_video_generation.py` — completed in 272 s (4 s @ 20 steps, 16:9) and returned a 0.9 MB MP4 with H.264 video + AAC 32 kHz stereo audio. Two renders in flight at once both 504'd at exactly 600 s (the public edge's timeout; instance GPU queue time counts against it) — run media requests one at a time. The chute's published llms.txt documents only `prompt`; the full schema was recovered from `GET https://api.chutes.ai/chutes/code/{chute_id}` (see the file's docstring and [docs/endpoint-guide.md §7](../docs/endpoint-guide.md)).

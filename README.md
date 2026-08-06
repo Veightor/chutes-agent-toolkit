@@ -401,7 +401,7 @@ chutes-agent-toolkit/
 │   └── llms-txt-review.md
 ├── cookbook/                              # runnable examples, live-verified 2026-06-11
 │   ├── README.md
-│   ├── python/ (01_first_call → 07_mini_agent)
+│   ├── python/ (01_first_call → 08_video_generation)
 │   └── javascript/chat.mjs
 ├── site/                                  # draft chutes.ai pages promoting agent use
 │   ├── README.md                          # page map + widget specs

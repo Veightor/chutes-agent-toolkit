@@ -1,0 +1,128 @@
+# minimaxh3fl2va
+
+> MiniMax H3 FL2VA — text/image-to-video+audio, GPU-resident NVFP4 transformer + NVFP4 text encoder, FA4 attention, 768p short-side, 4-10s with native 32 kHz stereo audio. Supports text-to-video, first-frame, last-frame, and first+last.
+
+This file is intended for AI coding agents wiring an application to this specific Chutes model.
+
+## Important URLs
+
+- Model page: https://chutes.ai/app/chute/vonkaiser-minimaxh3fl2va
+- Model llms.txt: https://chutes.ai/app/chute/vonkaiser-minimaxh3fl2va/llms.txt
+- Model OpenAPI 3.1 spec (this chute, callable): https://chutes.ai/app/chute/vonkaiser-minimaxh3fl2va/openapi.json
+- Global Chutes llms.txt: https://chutes.ai/llms.txt
+- Full Chutes docs export: https://chutes.ai/llms-full.txt
+- Management API OpenAPI (account/billing/keys, NOT this model): https://api.chutes.ai/openapi.json
+
+## Model Identifiers
+
+- Name: `minimaxh3fl2va`
+- Chute ID: `947976b4-834d-5522-816e-c4d8cf3fe81b`
+- Slug: `vonkaiser-minimaxh3fl2va`
+- Owner: `vonkaiser`
+
+## Authentication
+
+- Use `Authorization: Bearer $CHUTES_API_KEY` for inference calls.
+- Send JSON request bodies with `Content-Type: application/json` unless the endpoint documentation says otherwise.
+- The request body is FLAT — send the request fields at the top level (no `input_args`/`args` wrapper).
+- This model is served on its own host (`https://vonkaiser-minimaxh3fl2va.chutes.ai`). Call the endpoint paths listed below directly.
+- For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
+
+## Endpoints
+
+### 1. POST /generate
+
+- Base URL: `https://vonkaiser-minimaxh3fl2va.chutes.ai`
+- Output content type: `video/mp4`
+
+Request fields:
+
+- `prompt` (string, optional) Default: "A red fox trotting through a snowy pine forest, snow crunching underfoot.".
+
+Example call:
+
+```bash
+curl -X POST "https://vonkaiser-minimaxh3fl2va.chutes.ai/generate" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "prompt": "a serene mountain lake at sunset",
+  "seed": 42,
+  "duration": 5,
+  "aspect_ratio": "16:9",
+  "num_inference_steps": 30
+}' \
+  --output output.mp4
+```
+
+## Agent Integration Checklist
+
+- Pick the endpoint path that matches the desired task.
+- Set `CHUTES_API_KEY` in the server-side environment only.
+- Validate required fields before sending requests.
+- For media models, keep file upload, base64 conversion, and output preview/download handling explicit in the app UI.
+
+---
+
+# Toolkit addendum (not part of the upstream llms.txt)
+
+Everything above is the upstream model-page llms.txt, vendored verbatim on
+2026-08-06. Everything below was added by this repo because the upstream file
+documents only `prompt` — the real request schema was recovered from the
+deployed chute source (`GET https://api.chutes.ai/chutes/code/947976b4-834d-5522-816e-c4d8cf3fe81b`,
+pydantic class `FL2VAInput`) and spot-checked live on 2026-08-06.
+
+## Model Facts
+
+- Modalities: text, image in → video, audio out
+- Modes: text-to-video, first-frame image-to-video, last-frame, first+last interpolation
+- Output: MP4, H.264 video + AAC 32 kHz stereo audio (audio always generated, no flag), 24 fps, 768p short side
+- Precision: NVFP4 transformer + NVFP4 text encoder (torchao), FA4 attention, single RTX PRO 6000
+- Pricing basis: $1.80/hr GPU rate, billed per compute-second (from the model-page OpenAPI `x-chutes.pricing`)
+- Confidential compute: yes (`confidentialCompute: true` in the model-page OpenAPI)
+
+## Full request schema (POST /generate)
+
+| Field | Type | Constraints | Default |
+|---|---|---|---|
+| `prompt` | string | required, 1–7000 chars | — |
+| `first_image_b64` | string | optional, raw base64 image — first-frame conditioning (I2V) | null |
+| `last_image_b64` | string | optional, raw base64 image — last-frame conditioning | null |
+| `duration` | int | 4–10 seconds | 5 |
+| `aspect_ratio` | enum | `21:9` `16:9` `4:3` `1:1` `3:4` `9:16` | `16:9` |
+| `num_inference_steps` | int | 10–50 | 30 |
+| `seed` | int | optional, 0–2³²−1 | null (random) |
+
+Resolution per aspect ratio (fixed, no width/height fields): 21:9→1536×672,
+16:9→1344×768, 4:3→1024×768, 1:1→768×768, 3:4→768×1024, 9:16→768×1344.
+Frame count snaps to a 17n+5 grid (120–360 frames @ 24 fps).
+
+## Operational notes (verified live 2026-08-06)
+
+- The render is synchronous — the HTTP connection stays open for the whole
+  generation. The chute source references an 1800 s cord limit, but the public
+  ingress returns **HTTP 504 after ~600 s** (measured: an 8 s / 30-step render
+  504'd at exactly 600.2 s, nginx via Google LB). Always check the response
+  status + `Content-Type: video/mp4` — a 504 hands you a 160-byte HTML page
+  while curl still exits 0.
+- Measured render time: **272 s** for the minimum-length clip (124 frames ≈
+  5.2 s output) at 20 steps, 16:9, running solo. Instances serialize renders
+  on a per-GPU semaphore and queue time counts toward the 600 s edge window:
+  two concurrent requests at this size both 504'd. Send media requests one at
+  a time and keep `duration × num_inference_steps` modest.
+- `duration: 4` and `duration: 5` produce identical output — both snap to the
+  124-frame floor (5.17 s at 24 fps). Verified output: H.264 1344×768 (16:9)
+  + AAC 32 kHz stereo, ~0.9 MB for the minimum clip.
+- `first_image_b64` verified live: a ~135 KB JPEG sent as raw base64
+  (~183 KB string) was accepted, and the output's first frame matched the
+  conditioning image nearly pixel-for-pixel; render time was unchanged
+  (289 s at the minimum-clip config). `last_image_b64` is documented in the
+  chute source but has NOT been exercised live (BETA).
+- Out-of-range values (e.g. `duration: 99`) are rejected with HTTP 400
+  `"Invalid input parameters"` — the error does not name the offending field,
+  so validate against the table above before sending.
+- An empty body returns `"exhausted all available targets to no avail"` (the
+  instances reject it), not a schema error listing required fields.
+- `GET /openapi.json` on the chute host proxies to the management API — it
+  does NOT describe this chute. Use the model-page openapi.json or the chute
+  source (see above) instead.

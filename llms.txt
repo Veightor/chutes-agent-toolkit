@@ -8,7 +8,7 @@ The two facts that matter most: inference lives at `https://llm.chutes.ai/v1` (O
 
 - [Endpoint guide](docs/endpoint-guide.md): the one-page universal guide — auth, first call in 5 languages, routing, errors. Read this first.
 - [README](README.md): repo map, install paths for Claude/Hermes/OpenClaw/anything, verification log and BETA policy.
-- [Cookbook](cookbook/README.md): runnable examples — chat, streaming, tool calling, structured output, routing failover, vision, and a complete ~100-line tool-calling agent.
+- [Cookbook](cookbook/README.md): runnable examples — chat, streaming, tool calling, structured output, routing failover, vision, a complete ~100-line tool-calling agent, and video+audio generation on a media chute.
 - [Model picker](scripts/pick_model.py): `python scripts/pick_model.py --task agentic --routing latency` recommends models or routing pools from the live catalog.
 
 ## Skills (Claude plugin: plugins/chutes-ai/skills/, Hermes mirror: other-agents/hermes/skills/)
