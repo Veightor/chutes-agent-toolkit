@@ -3,7 +3,7 @@
 This file is generated from the public Chutes OpenAI-compatible model endpoint. Do not edit it by hand; run `python3 scripts/update_chutes_models.py` instead.
 
 Source: `GET https://llm.chutes.ai/v1/models` (no auth headers sent)
-Last updated: 2026-09-15 14:20 UTC
+Last updated: 2026-09-16 14:12 UTC
 
 ## Summary
 
@@ -20,10 +20,10 @@ Last updated: 2026-09-15 14:20 UTC
 |---|---:|---:|---:|---:|---|---|---|---|---|
 | `moonshotai/Kimi-K3-TEE` | 3 | 15 | 0.3 | 1049k | mxfp4 | sglang | yes | text+image+video | json_mode, structured_outputs, tools, reasoning |
 | `zai-org/GLM-5.2-TEE` | 1.25 | 3.95 | 0.125 | 1049k | fp4 | sglang | yes | text | json_mode, structured_outputs, tools, reasoning |
-| `moonshotai/Kimi-K2.6-TEE` | 0.58 | 3.4 | 0.058 | 262k | int4 | vllm | yes | text+image+video | json_mode, structured_outputs, tools, reasoning |
 | `zai-org/GLM-5.1-TEE` | 0.98 | 3.08 | 0.098 | 203k | fp8 | sglang | yes | text | json_mode, structured_outputs, tools, reasoning |
 | `Qwen/Qwen3.5-397B-A17B-TEE` | 0.45 | 3 | 0.045 | 262k | fp8 | sglang | yes | text+image | json_mode, tools, structured_outputs, reasoning |
-| `Qwen/Qwen3.8-27B-TEE` | 0.32 | 2.5 | 0.032 | 262k | fp8 | vllm | yes | text+image | json_mode, tools, structured_outputs, reasoning |
+| `moonshotai/Kimi-K2.6-TEE` | 0.5 | 2.85 | 0.05 | 262k | int4 | vllm | yes | text+image+video | json_mode, structured_outputs, tools, reasoning |
+| `Qwen/Qwen3.8-27B-TEE` | 0.24 | 2.2 | 0.024 | 262k | fp8 | vllm | yes | text+image | json_mode, tools, structured_outputs, reasoning |
 | `Qwen/Qwen3.6-27B-TEE` | 0.3 | 2 | 0.03 | 262k | fp8 | sglang | yes | text+image | json_mode, tools, structured_outputs, reasoning |
 | `deepseek-ai/DeepSeek-V4-Flash-0731-TEE` | 0.44 | 1.32 | 0.044 | 1049k | fp8 | sglang | yes | text | json_mode, structured_outputs, tools, reasoning |
 | `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE` | 0.2989 | 1.1957 | 0.02989 | 262k | bf16 | vllm | yes | text | json_mode, structured_outputs, tools, reasoning |
@@ -44,8 +44,8 @@ Last updated: 2026-09-15 14:20 UTC
 ### Cheapest image-capable models
 
 - `google/gemma-4-31B-turbo-TEE` ($0.12/$0.37, context 131k, text+image)
+- `Qwen/Qwen3.8-27B-TEE` ($0.24/$2.2, context 262k, text+image)
 - `Qwen/Qwen3.6-27B-TEE` ($0.3/$2, context 262k, text+image)
-- `Qwen/Qwen3.8-27B-TEE` ($0.32/$2.5, context 262k, text+image)
 
 ### Largest context windows
 
@@ -56,10 +56,10 @@ Last updated: 2026-09-15 14:20 UTC
 ### Tool-capable examples
 
 - `google/gemma-4-31B-turbo-TEE` ($0.12/$0.37, context 131k, text+image)
-- `Qwen/Qwen3.6-27B-TEE` ($0.3/$2, context 262k, text+image)
 - `Qwen/Qwen3.5-397B-A17B-TEE` ($0.45/$3, context 262k, text+image)
-- `Qwen/Qwen3.8-27B-TEE` ($0.32/$2.5, context 262k, text+image)
+- `Qwen/Qwen3.8-27B-TEE` ($0.24/$2.2, context 262k, text+image)
 - `deepseek-ai/DeepSeek-V3.2-TEE` ($1/$1, context 131k, text)
+- `Qwen/Qwen3.6-27B-TEE` ($0.3/$2, context 262k, text+image)
 
 ## Routing aliases
 
