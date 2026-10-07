@@ -314,23 +314,8 @@ def render_hermes_config(include_research: bool = False, direct_model: str | Non
         "    models:",
         *model_lines,
     ]
-    if include_research:
-        lines.extend(
-            [
-                "",
-                "  chutes-research:",
-                "    name: Chutes Research Opt-In",
-                "    base_url: https://research-data-opt-in-proxy.chutes.ai/v1",
-                "    key_env: CHUTES_API_KEY",
-                "    transport: chat_completions",
-                "    default_model: default:latency",
-                "    discover_models: true",
-                "    models:",
-                '      "default": {}',
-                '      "default:latency": {}',
-                '      "default:throughput": {}',
-            ]
-        )
+    # The former research-data-opt-in proxy is defunct (404 + no longer advertised,
+    # verified 2026-10-07), so include_research no longer emits a second provider.
     lines.extend(
         [
             "",
@@ -410,12 +395,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--env-path", type=Path, default=None, help="Optional Hermes .env path to inspect for CHUTES_API_KEY")
     parser.add_argument("--check-auth", action="store_true", help="Validate CHUTES_API_KEY with GET https://api.chutes.ai/users/me")
     parser.add_argument("--emit-config", action="store_true", help="Print a ready-to-paste Hermes provider config after the report")
-    parser.add_argument("--include-research", action="store_true", help="Include the opt-in research endpoint in --emit-config output")
+    parser.add_argument("--include-research", action="store_true", help="Deprecated no-op: the research opt-in endpoint is defunct (verified 2026-10-07)")
     parser.add_argument("--json", action="store_true", help="Emit machine-readable JSON instead of text")
     args = parser.parse_args(argv)
 
-    if args.include_research and not args.emit_config:
-        print("warning: --include-research only affects --emit-config output; pass --emit-config too", file=sys.stderr)
+    if args.include_research:
+        print("warning: --include-research is a deprecated no-op — the research opt-in proxy is defunct (404, verified 2026-10-07)", file=sys.stderr)
 
     fetch_error = None
     try:
