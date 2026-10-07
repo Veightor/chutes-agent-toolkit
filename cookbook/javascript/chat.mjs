@@ -1,4 +1,4 @@
-// Chutes chat + streaming with the OpenAI SDK. [VERIFIED 2026-06-11: ran live against the paid API]
+// Chutes chat + streaming with the OpenAI SDK. [VERIFIED 2026-10-07: ran live against the paid API]
 // Setup: npm install openai
 // Run:   CHUTES_API_KEY=cpk_... node chat.mjs
 

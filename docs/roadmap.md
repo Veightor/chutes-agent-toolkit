@@ -164,6 +164,20 @@ A swarm pass re-verified the toolkit against the live API (real GETs only; no wr
 - **SDK facts refreshed**: PyPI `chutes` 0.6.9 stable (0.6.11rc in flight with a `bittensor-wallet`/`async-substrate-interface` dependency swap); no GitHub releases/tags.
 - Not re-exercised (kept at April stamps or hedged): all write/deploy/registration POST flows, the easy-deploy 403 gate. (`POST /v1/chat/completions` Bearer auth, originally on this list, was live-verified later on 2026-06-11.)
 
+### Phase 9.6: 2026-10-07 per-agent-lane refresh — DELIVERED
+
+A per-agent-lane sweep (live catalog + paid completion + full cookbook re-run + upstream research per agent integration). The 2026-06-11 records above stand as history; current facts:
+
+- **Catalog is 14 TEE models** (was 13). Added since June: Qwen3.8-27B, Kimi-K3, GLM-5.2, DeepSeek-V4-Flash-0731, Nemotron-3-Nano-Omni-30B (1M-ctx tier now exists). Delisted: MiniMax-M2.5, Kimi-K2.5, GLM-5, Nemotron-3-Ultra-550B. All pinned defaults/examples re-pointed and trial-verified.
+- **Model-sweep baseline (2026-10-07)**: cheap tool-caller slot → `google/gemma-4-31B-turbo-TEE` (winner; 1.7 s clean tool call, $0.12/M in), failover `Qwen/Qwen3.8-27B-TEE`; flagship reasoner slot → `zai-org/GLM-5.2-TEE` (winner; 1.9 s, $1.25/M in, 1M ctx), premium alt `moonshotai/Kimi-K3-TEE`. `build_pool.py` live picks refreshed in `chutes-routing` references.
+- **Research data-opt-in proxy DEFUNCT** (404 + no longer advertised); all references updated, Hermes dual-endpoints example removed, doctor `--include-research` now a deprecated no-op.
+- **OpenClaw ships an official `@openclaw/chutes-provider` plugin** (OAuth or API-key onboarding; docs.openclaw.ai/providers/chutes); OpenClaw lane now leads with it. Verified against `openclaw@2026.9.8` docs.
+- **Hermes community catalog plugin landed**: `hermes-chutes-provider` v0.1.5 by TheStreamCode, merged into the hermes-agent plugin catalog 2026-10-04 (PR #126683). Hermes lane now leads with it; local Hermes verified v0.21.3.
+- **LiteLLM prefix is `chutes/`** (was documented as `chutes_ai/`); verified against LiteLLM 1.104.0.
+- **Cookbook 01–07 + chat.mjs re-verified live 2026-10-07**; 08's target video chute (vonkaiser-minimaxh3fl2va) was delisted — header updated with adaptation instructions.
+- **`.claude-plugin/marketplace.json` added** (was missing; `/plugin marketplace add` could not resolve before). `claude plugin validate .` passes. Plugin bumped to v1.3.1.
+- **Vendored model pages refreshed**: all 27 live pages re-fetched 2026-10-07; 9 dead pages (delisted chutes) removed; full-modality catalog rebuilt.
+
 ### Phase 10: wave 3 brainstorm (not yet scoped)
 
 - Graduate `chutes-sign-in:verify_siwc.py` step 4 (dev server hit) via a scripted Playwright run.

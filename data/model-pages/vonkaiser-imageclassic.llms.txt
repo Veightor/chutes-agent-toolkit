@@ -28,6 +28,11 @@ This file is intended for AI coding agents wiring an application to this specifi
 - This model is served on its own host (`https://vonkaiser-imageclassic.chutes.ai`). Call the endpoint paths listed below directly.
 - For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
 
+## Pricing
+
+- $1.80 per hour
+- Check the model page for current pricing.
+
 ## Playground Notes
 
 - The model field is required on the generic generate endpoint and must stay visible.
@@ -54,6 +59,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-imageclassic.chutes.ai/generate" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -67,6 +74,38 @@ curl -X POST "https://vonkaiser-imageclassic.chutes.ai/generate" \
   "negative_prompt": ""
 }' \
   --output output.jpg
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-imageclassic.chutes.ai/generate"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "seed": 42,
+    "model": "flux",
+    "width": 1024,
+    "height": 1024,
+    "prompt": "a serene mountain lake at sunset",
+    "negative_prompt": ""
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.jpg", "wb") as f:
+    f.write(response.content)
+print("Saved output.jpg (" + str(len(response.content)) + " bytes)")
 ```
 
 Playground presets:
@@ -91,6 +130,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-imageclassic.chutes.ai/image/flux" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -104,6 +145,38 @@ curl -X POST "https://vonkaiser-imageclassic.chutes.ai/image/flux" \
   "num_inference_steps": 4
 }' \
   --output output.jpg
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-imageclassic.chutes.ai/image/flux"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "seed": 42,
+    "width": 1024,
+    "height": 1024,
+    "prompt": "a serene mountain lake at sunset",
+    "guidance_scale": 3.5,
+    "num_inference_steps": 4
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.jpg", "wb") as f:
+    f.write(response.content)
+print("Saved output.jpg (" + str(len(response.content)) + " bytes)")
 ```
 
 Playground presets:
@@ -129,6 +202,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-imageclassic.chutes.ai/image/dreamshaper" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -143,6 +218,39 @@ curl -X POST "https://vonkaiser-imageclassic.chutes.ai/image/dreamshaper" \
   "num_inference_steps": 25
 }' \
   --output output.jpg
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-imageclassic.chutes.ai/image/dreamshaper"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "seed": 42,
+    "width": 1024,
+    "height": 1024,
+    "prompt": "a serene mountain lake at sunset",
+    "guidance_scale": 7.5,
+    "negative_prompt": "",
+    "num_inference_steps": 25
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.jpg", "wb") as f:
+    f.write(response.content)
+print("Saved output.jpg (" + str(len(response.content)) + " bytes)")
 ```
 
 Playground presets:
@@ -168,6 +276,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-imageclassic.chutes.ai/image/ilustmix" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -182,6 +292,39 @@ curl -X POST "https://vonkaiser-imageclassic.chutes.ai/image/ilustmix" \
   "num_inference_steps": 25
 }' \
   --output output.jpg
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-imageclassic.chutes.ai/image/ilustmix"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "seed": 42,
+    "width": 1024,
+    "height": 1024,
+    "prompt": "a serene mountain lake at sunset",
+    "guidance_scale": 7.5,
+    "negative_prompt": "",
+    "num_inference_steps": 25
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.jpg", "wb") as f:
+    f.write(response.content)
+print("Saved output.jpg (" + str(len(response.content)) + " bytes)")
 ```
 
 Playground presets:
@@ -207,6 +350,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-imageclassic.chutes.ai/image/juggernaut" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -221,6 +366,39 @@ curl -X POST "https://vonkaiser-imageclassic.chutes.ai/image/juggernaut" \
   "num_inference_steps": 25
 }' \
   --output output.jpg
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-imageclassic.chutes.ai/image/juggernaut"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "seed": 42,
+    "width": 1024,
+    "height": 1024,
+    "prompt": "a serene mountain lake at sunset",
+    "guidance_scale": 7.5,
+    "negative_prompt": "",
+    "num_inference_steps": 25
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.jpg", "wb") as f:
+    f.write(response.content)
+print("Saved output.jpg (" + str(len(response.content)) + " bytes)")
 ```
 
 Playground presets:

@@ -28,6 +28,11 @@ This file is intended for AI coding agents wiring an application to this specifi
 - This model is served on its own host (`https://vonkaiser-qwen-image-edit-2511.chutes.ai`). Call the endpoint paths listed below directly.
 - For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
 
+## Pricing
+
+- $1.80 per hour
+- Check the model page for current pricing.
+
 ## Playground Notes
 
 - Large reference images are uploaded through temporary Blob storage automatically.
@@ -43,9 +48,18 @@ This file is intended for AI coding agents wiring an application to this specifi
 
 Request fields:
 
-- `prompt` (string, optional) Default: "make the background a tropical beach scene".
+- `seed` (integer, optional) Default: null.
+- `width` (integer, optional) Default: 1024.
+- `height` (integer, optional) Default: 1024.
+- `prompt` (string, required)
+- `image_b64s` (array, required)
+- `true_cfg_scale` (number, optional) Default: 1.
+- `negative_prompt` (string, optional) Default: "".
+- `num_inference_steps` (integer, optional) Default: 4.
 
 Example call:
+
+cURL:
 
 ```bash
 # NOTE: replace the image_b64s placeholder(s) with real base64 data first.
@@ -65,6 +79,43 @@ curl -X POST "https://vonkaiser-qwen-image-edit-2511.chutes.ai/generate" \
   "num_inference_steps": 4
 }' \
   --output output.jpg
+```
+
+Python:
+
+```python
+import os
+import requests
+
+# NOTE: replace the placeholder(s) for image_b64s with real base64-encoded data before running.
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-qwen-image-edit-2511.chutes.ai/generate"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "prompt": "a serene mountain lake at sunset",
+    "seed": 42,
+    "width": 1024,
+    "height": 1024,
+    "image_b64s": [
+        "<base64-encoded image>"
+    ],
+    "true_cfg_scale": 1,
+    "negative_prompt": "",
+    "num_inference_steps": 4
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.jpg", "wb") as f:
+    f.write(response.content)
+print("Saved output.jpg (" + str(len(response.content)) + " bytes)")
 ```
 
 Playground presets:

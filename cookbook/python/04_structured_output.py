@@ -1,4 +1,4 @@
-"""Schema-enforced structured output. [VERIFIED 2026-06-11: ran live against the paid API]
+"""Schema-enforced structured output. [VERIFIED 2026-10-07: ran live against the paid API]
 
 Works on models advertising "structured_outputs"; for looser JSON use
 response_format={"type": "json_object"} on models advertising "json_mode".
@@ -10,7 +10,7 @@ import os
 
 from openai import OpenAI
 
-MODEL = os.environ.get("CHUTES_MODEL", "MiniMaxAI/MiniMax-M2.5-TEE")
+MODEL = os.environ.get("CHUTES_MODEL", "google/gemma-4-31B-turbo-TEE")
 
 client = OpenAI(base_url="https://llm.chutes.ai/v1", api_key=os.environ["CHUTES_API_KEY"])
 

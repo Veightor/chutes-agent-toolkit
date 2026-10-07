@@ -45,7 +45,7 @@ One honesty rule we hold ourselves to: parsing a quote proves its shape and cont
 # Build your pool only from confidential-compute models, with failover
 models = [m["id"] for m in get("https://llm.chutes.ai/v1/models")["data"]
           if m["confidential_compute"]]
-model = ",".join(models[:3])   # "zai-org/GLM-5-TEE,deepseek-ai/DeepSeek-V3.2-TEE,..."
+model = ",".join(models[:3])   # "zai-org/GLM-5.2-TEE,deepseek-ai/DeepSeek-V3.2-TEE,..."
 ```
 
 ---
@@ -59,7 +59,7 @@ TEE is the default and only tier. The pricing on `/v1/models` is the TEE price.
 No. Inference happens inside the enclave; the platform routes encrypted traffic to attested instances.
 
 **What about the 25% research discount proxy?**
-That is the explicit opposite trade: traffic through `research-data-opt-in-proxy.chutes.ai` is recorded for research. Sensitive workloads stay on `llm.chutes.ai`.
+It no longer exists — the former `research-data-opt-in-proxy.chutes.ai` endpoint was retired (verified 404, 2026-10-07). All traffic goes to `llm.chutes.ai`, which is TEE-backed.
 
 **What hardware is this?**
 Intel TDX CPUs fronting NVIDIA GPUs (Hopper and Blackwell observed in fleet attestation), with per-GPU attestation reports in the evidence bundle.

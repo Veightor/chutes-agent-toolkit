@@ -1,7 +1,7 @@
-"""Image input (vision). [VERIFIED 2026-06-11: ran live against the paid API]
+"""Image input (vision). [VERIFIED 2026-10-07: ran live against the paid API]
 
 Works on models whose input_modalities include "image"
-(e.g. the Qwen3.5/3.6 and Kimi-K2 lines — check /v1/models).
+(e.g. gemma-4-31B-turbo, the Qwen3.5/3.6/3.8 line, and Kimi-K2.6/K3 — check /v1/models).
 
 Images can be a data URI (shown here, always works) or a public URL — note that
 some hosts (e.g. Wikimedia) block Chutes' server-side fetcher with 403, so

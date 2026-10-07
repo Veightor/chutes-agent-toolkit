@@ -1,6 +1,6 @@
 # zai-org/GLM-5.1-TEE
 
-> GLM-5.1 is a large language model optimized for agentic tasks and coding that excels at sustained problem-solving over long horizons through iterative reasoning and tool use.
+> zai-org/GLM-5.1-FP8
 
 This file is intended for AI coding agents wiring an application to this specific Chutes model.
 
@@ -28,6 +28,12 @@ This file is intended for AI coding agents wiring an application to this specifi
 - This model is served on the shared OpenAI-compatible gateway. Set the request `model` field to the exact Name above (`zai-org/GLM-5.1-TEE`), and use base URL `https://llm.chutes.ai/v1`.
 - For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
 
+## Pricing
+
+- $0.98 input / $3.08 output per 1M tokens
+- $0.098 cached input per 1M tokens
+- Check the model page for current pricing.
+
 ## Endpoints
 
 ### 1. POST /v1/chat/completions
@@ -38,14 +44,37 @@ This file is intended for AI coding agents wiring an application to this specifi
 
 Request fields:
 
-- `seed` (integer, optional) Default: 42.
-- `model` (string, optional) Default: "zai-org/GLM-5.1-FP8".
-- `stream` (boolean, optional) Default: true.
-- `messages` (array, optional) Default: [{"role":"user","content":""}].
-- `max_tokens` (integer, optional) Default: 1024.
+- `seed` (integer, optional) Default: null.
+- `stop` (string, optional)
+- `min_p` (number, optional) Default: 0.
+- `model` (string, required)
+- `top_k` (integer, optional) Default: -1.
+- `top_p` (number, optional) Default: 1.
+- `stream` (boolean, optional) Default: false.
+- `best_of` (integer, optional) Default: null.
+- `logprobs` (boolean, optional) Default: false.
+- `messages` (array, required)
+- `ignore_eos` (boolean, optional) Default: false.
+- `logit_bias` (object, optional) Default: null.
+- `max_tokens` (integer, optional) Default: null.
+- `min_tokens` (integer, optional) Default: 0.
 - `temperature` (number, optional) Default: 0.7.
+- `top_logprobs` (integer, optional) Default: 0.
+- `length_penalty` (number, optional) Default: 1.
+- `stop_token_ids` (array, optional)
+- `prompt_logprobs` (integer, optional) Default: null.
+- `response_format` (object, optional) Default: null.
+- `use_beam_search` (boolean, optional) Default: false.
+- `presence_penalty` (number, optional) Default: 0.
+- `frequency_penalty` (number, optional) Default: 0.
+- `repetition_penalty` (number, optional) Default: 1.
+- `skip_special_tokens` (boolean, optional) Default: true.
+- `include_stop_str_in_output` (boolean, optional) Default: false.
+- `spaces_between_special_tokens` (boolean, optional) Default: true.
 
 Example call:
+
+cURL:
 
 ```bash
 curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
@@ -65,6 +94,60 @@ curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
 }'
 ```
 
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://llm.chutes.ai/v1/chat/completions"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "model": "zai-org/GLM-5.1-TEE",
+    "messages": [
+        {
+            "role": "user",
+            "content": "Hello!"
+        }
+    ],
+    "stream": True,
+    "max_tokens": 1024,
+    "temperature": 0.7
+}
+
+import json
+
+response = requests.request("POST", url, headers=headers, json=data, stream=True)
+response.raise_for_status()
+
+for line in response.iter_lines():
+    if not line:
+        continue
+    line = line.decode("utf-8")
+    if not line.startswith("data: "):
+        continue
+    chunk = line[6:]
+    if chunk == "[DONE]":
+        break
+    try:
+        choices = json.loads(chunk).get("choices") or []
+    except json.JSONDecodeError:
+        continue
+    if not choices:
+        continue
+    content = choices[0].get("delta", {}).get("content")
+    if content:
+        print(content, end="", flush=True)
+print()
+```
+
 ### 2. POST /v1/completions
 
 - Base URL: `https://llm.chutes.ai`
@@ -73,14 +156,37 @@ curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
 
 Request fields:
 
-- `seed` (integer, optional) Default: 42.
-- `model` (string, optional) Default: "zai-org/GLM-5.1-FP8".
+- `seed` (integer, optional) Default: null.
+- `stop` (string, optional)
+- `min_p` (number, optional) Default: 0.
+- `model` (string, required)
+- `top_k` (integer, optional) Default: -1.
+- `top_p` (number, optional) Default: 1.
 - `prompt` (string, required)
-- `stream` (boolean, optional) Default: true.
-- `max_tokens` (integer, optional) Default: 1024.
+- `stream` (boolean, optional) Default: false.
+- `best_of` (integer, optional) Default: null.
+- `logprobs` (boolean, optional) Default: false.
+- `ignore_eos` (boolean, optional) Default: false.
+- `logit_bias` (object, optional) Default: null.
+- `max_tokens` (integer, optional) Default: null.
+- `min_tokens` (integer, optional) Default: 0.
 - `temperature` (number, optional) Default: 0.7.
+- `top_logprobs` (integer, optional) Default: 0.
+- `length_penalty` (number, optional) Default: 1.
+- `stop_token_ids` (array, optional)
+- `prompt_logprobs` (integer, optional) Default: null.
+- `response_format` (object, optional) Default: null.
+- `use_beam_search` (boolean, optional) Default: false.
+- `presence_penalty` (number, optional) Default: 0.
+- `frequency_penalty` (number, optional) Default: 0.
+- `repetition_penalty` (number, optional) Default: 1.
+- `skip_special_tokens` (boolean, optional) Default: true.
+- `include_stop_str_in_output` (boolean, optional) Default: false.
+- `spaces_between_special_tokens` (boolean, optional) Default: true.
 
 Example call:
+
+cURL:
 
 ```bash
 curl -X POST "https://llm.chutes.ai/v1/completions" \
@@ -111,6 +217,52 @@ curl -X POST "https://llm.chutes.ai/v1/completions" \
 }'
 ```
 
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://llm.chutes.ai/v1/completions"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "seed": 42,
+    "model": "zai-org/GLM-5.1-TEE",
+    "prompt": "a serene mountain lake at sunset",
+    "stream": False,
+    "max_tokens": 1024,
+    "temperature": 0.7,
+    "min_p": 0,
+    "top_k": -1,
+    "top_p": 1,
+    "logprobs": False,
+    "ignore_eos": False,
+    "min_tokens": 0,
+    "top_logprobs": 0,
+    "length_penalty": 1,
+    "use_beam_search": False,
+    "presence_penalty": 0,
+    "frequency_penalty": 0,
+    "repetition_penalty": 1,
+    "skip_special_tokens": True,
+    "include_stop_str_in_output": False,
+    "spaces_between_special_tokens": True
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
+```
+
 ### 3. POST /v1/chat/completions
 
 - Base URL: `https://llm.chutes.ai`
@@ -118,14 +270,37 @@ curl -X POST "https://llm.chutes.ai/v1/completions" \
 
 Request fields:
 
-- `seed` (integer, optional) Default: 42.
-- `model` (string, optional) Default: "zai-org/GLM-5.1-FP8".
+- `seed` (integer, optional) Default: null.
+- `stop` (string, optional)
+- `min_p` (number, optional) Default: 0.
+- `model` (string, required)
+- `top_k` (integer, optional) Default: -1.
+- `top_p` (number, optional) Default: 1.
 - `stream` (boolean, optional) Default: false.
-- `messages` (array, optional) Default: [{"role":"user","content":""}].
-- `max_tokens` (integer, optional) Default: 1024.
+- `best_of` (integer, optional) Default: null.
+- `logprobs` (boolean, optional) Default: false.
+- `messages` (array, required)
+- `ignore_eos` (boolean, optional) Default: false.
+- `logit_bias` (object, optional) Default: null.
+- `max_tokens` (integer, optional) Default: null.
+- `min_tokens` (integer, optional) Default: 0.
 - `temperature` (number, optional) Default: 0.7.
+- `top_logprobs` (integer, optional) Default: 0.
+- `length_penalty` (number, optional) Default: 1.
+- `stop_token_ids` (array, optional)
+- `prompt_logprobs` (integer, optional) Default: null.
+- `response_format` (object, optional) Default: null.
+- `use_beam_search` (boolean, optional) Default: false.
+- `presence_penalty` (number, optional) Default: 0.
+- `frequency_penalty` (number, optional) Default: 0.
+- `repetition_penalty` (number, optional) Default: 1.
+- `skip_special_tokens` (boolean, optional) Default: true.
+- `include_stop_str_in_output` (boolean, optional) Default: false.
+- `spaces_between_special_tokens` (boolean, optional) Default: true.
 
 Example call:
+
+cURL:
 
 ```bash
 curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
@@ -145,6 +320,41 @@ curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
 }'
 ```
 
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://llm.chutes.ai/v1/chat/completions"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "model": "zai-org/GLM-5.1-TEE",
+    "messages": [
+        {
+            "role": "user",
+            "content": "Hello!"
+        }
+    ],
+    "stream": False,
+    "max_tokens": 1024,
+    "temperature": 0.7
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
+```
+
 ### 4. POST /v1/completions
 
 - Base URL: `https://llm.chutes.ai`
@@ -152,14 +362,37 @@ curl -X POST "https://llm.chutes.ai/v1/chat/completions" \
 
 Request fields:
 
-- `seed` (integer, optional) Default: 42.
-- `model` (string, optional) Default: "zai-org/GLM-5.1-FP8".
+- `seed` (integer, optional) Default: null.
+- `stop` (string, optional)
+- `min_p` (number, optional) Default: 0.
+- `model` (string, required)
+- `top_k` (integer, optional) Default: -1.
+- `top_p` (number, optional) Default: 1.
 - `prompt` (string, required)
 - `stream` (boolean, optional) Default: false.
-- `max_tokens` (integer, optional) Default: 1024.
+- `best_of` (integer, optional) Default: null.
+- `logprobs` (boolean, optional) Default: false.
+- `ignore_eos` (boolean, optional) Default: false.
+- `logit_bias` (object, optional) Default: null.
+- `max_tokens` (integer, optional) Default: null.
+- `min_tokens` (integer, optional) Default: 0.
 - `temperature` (number, optional) Default: 0.7.
+- `top_logprobs` (integer, optional) Default: 0.
+- `length_penalty` (number, optional) Default: 1.
+- `stop_token_ids` (array, optional)
+- `prompt_logprobs` (integer, optional) Default: null.
+- `response_format` (object, optional) Default: null.
+- `use_beam_search` (boolean, optional) Default: false.
+- `presence_penalty` (number, optional) Default: 0.
+- `frequency_penalty` (number, optional) Default: 0.
+- `repetition_penalty` (number, optional) Default: 1.
+- `skip_special_tokens` (boolean, optional) Default: true.
+- `include_stop_str_in_output` (boolean, optional) Default: false.
+- `spaces_between_special_tokens` (boolean, optional) Default: true.
 
 Example call:
+
+cURL:
 
 ```bash
 curl -X POST "https://llm.chutes.ai/v1/completions" \
@@ -190,6 +423,52 @@ curl -X POST "https://llm.chutes.ai/v1/completions" \
 }'
 ```
 
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://llm.chutes.ai/v1/completions"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "seed": 42,
+    "model": "zai-org/GLM-5.1-TEE",
+    "prompt": "a serene mountain lake at sunset",
+    "stream": False,
+    "max_tokens": 1024,
+    "temperature": 0.7,
+    "min_p": 0,
+    "top_k": -1,
+    "top_p": 1,
+    "logprobs": False,
+    "ignore_eos": False,
+    "min_tokens": 0,
+    "top_logprobs": 0,
+    "length_penalty": 1,
+    "use_beam_search": False,
+    "presence_penalty": 0,
+    "frequency_penalty": 0,
+    "repetition_penalty": 1,
+    "skip_special_tokens": True,
+    "include_stop_str_in_output": False,
+    "spaces_between_special_tokens": True
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
+```
+
 ### 5. GET /v1/models
 
 - Base URL: `https://llm.chutes.ai`
@@ -200,11 +479,37 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X GET "https://llm.chutes.ai/v1/models" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{}'
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://llm.chutes.ai/v1/models"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {}
+
+response = requests.request("GET", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
 ```
 
 ## Model Facts

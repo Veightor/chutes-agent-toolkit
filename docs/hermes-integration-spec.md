@@ -2,12 +2,13 @@
 
 This document defines the current Hermes-facing Chutes assets in this repo and the target state for cleaner Chutes support in Hermes.
 
-## Current state checked against Hermes v0.16.0
+## Current state checked against Hermes v0.21.3 (updated 2026-10-07)
 
-As of Hermes Agent v0.16.0, the installed upstream provider registry does not expose a first-class `chutes` provider. Chutes works through:
+Hermes core still does not expose a first-class `chutes` provider, but the official `hermes-agent` plugin catalog now lists [`hermes-chutes-provider`](https://github.com/TheStreamCode/hermes-chutes-provider) v0.1.5 by TheStreamCode (merged 2026-10-04, PR #126683) — a standalone model-provider plugin registering provider id `chutes`. Chutes works through:
 
-1. Hermes named-provider configuration for OpenAI-compatible model backends (`providers:` preferred; `custom_providers:` legacy-compatible).
-2. Hermes `mcp_servers` / `hermes mcp add` for tool-level Chutes access through the local stdio MCP server.
+1. The catalog plugin (manual directory install into `$HERMES_HOME/plugins/model-providers/chutes` until upstream standalone-plugin install lands).
+2. Hermes named-provider configuration for OpenAI-compatible model backends (`providers:` preferred; `custom_providers:` legacy-compatible).
+3. Hermes `mcp_servers` / `hermes mcp add` for tool-level Chutes access through the local stdio MCP server.
 3. The Hermes skill mirror under `other-agents/hermes/skills/`, with shared scripts still single-sourced under `plugins/chutes-ai/skills/`.
 
 Do not describe first-class Chutes provider support as upstream-shipped unless the target Hermes install actually shows it in `hermes model` / the provider registry.
@@ -82,19 +83,7 @@ Recommended environment variable in `~/.hermes/.env`:
 CHUTES_API_KEY=cpk_...
 ```
 
-Optional research endpoint:
-
-```yaml
-providers:
-  chutes-research:
-    name: Chutes Research Opt-In
-    base_url: https://research-data-opt-in-proxy.chutes.ai/v1
-    key_env: CHUTES_API_KEY
-    transport: chat_completions
-    default_model: default:latency
-```
-
-Research endpoint caveat: prompts and responses may be recorded for research; use only with explicit user consent.
+The former optional research endpoint (`research-data-opt-in-proxy.chutes.ai`) is defunct — verified 404 and no longer advertised, 2026-10-07. Do not configure a `chutes-research` provider.
 
 ### Auth note
 
@@ -151,9 +140,7 @@ Unexercised read tools and all write/deploy tools retain BETA labels according t
 - canonical live discovery source is `https://llm.chutes.ai/v1/models`
 - stronger claims require evidence inspection via `chutes-tee`
 
-4. Research endpoint tradeoff:
-- `https://research-data-opt-in-proxy.chutes.ai/v1`
-- same API key, lower cost, but prompt/response data may be recorded for research
+4. Research endpoint: defunct (verified 2026-10-07); do not document or configure it.
 
 ## Future native Hermes provider scope
 

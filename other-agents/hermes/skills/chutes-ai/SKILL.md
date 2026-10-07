@@ -31,13 +31,12 @@ Do not treat static model snapshots as authoritative.
 
 - Management API: `https://api.chutes.ai`
 - Inference API: `https://llm.chutes.ai/v1`
-- Research endpoint: `https://research-data-opt-in-proxy.chutes.ai/v1`
 
 ## Authentication
 
 Use a `cpk_...` API key. Store it as `CHUTES_API_KEY` in `~/.hermes/.env` or in this repo's keychain-backed credential manager; never paste the raw key into config examples or chat.
 
-Chutes auth was re-verified in the shared Chutes skills on 2026-06-11: use standard bearer authorization semantics (`Authorization: Bearer` plus the `cpk_...` value) for configured providers. `GET /v1/models` is public and should not be used as proof that a specific auth header works. Older April notes about `X-API-Key` are superseded for Hermes-facing setup.
+Chutes auth was re-verified in the shared Chutes skills on 2026-06-11 and again 2026-10-07: use standard bearer authorization semantics (`Authorization: Bearer` plus the `cpk_...` value) for configured providers. `GET /v1/models` is public and should not be used as proof that a specific auth header works. Older April notes about `X-API-Key` are superseded for Hermes-facing setup.
 
 ## Hermes setup pattern
 
@@ -64,17 +63,7 @@ model:
 
 Legacy Hermes configs may use `custom_providers:` with equivalent `name`, `base_url`, `key_env`, `api_mode`, and `model` fields.
 
-Optional research profile:
-
-```yaml
-providers:
-  chutes-research:
-    name: Chutes Research Opt-In
-    base_url: https://research-data-opt-in-proxy.chutes.ai/v1
-    key_env: CHUTES_API_KEY
-    transport: chat_completions
-    default_model: default:latency
-```
+The former research opt-in endpoint (`research-data-opt-in-proxy.chutes.ai`) is defunct — verified 404 and no longer advertised as of 2026-10-07. Do not configure it.
 
 ## Routing guidance
 

@@ -103,6 +103,7 @@ def test_render_hermes_config_uses_env_var_and_live_direct_model_without_secret(
     assert "cpk_" not in config
     assert "apiKey" not in config
     assert "https://llm.chutes.ai/v1" in config
-    assert "https://research-data-opt-in-proxy.chutes.ai/v1" in config
+    # Defunct research proxy must never be emitted (verified dead 2026-10-07).
+    assert "research-data-opt-in-proxy" not in config
     assert '"cheap-tools": {}' in config
     assert "provider: custom:chutes" in config

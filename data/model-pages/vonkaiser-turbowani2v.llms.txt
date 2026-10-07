@@ -28,6 +28,11 @@ This file is intended for AI coding agents wiring an application to this specifi
 - This model is served on its own host (`https://vonkaiser-turbowani2v.chutes.ai`). Call the endpoint paths listed below directly.
 - For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
 
+## Pricing
+
+- $1.80 per hour
+- Check the model page for current pricing.
+
 ## Playground Notes
 
 - Short, physical motion descriptions usually work better than broad cinematic prompts.
@@ -43,10 +48,26 @@ This file is intended for AI coding agents wiring an application to this specifi
 
 Request fields:
 
-- `prompt` (string, optional) Default: "A cat wearing sunglasses sits on a surfboard, the ocean waves gently rocking it".
-- `image_b64` (string, optional) Default: "".
+- `fps` (integer, optional) Default: null.
+- `ode` (boolean, optional) Default: true.
+- `seed` (integer, optional) Default: 42.
+- `image` (string, optional) - URL or base64 (wan22fast) Default: null.
+- `frames` (integer, optional) - Legacy alias for num frames Default: null.
+- `prompt` (string, required)
+- `boundary` (number, optional) Default: 0.9.
+- `duration` (number, optional) - Target clip length in seconds. With default 16 fps, derives frame count (snapped to Wan 4n+1). If frames are set but fps omitted, fps is derived from duration for the output MP4. Default: null.
+- `sla_topk` (number, optional) Default: 0.1.
+- `image_b64` (string, optional) Default: null.
+- `num_steps` (integer, optional) Default: 4.
+- `sigma_max` (number, optional) Default: 200.
+- `num_frames` (integer, optional) Default: null.
+- `resolution` (string, optional) Default: "480p". Options: 480p, 720p.
+- `aspect_ratio` (string, optional) Default: "16:9".
+- `adaptive_resolution` (boolean, optional) - Resize to fit resolution bucket while preserving aspect ratio (wan22fast-style). Default: true.
 
 Example call:
+
+cURL:
 
 ```bash
 curl -X POST "https://vonkaiser-turbowani2v.chutes.ai/generate" \
@@ -65,6 +86,42 @@ curl -X POST "https://vonkaiser-turbowani2v.chutes.ai/generate" \
   "adaptive_resolution": true
 }' \
   --output output.mp4
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-turbowani2v.chutes.ai/generate"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "prompt": "a serene mountain lake at sunset",
+    "ode": True,
+    "seed": 42,
+    "boundary": 0.9,
+    "sla_topk": 0.1,
+    "num_steps": 4,
+    "sigma_max": 200,
+    "resolution": "480p",
+    "aspect_ratio": "16:9",
+    "adaptive_resolution": True
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.mp4", "wb") as f:
+    f.write(response.content)
+print("Saved output.mp4 (" + str(len(response.content)) + " bytes)")
 ```
 
 Playground presets:

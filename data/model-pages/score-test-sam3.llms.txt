@@ -28,6 +28,11 @@ This file is intended for AI coding agents wiring an application to this specifi
 - This model is served on its own host (`https://score-test-sam3.chutes.ai`). Call the endpoint paths listed below directly.
 - For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
 
+## Pricing
+
+- $1.80 per hour
+- Check the model page for current pricing.
+
 ## Endpoints
 
 ### 1. POST /health
@@ -40,11 +45,37 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://score-test-sam3.chutes.ai/health" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{}'
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://score-test-sam3.chutes.ai/health"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
 ```
 
 ### 2. POST /sam3/segment
@@ -57,6 +88,8 @@ Request fields:
 - `data` (object, required)
 
 Example call:
+
+cURL:
 
 ```bash
 curl -X POST "https://score-test-sam3.chutes.ai/sam3/segment" \
@@ -76,6 +109,43 @@ curl -X POST "https://score-test-sam3.chutes.ai/sam3/segment" \
     ]
   }
 }'
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://score-test-sam3.chutes.ai/sam3/segment"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "data": {
+        "image": {
+            "type": "example-string",
+            "value": "example-string"
+        },
+        "prompts": [
+            {
+                "text": "Your text here",
+                "type": "example-string"
+            }
+        ]
+    }
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
 ```
 
 ## Agent Integration Checklist

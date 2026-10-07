@@ -11,14 +11,14 @@
 [![Powered by Bittensor](https://img.shields.io/badge/powered%20by-Bittensor-FF6B00)](https://bittensor.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-One toolkit, every agent. Drop Chutes into **Claude**, **Hermes**, **OpenClaw**, **Codex**, or any OpenAI-compatible client — decentralized serverless inference for open-source models (Kimi, GLM, Qwen, DeepSeek, MiniMax, Gemma, Nemotron, Mistral), powered by Bittensor. The hosted catalog is currently **all TEE-backed** (`confidential_compute: true`); the live list at [`https://llm.chutes.ai/v1/models`](https://llm.chutes.ai/v1/models) is always the source of truth (and the badges above read straight from the daily-refreshed snapshot).
+One toolkit, every agent. Drop Chutes into **Claude**, **Hermes**, **OpenClaw**, **Codex**, or any OpenAI-compatible client — decentralized serverless inference for open-source models (Kimi, GLM, Qwen, DeepSeek, Gemma, Nemotron, Mistral), powered by Bittensor. The hosted catalog is currently **all TEE-backed** (`confidential_compute: true`); the live list at [`https://llm.chutes.ai/v1/models`](https://llm.chutes.ai/v1/models) is always the source of truth (and the badges above read straight from the daily-refreshed snapshot).
 
 ### 🚀 Start here
 
 | You want to… | Go to |
 |---|---|
 | **Call the endpoint from anything** (the one-page universal guide) | 📘 [**`docs/endpoint-guide.md`**](docs/endpoint-guide.md) |
-| **Run working code right now** (chat, tools, routing, a full mini-agent — live-verified 2026-06-11) | 🍳 [**`cookbook/`**](cookbook/README.md) |
+| **Run working code right now** (chat, tools, routing, a full mini-agent — live-verified 2026-10-07) | 🍳 [**`cookbook/`**](cookbook/README.md) |
 | **Pick a model for your task** (`--task agentic --routing latency`) | 🎯 [`scripts/pick_model.py`](scripts/pick_model.py) |
 | Use it inside **Claude** (Code / Cowork) | [Install for Claude](#install-for-claude-code--cowork) |
 | Use it inside **Hermes** | [`other-agents/hermes/`](other-agents/hermes/README.md) |
@@ -34,12 +34,12 @@ This repo is both a **Claude plugin marketplace** and a **multi-agent toolkit** 
 
 | Component | Version | Notes |
 |---|---|---|
-| Toolkit / `chutes-ai` plugin | **v1.3.0** | see [`plugin.json`](plugins/chutes-ai/.claude-plugin/plugin.json) |
+| Toolkit / `chutes-ai` plugin | **v1.3.1** | see [`plugin.json`](plugins/chutes-ai/.claude-plugin/plugin.json) |
 | Model snapshot | _auto_ | daily-refreshed → badges above + [`data/chutes-models.json`](data/chutes-models.json) |
 | Chutes SDK (PyPI `chutes`) | 0.6.9 (stable) | for `chutes deploy` / TEE `tee=True` |
-| Hermes (verified against) | v0.16.0 | named OpenAI-compatible provider |
-| OpenClaw (verified against) | `openclaw@latest` | `models.providers` JSON5 config |
-| Last live API re-verification | 2026-06-11 | auth + catalog + TEE, see below |
+| Hermes (verified against) | v0.21.3 | catalog plugin [`hermes-chutes-provider`](https://github.com/TheStreamCode/hermes-chutes-provider) v0.1.5 by TheStreamCode, or named OpenAI-compatible provider |
+| OpenClaw (verified against) | `openclaw@2026.9.8` docs | official `@openclaw/chutes-provider` plugin, or `models.providers` JSON5 config |
+| Last live API re-verification | 2026-10-07 | auth + catalog + paid completion + cookbook, see below |
 
 ---
 
@@ -86,6 +86,19 @@ A full re-verification pass (real GETs against the live API, no management write
 - **Agent registration**: live status GET re-verified; terminal status is `"completed"` (not `"ready"` as previously documented).
 - Read-only scripts across `chutes-platform-ops`, `chutes-routing`, and `chutes-agent-registration` were re-run live; write/deploy flows were not re-exercised and keep their existing labels. Exception: `POST /v1/chat/completions` **was** exercised live with Bearer on 2026-06-11 (direct model id, `unsloth/Mistral-Nemo-Instruct-2407-TEE`) — the response carried `x-chutes-invocationid` plus quota headers, and `usage.prompt_tokens_details.cached_tokens` shows prompt caching is active on inference.
 
+### 2026-10-07 refresh — what changed on the platform and in the ecosystem
+
+A full per-agent-lane re-verification pass (live catalog + a real paid completion + every cookbook example re-run, plus upstream research on each agent integration). Current facts that supersede the 2026-06-11 notes above:
+
+- **Catalog is now 14 TEE models** (was 13). New since June: `Qwen/Qwen3.8-27B-TEE`, `moonshotai/Kimi-K3-TEE`, `zai-org/GLM-5.2-TEE`, `deepseek-ai/DeepSeek-V4-Flash-0731-TEE`, `Nemotron-3-Nano-Omni-30B-TEE` (1M-context tier now exists: GLM-5.2, Kimi-K3, DeepSeek-V4-Flash). **Delisted:** `MiniMaxAI/MiniMax-M2.5-TEE`, `moonshotai/Kimi-K2.5-TEE`, `zai-org/GLM-5-TEE`, `nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-TEE`. Every pinned example/default across the repo was re-pointed at live models; swaps were trial-verified (gemma-4-31B-turbo won the cheap tool-caller bake-off, GLM-5.2 the flagship slot).
+- **The 25% research data-opt-in proxy is DEFUNCT**: `research-data-opt-in-proxy.chutes.ai` returns 404 `DEPLOYMENT_NOT_FOUND` and the offer is gone from chutes.ai/llms.txt and the pricing page. All references across the toolkit now say so; the Hermes dual-endpoints config example was removed and `hermes_chutes_doctor.py --include-research` is a deprecated no-op.
+- **OpenClaw now ships an official Chutes provider**: `openclaw plugins install @openclaw/chutes-provider` with browser OAuth (`openclaw onboard --auth-choice chutes`) or API-key onboarding, documented at [docs.openclaw.ai/providers/chutes](https://docs.openclaw.ai/providers/chutes). The OpenClaw guide now leads with it; the manual `models.providers` JSON5 path stays as the customization fallback.
+- **Hermes has a community catalog provider plugin**: [`hermes-chutes-provider`](https://github.com/TheStreamCode/hermes-chutes-provider) v0.1.5 by **TheStreamCode** was merged into the official `hermes-agent` plugin catalog on 2026-10-04 ([PR #126683](https://github.com/NousResearch/hermes-agent/pull/126683)) — props to TheStreamCode for landing the first Chutes provider in the Hermes community catalog. The Hermes guide now leads with it (manual directory install until upstream standalone-plugin install lands). Local Hermes verified at v0.21.3.
+- **LiteLLM prefix corrected**: the provider prefix is `chutes/` (not `chutes_ai/`), env var `CHUTES_API_KEY`, verified against LiteLLM 1.104.0 source.
+- **Cookbook re-verified**: examples 01–07 + `chat.mjs` all ran live on 2026-10-07 with the new default models (total spend well under $0.01). 08 (video) keeps its 2026-08-06 verification.
+- **Claude marketplace manifest added**: `.claude-plugin/marketplace.json` now exists (it was missing, so `/plugin marketplace add Veightor/chutes-agent-toolkit` could not resolve); `claude plugin validate .` passes.
+- Auth model unchanged: Bearer `cpk_` everywhere (re-verified on the public catalog GET and a live paid completion); `X-API-Key` still dead.
+
 ### Still BETA
 
 - **`chutes-deploy`** — permanent BETA under the deploy-features policy. Wave-2 live verification found that the easy-deploy lanes (`POST /chutes/vllm`, `POST /chutes/diffusion`) were gated server-side with HTTP 403 `{"detail":"Easy deployment is currently disabled!"}` on at least some account classes; both endpoints are still present in `openapi.json` but the gate could not be re-probed read-only, so assume gated (unverified as of 2026-06-11). The API requires `revision` to be a full 40-hex HF commit SHA (`^[a-fA-F0-9]{40}$`) — now verified server-side, and `--revision` branch→SHA auto-resolve is in place. `teeify_chute.py` is **[BETA — DEFUNCT]**: `PUT /chutes/{id}/teeify` no longer exists. A new self-serve private TEE deploy product (RTX Pro 6000, $1.80/hr + 3× hourly deploy fee) appeared on the pricing page **[BETA]** (unverified as of 2026-06-11).
@@ -95,7 +108,6 @@ A full re-verification pass (real GETs against the live API, no management write
 - **`chutes-mcp-portability` write tools** — `chutes_deploy_vllm`, `chutes_deploy_diffusion`, `chutes_teeify` (now also deprecated in place: the upstream endpoint is gone), `chutes_set_alias`, `chutes_delete_alias`, `chutes_create_api_key` stay permanent BETA under the deploy-features policy. `chutes_set_alias` / `chutes_delete_alias` were functionally exercised in wave 2 (and the wave-1 schema bug was fixed), but deploy-side writes keep the label.
 - **`chutes-mcp-portability` three unexercised read tools** — `chutes_chat_complete` (the underlying `POST /v1/chat/completions` + Bearer auth were verified live 2026-06-11 via direct curl, but the tool itself has not been exercised through the MCP path), `chutes_get_evidence` (the `chutes-tee` skill exercises the underlying endpoint but not through the MCP path), `chutes_oauth_introspect` (needs a live OAuth token).
 - **`chutes-tee` verified-verdict pipeline** — the scripts detect Intel DCAP but the cryptographic-validation wiring is spec-only; `shape-valid` remains the practical verdict ceiling **[BETA]**.
-- **Research data-opt-in proxy (25% discount)** — documented from `chutes.ai/llms.txt`, not exercised end-to-end on this account **[BETA]**.
 
 ---
 

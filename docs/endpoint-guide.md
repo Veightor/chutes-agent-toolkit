@@ -199,13 +199,13 @@ Comma-separate model IDs; append a strategy suffix:
 
 ```python
 # Sequential failover — try each in order until one answers
-model="zai-org/GLM-5-TEE,deepseek-ai/DeepSeek-V3.2-TEE,Qwen/Qwen3.5-397B-A17B-TEE"
+model="zai-org/GLM-5.2-TEE,deepseek-ai/DeepSeek-V3.2-TEE,Qwen/Qwen3.5-397B-A17B-TEE"
 
 # Lowest latency right now (best for interactive chat)
-model="zai-org/GLM-5-TEE,deepseek-ai/DeepSeek-V3.2-TEE:latency"
+model="zai-org/GLM-5.2-TEE,deepseek-ai/DeepSeek-V3.2-TEE:latency"
 
 # Highest throughput right now (best for long generations / batch)
-model="zai-org/GLM-5-TEE,deepseek-ai/DeepSeek-V3.2-TEE:throughput"
+model="zai-org/GLM-5.2-TEE,deepseek-ai/DeepSeek-V3.2-TEE:throughput"
 ```
 
 ### Saved pool + aliases (set once in the dashboard)
@@ -240,7 +240,7 @@ for chunk in stream:
 
 **JSON mode & structured outputs** — `response_format={"type": "json_object"}` on models advertising `"json_mode"`; full JSON-schema enforcement on models advertising `"structured_outputs"`.
 
-**Vision** — send image parts in `content` to models whose `input_modalities` include `"image"` (e.g. `google/gemma-4-31B-turbo-TEE`, `Qwen/Qwen3.6-27B-TEE`, the Kimi-K2 line). Kimi also accepts `"video"`.
+**Vision** — send image parts in `content` to models whose `input_modalities` include `"image"` (e.g. `google/gemma-4-31B-turbo-TEE`, `Qwen/Qwen3.6-27B-TEE`, `moonshotai/Kimi-K2.6-TEE` / `Kimi-K3-TEE`). Kimi also accepts `"video"`.
 
 **Media chutes (video / image / audio generation)** — these never appear on the gateway; each runs on its own host (`https://<slug>.chutes.ai`) and takes a flat JSON body on `POST /generate`, returning raw media bytes (see the [full-modality catalog](model-pages.md)). Three things bite agents here:
 
@@ -273,7 +273,7 @@ As of the latest snapshot, **100% of hosted models run with `confidential_comput
 - **Crypto** — send `$TAO`, SN64, or any Bittensor alpha token to your `payment_address`; auto-converts to USD within minutes (non-refundable).
 - **Stripe** — [chutes.ai/app](https://chutes.ai/app) → billing → "Add Balance" → "Top up with Stripe" (25+ payment methods).
 
-**25% research discount:** swap the inference base URL for `https://research-data-opt-in-proxy.chutes.ai/v1` — same API, same models, same key, **25% cheaper**. The trade: prompts/responses are recorded for joint caching research with Harvard. **Never send sensitive data here.** Confirm it's active via `GET https://api.chutes.ai/users/me/discounts`.
+**25% research discount — DEFUNCT:** the former `research-data-opt-in-proxy.chutes.ai` endpoint is gone (verified 2026-10-07: HTTP 404 `DEPLOYMENT_NOT_FOUND`, offer no longer advertised on chutes.ai). Current advertised discounts are subscription tiers (Plus 6% / Pro 10% off PAYG overage); per-account discounts show in `GET https://api.chutes.ai/users/me/discounts`.
 
 ---
 

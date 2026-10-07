@@ -30,20 +30,20 @@ Put this in `~/.zshrc` or `~/.bashrc`.
 
 ## Pick a model
 
-Aider caches capabilities per model. As of 2026-06-11 the Chutes catalog is 13 models, **all TEE** (`-TEE` suffix, `confidential_compute: true`) — older non-TEE ids like `deepseek-ai/DeepSeek-V3-0324` and `deepseek-ai/DeepSeek-R1` no longer exist on `/v1/models`. A few reasonable starting points:
+Aider caches capabilities per model. As of 2026-10-07 the Chutes catalog is 14 models, **all TEE** (`-TEE` suffix, `confidential_compute: true`) — older non-TEE ids like `deepseek-ai/DeepSeek-V3-0324` and `deepseek-ai/DeepSeek-R1` no longer exist on `/v1/models`. A few reasonable starting points:
 
 | Intent | Model |
 |---|---|
 | Everyday editing | `deepseek-ai/DeepSeek-V3.2-TEE` |
 | Coding/agentic flagship | `moonshotai/Kimi-K2.6-TEE` or `zai-org/GLM-5.1-TEE` |
-| Budget coding workhorse | `MiniMaxAI/MiniMax-M2.5-TEE` |
+| Budget coding workhorse | `Qwen/Qwen3.8-27B-TEE` |
 | Cheap background | `Qwen/Qwen3-32B-TEE` (or `unsloth/Mistral-Nemo-Instruct-2407-TEE`, the cheapest) |
 | Reasoning-heavy refactors | `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE` |
 
 You can also use routing strings as the model id:
 
 ```yaml
-model: deepseek-ai/DeepSeek-V3.2-TEE,zai-org/GLM-5-TEE,Qwen/Qwen3-32B-TEE:latency
+model: deepseek-ai/DeepSeek-V3.2-TEE,zai-org/GLM-5.2-TEE,Qwen/Qwen3-32B-TEE:latency
 ```
 
 Aider will pass this through as the `model` parameter, and Chutes' router will rank the pool by TTFT per request.

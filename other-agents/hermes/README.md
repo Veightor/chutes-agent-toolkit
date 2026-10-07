@@ -4,9 +4,9 @@
 
 This guide shows the current Hermes-facing Chutes setup in this repo.
 
-Important distinction:
-- Hermes upstream v0.16.0 does not ship a first-class `chutes` provider in the installed provider registry.
-- Hermes supports named OpenAI-compatible endpoints through the keyed `providers:` config shape and the legacy `custom_providers:` list.
+Important distinction (updated 2026-10-07, verified against Hermes v0.21.3):
+- Hermes core still does not ship a built-in `chutes` provider — but there is now a **community model-provider plugin in the official Hermes plugin catalog**: [`hermes-chutes-provider`](https://github.com/TheStreamCode/hermes-chutes-provider) (v0.1.5), merged into the `hermes-agent` catalog on 2026-10-04 ([PR #126683](https://github.com/NousResearch/hermes-agent/pull/126683)). Big props to **[TheStreamCode](https://github.com/TheStreamCode)** for building it and landing it in the Hermes community catalog — 13/13 `hermes plugins validate` checks, zero warnings. See [Option 0](#option-0--the-catalog-plugin-recommended) below.
+- Without the plugin, Hermes supports named OpenAI-compatible endpoints through the keyed `providers:` config shape and the legacy `custom_providers:` list.
 - Hermes also supports stdio/HTTP MCP servers via `hermes mcp add`, so the Chutes MCP server can be used directly as a tool surface.
 
 When live model inventory, pricing, capabilities, or TEE status matter, always use:
@@ -75,7 +75,29 @@ Current Hermes skill mirror:
 | `chutes-agent-registration` | Bittensor-backed Chutes agent registration prep | BETA |
 | `chutes-tee` | Evidence fetch, TDX/GPU attestation parsing | shape-valid |
 
-## Configure Chutes as a Hermes custom provider
+## Option 0 — the catalog plugin (recommended)
+
+[`hermes-chutes-provider`](https://github.com/TheStreamCode/hermes-chutes-provider) by [TheStreamCode](https://github.com/TheStreamCode) registers a stable `chutes` provider that discovers tool-capable models from the live catalog and falls back to Chutes routing aliases when the catalog is unreachable. It is listed in the official Hermes plugin catalog (merged 2026-10-04); native `hermes plugins install` support is pending upstream, so install is a manual directory clone of the released tag:
+
+```bash
+export HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
+mkdir -p "$HERMES_HOME/plugins/model-providers"
+git clone --branch v0.1.5 --depth 1 \
+  https://github.com/TheStreamCode/hermes-chutes-provider.git \
+  "$HERMES_HOME/plugins/model-providers/chutes"
+```
+
+Add the key to `$HERMES_HOME/.env` (`CHUTES_API_KEY=cpk_...`, optional `CHUTES_BASE_URL` override), then select it in `$HERMES_HOME/config.yaml`:
+
+```yaml
+model:
+  provider: chutes
+  default: default:latency
+```
+
+Start a new Hermes process and run `hermes doctor` — the Provider Connectivity section should list Chutes. `chutes-ai` and `chutesai` resolve as aliases; use the canonical `chutes` in `provider:model` input. **[BETA]** — the plugin is validated upstream (`hermes plugins validate` 13/13 on the pinned commit), but this repo has not yet exercised it end-to-end on a live Hermes install.
+
+## Configure Chutes as a Hermes custom provider (manual fallback)
 
 Put the API key in `~/.hermes/.env`:
 
@@ -114,14 +136,13 @@ hermes model
 
 and select the saved custom provider if you prefer the picker.
 
-Auth note: Chutes auth was re-verified in the shared Chutes skills on 2026-06-11. Use standard bearer authorization semantics (`Authorization: Bearer` plus the `cpk_...` value) for configured providers; `/v1/models` is public and does not prove an auth header works. Older April notes about `X-API-Key` are superseded for Hermes-facing setup.
+Auth note: Chutes auth was re-verified in the shared Chutes skills on 2026-06-11 and again on 2026-10-07 (live paid completion with Bearer). Use standard bearer authorization semantics (`Authorization: Bearer` plus the `cpk_...` value) for configured providers; `/v1/models` is public and does not prove an auth header works. Older April notes about `X-API-Key` are superseded for Hermes-facing setup.
 
 ## Config examples
 
 Checked-in snippets live in `other-agents/hermes/config-examples/`:
 
 - `chutes-basic.yaml` — make Chutes the active model backend.
-- `chutes-dual-endpoints.yaml` — normal endpoint plus opt-in research endpoint.
 - `chutes-cheap-routing.yaml` — use Chutes as Hermes `smart_model_routing.cheap_model`.
 - `chutes-delegation.yaml` — use Chutes for delegated/background subtasks.
 

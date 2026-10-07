@@ -7,7 +7,7 @@ description: "Chutes.ai hub skill — the entry point for decentralized open-sou
 
 This skill is the **hub** for Chutes.ai integration. It covers the "Use Chutes" lane end-to-end (account → API keys → models → inference) and routes to sibling skills for the other three lanes.
 
-Chutes provides OpenAI-compatible inference for top open-source models (DeepSeek, Qwen, Kimi, GLM, Gemma, MiniMax, Nemotron) on decentralized GPU infrastructure, very cheaply. As of 2026-06-11 the entire hosted LLM catalog runs in TEEs (confidential compute) — every model on `/v1/models` has `confidential_compute: true`. There are no Llama models on the platform. Any tool that talks to OpenAI can point at Chutes instead.
+Chutes provides OpenAI-compatible inference for top open-source models (DeepSeek, Qwen, Kimi, GLM, Gemma, Nemotron, Mistral) on decentralized GPU infrastructure, very cheaply. As of 2026-10-07 the entire hosted LLM catalog runs in TEEs (confidential compute) — every model on `/v1/models` has `confidential_compute: true`. There are no Llama or MiniMax LLMs on the platform. Any tool that talks to OpenAI can point at Chutes instead.
 
 ## Four product lanes
 
@@ -170,7 +170,7 @@ GET https://llm.chutes.ai/v1/models
 Authorization: Bearer cpk_...   # optional — endpoint is public (verified 2026-06-11)
 ```
 
-As of 2026-06-11 the catalog is **13 LLMs, all TEE** (`confidential_compute: true`, `-TEE` suffixed IDs). Each model exposes `id`, `root`, `chute_id`, `confidential_compute` (boolean — **use this, not the `-TEE` suffix**, as source of truth), `owned_by` (`sglang` / `vllm`), `pricing.{prompt,completion,input_cache_read}` (USD per 1M tokens), `context_length`, `max_output_length`, `supported_features` (`tools`, `json_mode`, `structured_outputs`, `reasoning`), `supported_sampling_parameters`, `input_modalities`, `output_modalities`, `quantization`.
+As of 2026-10-07 the catalog is **14 LLMs, all TEE** (`confidential_compute: true`, `-TEE` suffixed IDs). Each model exposes `id`, `root`, `chute_id`, `confidential_compute` (boolean — **use this, not the `-TEE` suffix**, as source of truth), `owned_by` (`sglang` / `vllm`), `pricing.{prompt,completion,input_cache_read}` (USD per 1M tokens), `context_length`, `max_output_length`, `supported_features` (`tools`, `json_mode`, `structured_outputs`, `reasoning`), `supported_sampling_parameters`, `input_modalities`, `output_modalities`, `quantization`.
 
 Chutes hosts more than LLMs: **image, video, TTS (54 voices / 9 languages), STT, music, moderation, and custom inference.**
 
@@ -184,10 +184,10 @@ Full guide: [`docs/endpoint-guide.md` §7](../../../../docs/endpoint-guide.md); 
 
 Quick static reference: `references/known-models.md`. Always query the live endpoint for authoritative data.
 
-When helping users choose (live catalog as of 2026-06-11):
-- **Frontier coding/agentic** → `moonshotai/Kimi-K2.6-TEE` or `zai-org/GLM-5.1-TEE`; budget → `MiniMaxAI/MiniMax-M2.5-TEE`.
-- **Reasoning** → `zai-org/GLM-5.1-TEE`, `nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-TEE`; budget → `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE`.
-- **Cheap-fast chat** → `google/gemma-4-31B-turbo-TEE`; absolute cheapest → `unsloth/Mistral-Nemo-Instruct-2407-TEE`.
+When helping users choose (live catalog as of 2026-10-07):
+- **Frontier coding/agentic** → `moonshotai/Kimi-K3-TEE` or `zai-org/GLM-5.2-TEE` (both 1M ctx); budget → `Qwen/Qwen3.8-27B-TEE`.
+- **Reasoning** → `zai-org/GLM-5.2-TEE`, `deepseek-ai/DeepSeek-V4-Flash-0731-TEE` (1M ctx); budget → `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE`.
+- **Cheap-fast chat** → `google/gemma-4-31B-turbo-TEE` (also vision + tools; bake-off verified 2026-10-07); absolute cheapest → `unsloth/Mistral-Nemo-Instruct-2407-TEE`.
 - **Vision/multimodal** → `moonshotai/Kimi-K2.6-TEE` (text+image+video), `Qwen/Qwen3.5-397B-A17B-TEE`, `google/gemma-4-31B-turbo-TEE`.
 - **Privacy** → everything: all hosted LLMs are `confidential_compute: true` now.
 - **Cost** → `pricing.prompt`, `pricing.completion`, cache hits via `pricing.input_cache_read`.
@@ -279,7 +279,7 @@ For anything beyond a balance check — discounts, quotas by chute, subscription
 ## Special features (one-line summaries, deep content in siblings)
 
 - **TEE (confidential compute).** As of 2026-06-11 **every** hosted LLM runs in Intel TDX (`confidential_compute: true`). Attestation evidence: `GET /chutes/{chute_id}/evidence?nonce=<64 hex chars>` — the nonce query param is required and must be exactly 64 hex characters (32 bytes). Golden TEE measurements: `GET /servers/tee/measurements` (unverified as of 2026-06-11). See the `chutes-tee` skill for the verification flow.
-- **Harvard research endpoint (25% off).** Drop-in replacement base URL `https://research-data-opt-in-proxy.chutes.ai/v1`. Trade-off: prompts/responses are recorded for research. Do not send sensitive data.
+- **Research endpoint (25% off) — DEFUNCT.** The former `https://research-data-opt-in-proxy.chutes.ai/v1` proxy is gone (verified 2026-10-07: HTTP 404 `DEPLOYMENT_NOT_FOUND`, and the discount is no longer advertised on chutes.ai/llms.txt or the pricing page). Do not configure it. Current advertised discounts are subscription-tier only (Plus/Pro).
 - **Cache hit pricing.** Repeated prompts transparently hit the cache and pay `pricing.input_cache_read`.
 - **Sign in with Chutes.** OAuth 2.0 + PKCE. `POST /idp/apps`, `cid_` / `csc_` returned. Full integrator flow lives in `chutes-sign-in`.
 - **Model aliases.** Stable semantic handles via `/model_aliases/`. Recommended packs (`interactive-fast`, `private-reasoning`, `cheap-background`, `agent-coder`, `tee-chat`) live in `chutes-routing` stub; create one with `chutes-deploy` → `alias_deploy.py` **[BETA]**.

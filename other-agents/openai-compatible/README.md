@@ -26,7 +26,7 @@ Full REST API spec. Swagger UI available at `https://api.chutes.ai/docs`.
 https://llm.chutes.ai/v1/models
 ```
 
-Structured JSON of all available models with pricing, context length, TEE status, supported features, and per-token cost in USD and TAO. Public — no auth required (verified 2026-06-11). As of 2026-06-11 every hosted LLM is a `-TEE` variant with `confidential_compute: true` (13 models); treat this endpoint as the source of truth instead of hardcoding model ids.
+Structured JSON of all available models with pricing, context length, TEE status, supported features, and per-token cost in USD and TAO. Public — no auth required (re-verified 2026-10-07). As of 2026-10-07 every hosted LLM is a `-TEE` variant with `confidential_compute: true` (14 models); treat this endpoint as the source of truth instead of hardcoding model ids.
 
 ## Docs Index (Machine-Readable)
 
@@ -56,13 +56,13 @@ llm = ChatOpenAI(
 import litellm
 
 response = litellm.completion(
-    model="chutes_ai/deepseek-ai/DeepSeek-V3.2-TEE",
+    model="chutes/deepseek-ai/DeepSeek-V3.2-TEE",
     messages=[{"role": "user", "content": "Hello"}],
     api_key="cpk_..."
 )
 ```
 
-See [LiteLLM Chutes docs](https://docs.litellm.ai/docs/providers/chutes) for full configuration.
+The provider prefix is `chutes/` and LiteLLM reads `CHUTES_API_KEY` from the environment (verified against LiteLLM 1.104.0, 2026-10-07). See [LiteLLM Chutes docs](https://docs.litellm.ai/docs/providers/chutes) for full configuration.
 
 ### Vercel AI SDK
 
@@ -75,8 +75,10 @@ import { createChutes } from '@chutes-ai/ai-sdk-provider';
 const chutes = createChutes({ apiKey: 'cpk_...' });
 ```
 
+Package: [`@chutes-ai/ai-sdk-provider`](https://www.npmjs.com/package/@chutes-ai/ai-sdk-provider) (latest 0.1.2, published 2025-12; still the current official provider as of 2026-10-07).
+
 ### Any OpenAI-Compatible Client
 
-Chutes is a drop-in replacement for the OpenAI API. Change the base URL to `https://llm.chutes.ai/v1` and use a `cpk_` API key. That's it.
+Chutes is a drop-in replacement for the OpenAI API. Change the base URL to `https://llm.chutes.ai/v1` and use a `cpk_` API key. That's it. Chutes' own [`llms.txt`](https://chutes.ai/llms.txt) lists LiteLLM, Vercel AI SDK, LangChain, Cline, Kilo Code, Roo Code, Cursor, and Aider as confirmed live integrations.
 
 Auth note (re-verified 2026-06-11): the standard `Authorization: Bearer cpk_...` header is the platform-recommended one and is live-verified on both `GET /v1/models` and a real paid `POST /chat/completions` (HTTP 200, completion returned) — so clients that hardcode Bearer (i.e. all OpenAI SDKs) work as-is. The legacy `X-API-Key` header is confirmed silently ignored on the inference surface (live, 2026-06-11: a completion POST with it got the anonymous 429, byte-identical to no auth at all, while Bearer succeeded in the same minute) and returns 401 on `api.chutes.ai` management endpoints; don't use it.

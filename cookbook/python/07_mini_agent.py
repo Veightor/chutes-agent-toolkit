@@ -1,4 +1,4 @@
-"""A complete tool-calling agent on Chutes in ~100 lines. [VERIFIED 2026-06-11: ran live against the paid API]
+"""A complete tool-calling agent on Chutes in ~100 lines. [VERIFIED 2026-10-07: ran live against the paid API]
 
 The loop every agent framework wraps: model picks tools, we execute them,
 results go back, repeat until the model answers in plain text. No framework,
@@ -13,7 +13,7 @@ import sys
 
 from openai import OpenAI
 
-MODEL = os.environ.get("CHUTES_MODEL", "MiniMaxAI/MiniMax-M2.5-TEE")
+MODEL = os.environ.get("CHUTES_MODEL", "google/gemma-4-31B-turbo-TEE")
 MAX_TURNS = 8
 
 # --- tools: plain python functions + their OpenAI schemas -------------------

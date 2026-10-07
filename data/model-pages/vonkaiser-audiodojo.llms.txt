@@ -28,6 +28,11 @@ This file is intended for AI coding agents wiring an application to this specifi
 - This model is served on its own host (`https://vonkaiser-audiodojo.chutes.ai`). Call the endpoint paths listed below directly.
 - For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
 
+## Pricing
+
+- $1.80 per hour
+- Check the model page for current pricing.
+
 ## Playground Notes
 
 - Text-to-speech endpoints return audio directly; speech-to-text and analysis endpoints return JSON.
@@ -50,6 +55,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-audiodojo.chutes.ai/speak" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -60,6 +67,35 @@ curl -X POST "https://vonkaiser-audiodojo.chutes.ai/speak" \
   "voice": "af_heart"
 }' \
   --output output.wav
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-audiodojo.chutes.ai/speak"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "text": "Your text here",
+    "speed": 1,
+    "voice": "af_heart"
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.wav", "wb") as f:
+    f.write(response.content)
+print("Saved output.wav (" + str(len(response.content)) + " bytes)")
 ```
 
 Playground presets:
@@ -80,6 +116,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-audiodojo.chutes.ai/tts/kokoro" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -90,6 +128,35 @@ curl -X POST "https://vonkaiser-audiodojo.chutes.ai/tts/kokoro" \
   "voice": "af_heart"
 }' \
   --output output.wav
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-audiodojo.chutes.ai/tts/kokoro"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "text": "Your text here",
+    "speed": 1,
+    "voice": "af_heart"
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.wav", "wb") as f:
+    f.write(response.content)
+print("Saved output.wav (" + str(len(response.content)) + " bytes)")
 ```
 
 Playground presets:
@@ -114,6 +181,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 # NOTE: replace the ref_audio_b64 placeholder(s) with real base64 data first.
 curl -X POST "https://vonkaiser-audiodojo.chutes.ai/tts/qwen3clone" \
@@ -131,6 +200,40 @@ curl -X POST "https://vonkaiser-audiodojo.chutes.ai/tts/qwen3clone" \
   --output output.wav
 ```
 
+Python:
+
+```python
+import os
+import requests
+
+# NOTE: replace the placeholder(s) for ref_audio_b64 with real base64-encoded data before running.
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-audiodojo.chutes.ai/tts/qwen3clone"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "text": "Your text here",
+    "language": "English",
+    "ref_text": "",
+    "trim_sample": False,
+    "auto_denoise": False,
+    "high_fidelity": False,
+    "ref_audio_b64": "<base64-encoded audio>"
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.wav", "wb") as f:
+    f.write(response.content)
+print("Saved output.wav (" + str(len(response.content)) + " bytes)")
+```
+
 ### 4. POST /tts/qwen3custom
 
 - Base URL: `https://vonkaiser-audiodojo.chutes.ai`
@@ -146,6 +249,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-audiodojo.chutes.ai/tts/qwen3custom" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -155,6 +260,34 @@ curl -X POST "https://vonkaiser-audiodojo.chutes.ai/tts/qwen3custom" \
   "language": "English"
 }' \
   --output output.wav
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-audiodojo.chutes.ai/tts/qwen3custom"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "text": "Your text here",
+    "language": "English"
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.wav", "wb") as f:
+    f.write(response.content)
+print("Saved output.wav (" + str(len(response.content)) + " bytes)")
 ```
 
 Playground presets:
@@ -175,6 +308,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-audiodojo.chutes.ai/tts/qwen3design" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -185,6 +320,35 @@ curl -X POST "https://vonkaiser-audiodojo.chutes.ai/tts/qwen3design" \
   "language": "English"
 }' \
   --output output.wav
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-audiodojo.chutes.ai/tts/qwen3design"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "text": "Your text here",
+    "instruct": "example-string",
+    "language": "English"
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.wav", "wb") as f:
+    f.write(response.content)
+print("Saved output.wav (" + str(len(response.content)) + " bytes)")
 ```
 
 Playground presets:
@@ -205,6 +369,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 # NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
 curl -X POST "https://vonkaiser-audiodojo.chutes.ai/stt/whisper" \
@@ -214,6 +380,34 @@ curl -X POST "https://vonkaiser-audiodojo.chutes.ai/stt/whisper" \
   "audio_b64": "<base64-encoded audio>",
   "return_timestamps": true
 }'
+```
+
+Python:
+
+```python
+import os
+import requests
+
+# NOTE: replace the placeholder(s) for audio_b64 with real base64-encoded data before running.
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-audiodojo.chutes.ai/stt/whisper"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "audio_b64": "<base64-encoded audio>",
+    "return_timestamps": True
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
 ```
 
 Playground presets:
@@ -233,6 +427,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 # NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
 curl -X POST "https://vonkaiser-audiodojo.chutes.ai/stt/canary" \
@@ -242,6 +438,34 @@ curl -X POST "https://vonkaiser-audiodojo.chutes.ai/stt/canary" \
   "audio_b64": "<base64-encoded audio>",
   "max_new_tokens": 256
 }'
+```
+
+Python:
+
+```python
+import os
+import requests
+
+# NOTE: replace the placeholder(s) for audio_b64 with real base64-encoded data before running.
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-audiodojo.chutes.ai/stt/canary"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "audio_b64": "<base64-encoded audio>",
+    "max_new_tokens": 256
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
 ```
 
 Playground presets:
@@ -261,6 +485,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 # NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
 curl -X POST "https://vonkaiser-audiodojo.chutes.ai/stt/parakeet" \
@@ -270,6 +496,34 @@ curl -X POST "https://vonkaiser-audiodojo.chutes.ai/stt/parakeet" \
   "audio_b64": "<base64-encoded audio>",
   "timestamps": true
 }'
+```
+
+Python:
+
+```python
+import os
+import requests
+
+# NOTE: replace the placeholder(s) for audio_b64 with real base64-encoded data before running.
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-audiodojo.chutes.ai/stt/parakeet"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "audio_b64": "<base64-encoded audio>",
+    "timestamps": True
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
 ```
 
 Playground presets:
@@ -288,6 +542,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 # NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
 curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/vad" \
@@ -297,6 +553,34 @@ curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/vad" \
   "audio_b64": "<base64-encoded audio>"
 }' \
   --output output.wav
+```
+
+Python:
+
+```python
+import os
+import requests
+
+# NOTE: replace the placeholder(s) for audio_b64 with real base64-encoded data before running.
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-audiodojo.chutes.ai/audio/vad"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "audio_b64": "<base64-encoded audio>"
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.wav", "wb") as f:
+    f.write(response.content)
+print("Saved output.wav (" + str(len(response.content)) + " bytes)")
 ```
 
 ### 10. POST /audio/diarize
@@ -311,6 +595,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 # NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
 curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/diarize" \
@@ -320,6 +606,34 @@ curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/diarize" \
   "audio_b64": "<base64-encoded audio>"
 }' \
   --output output.wav
+```
+
+Python:
+
+```python
+import os
+import requests
+
+# NOTE: replace the placeholder(s) for audio_b64 with real base64-encoded data before running.
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-audiodojo.chutes.ai/audio/diarize"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "audio_b64": "<base64-encoded audio>"
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.wav", "wb") as f:
+    f.write(response.content)
+print("Saved output.wav (" + str(len(response.content)) + " bytes)")
 ```
 
 ### 11. POST /audio/verifyspeaker
@@ -335,6 +649,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 # NOTE: replace the audio_a_b64, audio_b_b64 placeholder(s) with real base64 data first.
 curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/verifyspeaker" \
@@ -345,6 +661,35 @@ curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/verifyspeaker" \
   "audio_b_b64": "<base64-encoded audio>"
 }' \
   --output output.wav
+```
+
+Python:
+
+```python
+import os
+import requests
+
+# NOTE: replace the placeholder(s) for audio_a_b64, audio_b_b64 with real base64-encoded data before running.
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-audiodojo.chutes.ai/audio/verifyspeaker"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "audio_a_b64": "<base64-encoded audio>",
+    "audio_b_b64": "<base64-encoded audio>"
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.wav", "wb") as f:
+    f.write(response.content)
+print("Saved output.wav (" + str(len(response.content)) + " bytes)")
 ```
 
 ### 12. POST /audio/denoise
@@ -359,6 +704,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 # NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
 curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/denoise" \
@@ -368,6 +715,34 @@ curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/denoise" \
   "audio_b64": "<base64-encoded audio>"
 }' \
   --output output.wav
+```
+
+Python:
+
+```python
+import os
+import requests
+
+# NOTE: replace the placeholder(s) for audio_b64 with real base64-encoded data before running.
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-audiodojo.chutes.ai/audio/denoise"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "audio_b64": "<base64-encoded audio>"
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.wav", "wb") as f:
+    f.write(response.content)
+print("Saved output.wav (" + str(len(response.content)) + " bytes)")
 ```
 
 ### 13. POST /audio/separate
@@ -382,6 +757,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 # NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
 curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/separate" \
@@ -391,6 +768,34 @@ curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/separate" \
   "audio_b64": "<base64-encoded audio>"
 }' \
   --output output.wav
+```
+
+Python:
+
+```python
+import os
+import requests
+
+# NOTE: replace the placeholder(s) for audio_b64 with real base64-encoded data before running.
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-audiodojo.chutes.ai/audio/separate"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "audio_b64": "<base64-encoded audio>"
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.wav", "wb") as f:
+    f.write(response.content)
+print("Saved output.wav (" + str(len(response.content)) + " bytes)")
 ```
 
 ### 14. POST /audio/detectlanguage
@@ -405,6 +810,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 # NOTE: replace the audio_b64 placeholder(s) with real base64 data first.
 curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/detectlanguage" \
@@ -414,6 +821,34 @@ curl -X POST "https://vonkaiser-audiodojo.chutes.ai/audio/detectlanguage" \
   "audio_b64": "<base64-encoded audio>"
 }' \
   --output output.wav
+```
+
+Python:
+
+```python
+import os
+import requests
+
+# NOTE: replace the placeholder(s) for audio_b64 with real base64-encoded data before running.
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-audiodojo.chutes.ai/audio/detectlanguage"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "audio_b64": "<base64-encoded audio>"
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.wav", "wb") as f:
+    f.write(response.content)
+print("Saved output.wav (" + str(len(response.content)) + " bytes)")
 ```
 
 ## Model Facts

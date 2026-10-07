@@ -1,5 +1,5 @@
 {
-  "count": 32,
+  "count": 27,
   "data": [
     {
       "category": "other",
@@ -32,21 +32,6 @@
       "tagline": "Halo Guard Alpha 4B"
     },
     {
-      "category": "other",
-      "chat_llm": false,
-      "chute_id": "ddf6a658-c408-5651-9e12-4e12a5ad1a03",
-      "in_v1_models_snapshot": false,
-      "input_modalities": [],
-      "llms_txt": "https://chutes.ai/app/chute/astroboi-haloqwen-output-guard/llms.txt",
-      "modalities": null,
-      "model_page": "https://chutes.ai/app/chute/astroboi-haloqwen-output-guard",
-      "name": "haloqwen-output-guard",
-      "output_modalities": [],
-      "owner": "astroboi",
-      "slug": "astroboi-haloqwen-output-guard",
-      "tagline": "HaloQwen Output Guard"
-    },
-    {
       "category": "chat-llm",
       "chat_llm": true,
       "chute_id": "398651e1-5f85-5e50-a513-7c5324e8e839",
@@ -63,7 +48,22 @@
       ],
       "owner": "chutes",
       "slug": "chutes-deepseek-ai-deepseek-v3-2-tee",
-      "tagline": "DeepSeek-V3.2 is an open-source LLM optimized for efficient reasoning and agent tasks through sparse attention and reinforcement learning, useful for complex problem-solving and tool-use applications."
+      "tagline": "deepseek-ai/DeepSeek-V3.2"
+    },
+    {
+      "category": "chat-llm",
+      "chat_llm": true,
+      "chute_id": "b4d58772-e72b-55d1-9d73-d30dff6d2ed8",
+      "in_v1_models_snapshot": true,
+      "input_modalities": [],
+      "llms_txt": "https://chutes.ai/app/chute/chutes-deepseek-ai-deepseek-v4-flash-0731-tee/llms.txt",
+      "modalities": null,
+      "model_page": "https://chutes.ai/app/chute/chutes-deepseek-ai-deepseek-v4-flash-0731-tee",
+      "name": "deepseek-ai/DeepSeek-V4-Flash-0731-TEE",
+      "output_modalities": [],
+      "owner": "chutes",
+      "slug": "chutes-deepseek-ai-deepseek-v4-flash-0731-tee",
+      "tagline": "DeepSeek-V4-Flash-0731"
     },
     {
       "category": "chat-llm",
@@ -86,64 +86,6 @@
       "tagline": "Gemma-4-31B-IT NVFP4 with DFlash speculative decoding"
     },
     {
-      "category": "audio",
-      "chat_llm": false,
-      "chute_id": "4be47dee-7bee-53a4-a208-32a66f47a0b0",
-      "in_v1_models_snapshot": false,
-      "input_modalities": [
-        "text"
-      ],
-      "llms_txt": "https://chutes.ai/app/chute/chutes-kokoro/llms.txt",
-      "modalities": "text in \u2192 audio out",
-      "model_page": "https://chutes.ai/app/chute/chutes-kokoro",
-      "name": "kokoro",
-      "output_modalities": [
-        "audio"
-      ],
-      "owner": "chutes",
-      "slug": "chutes-kokoro",
-      "tagline": "Text-to-speech with hexgrad/Kokoro-82M"
-    },
-    {
-      "category": "other",
-      "chat_llm": false,
-      "chute_id": "ce6a92e4-5c2f-5681-9742-c80a4447bbdf",
-      "in_v1_models_snapshot": false,
-      "input_modalities": [
-        "text"
-      ],
-      "llms_txt": "https://chutes.ai/app/chute/chutes-minimaxai-minimax-m2-5-tee/llms.txt",
-      "modalities": "text in \u2192 text out",
-      "model_page": "https://chutes.ai/app/chute/chutes-minimaxai-minimax-m2-5-tee",
-      "name": "MiniMaxAI/MiniMax-M2.5-TEE",
-      "output_modalities": [
-        "text"
-      ],
-      "owner": "chutes",
-      "slug": "chutes-minimaxai-minimax-m2-5-tee",
-      "tagline": "MiniMax-M2.5 is a frontier-class LLM excelling at coding, agentic tool use, and office automation tasks, with state-of-the-art performance on benchmarks like SWE-Bench while being dramatically more cost-effective than competitors."
-    },
-    {
-      "category": "vision-understanding",
-      "chat_llm": false,
-      "chute_id": "2ff25e81-4586-5ec8-b892-3a6f342693d7",
-      "in_v1_models_snapshot": false,
-      "input_modalities": [
-        "text",
-        "image"
-      ],
-      "llms_txt": "https://chutes.ai/app/chute/chutes-moonshotai-kimi-k2-5-tee/llms.txt",
-      "modalities": "text, image in \u2192 text out",
-      "model_page": "https://chutes.ai/app/chute/chutes-moonshotai-kimi-k2-5-tee",
-      "name": "moonshotai/Kimi-K2.5-TEE",
-      "output_modalities": [
-        "text"
-      ],
-      "owner": "chutes",
-      "slug": "chutes-moonshotai-kimi-k2-5-tee",
-      "tagline": "Kimi K2.5 with DFlash speculative decoding"
-    },
-    {
       "category": "chat-llm",
       "chat_llm": true,
       "chute_id": "aac09863-35b4-5d9b-9b67-6e6a9d54273a",
@@ -163,6 +105,36 @@
       "owner": "chutes",
       "slug": "chutes-moonshotai-kimi-k2-6-tee",
       "tagline": "moonshotai/Kimi-K2.6"
+    },
+    {
+      "category": "chat-llm",
+      "chat_llm": true,
+      "chute_id": "0bb5d4c2-b5da-587d-b88e-62b4839028ec",
+      "in_v1_models_snapshot": true,
+      "input_modalities": [],
+      "llms_txt": "https://chutes.ai/app/chute/chutes-moonshotai-kimi-k3-tee/llms.txt",
+      "modalities": null,
+      "model_page": "https://chutes.ai/app/chute/chutes-moonshotai-kimi-k3-tee",
+      "name": "moonshotai/Kimi-K3-TEE",
+      "output_modalities": [],
+      "owner": "chutes",
+      "slug": "chutes-moonshotai-kimi-k3-tee",
+      "tagline": "moonshotai/Kimi-K3"
+    },
+    {
+      "category": "chat-llm",
+      "chat_llm": true,
+      "chute_id": "761ccdab-2e3d-5268-ab03-55f8ba94a80c",
+      "in_v1_models_snapshot": true,
+      "input_modalities": [],
+      "llms_txt": "https://chutes.ai/app/chute/chutes-nemotron-3-nano-omni-30b-tee/llms.txt",
+      "modalities": null,
+      "model_page": "https://chutes.ai/app/chute/chutes-nemotron-3-nano-omni-30b-tee",
+      "name": "Nemotron-3-Nano-Omni-30B-TEE",
+      "output_modalities": [],
+      "owner": "chutes",
+      "slug": "chutes-nemotron-3-nano-omni-30b-tee",
+      "tagline": "Multimodal reasoning: video, audio, image, and text \u2192 answers, summaries, and tools"
     },
     {
       "category": "chat-llm",
@@ -245,6 +217,21 @@
       "tagline": "Qwen/Qwen3.6-27B-FP8 with DFlash speculative decoding"
     },
     {
+      "category": "chat-llm",
+      "chat_llm": true,
+      "chute_id": "9ecb73cc-909b-5334-9cd8-74985945cff5",
+      "in_v1_models_snapshot": true,
+      "input_modalities": [],
+      "llms_txt": "https://chutes.ai/app/chute/chutes-qwen-qwen3-8-27b-tee/llms.txt",
+      "modalities": null,
+      "model_page": "https://chutes.ai/app/chute/chutes-qwen-qwen3-8-27b-tee",
+      "name": "Qwen/Qwen3.8-27B-TEE",
+      "output_modalities": [],
+      "owner": "chutes",
+      "slug": "chutes-qwen-qwen3-8-27b-tee",
+      "tagline": "Qwen/Qwen3.8-27B-FP8"
+    },
+    {
       "category": "embedding",
       "chat_llm": false,
       "chute_id": "21822836-bfa6-5426-b27e-dd5fdda1249e",
@@ -299,7 +286,7 @@
       ],
       "owner": "chutes",
       "slug": "chutes-zai-org-glm-5-1-tee",
-      "tagline": "GLM-5.1 is a large language model optimized for agentic tasks and coding that excels at sustained problem-solving over long horizons through iterative reasoning and tool use."
+      "tagline": "zai-org/GLM-5.1-FP8"
     },
     {
       "category": "chat-llm",
@@ -319,40 +306,6 @@
       "owner": "chutes",
       "slug": "chutes-zai-org-glm-5-2-tee",
       "tagline": "nvidia/GLM-5.2-NVFP4"
-    },
-    {
-      "category": "other",
-      "chat_llm": false,
-      "chute_id": "e51e818e-fa63-570d-9f68-49d7d1b4d12f",
-      "in_v1_models_snapshot": false,
-      "input_modalities": [
-        "text"
-      ],
-      "llms_txt": "https://chutes.ai/app/chute/chutes-zai-org-glm-5-tee/llms.txt",
-      "modalities": "text in \u2192 text out",
-      "model_page": "https://chutes.ai/app/chute/chutes-zai-org-glm-5-tee",
-      "name": "zai-org/GLM-5-TEE",
-      "output_modalities": [
-        "text"
-      ],
-      "owner": "chutes",
-      "slug": "chutes-zai-org-glm-5-tee",
-      "tagline": "zai-org/GLM-5-FP8"
-    },
-    {
-      "category": "other",
-      "chat_llm": false,
-      "chute_id": "b34a0fc1-87ac-5128-a61b-de5e7ac75023",
-      "in_v1_models_snapshot": false,
-      "input_modalities": [],
-      "llms_txt": "https://chutes.ai/app/chute/resi0aaron-resi-usa-residential-appraisal/llms.txt",
-      "modalities": null,
-      "model_page": "https://chutes.ai/app/chute/resi0aaron-resi-usa-residential-appraisal",
-      "name": "RESI-USA-residential-appraisal",
-      "output_modalities": [],
-      "owner": "resi0aaron",
-      "slug": "resi0aaron-resi-usa-residential-appraisal",
-      "tagline": "RESI USA Residential Model Current Winner"
     },
     {
       "category": "other",
@@ -448,70 +401,6 @@
       "owner": "vonkaiser",
       "slug": "vonkaiser-imageclassic",
       "tagline": "Four classic image models on one chute: FLUX.1-schnell + three SDXL checkpoints"
-    },
-    {
-      "category": "audio",
-      "chat_llm": false,
-      "chute_id": "77711d2c-c0ec-5378-90a9-41823591058b",
-      "in_v1_models_snapshot": false,
-      "input_modalities": [
-        "text",
-        "image"
-      ],
-      "llms_txt": "https://chutes.ai/app/chute/vonkaiser-ltx-23-video/llms.txt",
-      "modalities": "text, image in \u2192 video, audio out",
-      "model_page": "https://chutes.ai/app/chute/vonkaiser-ltx-23-video",
-      "name": "LTX-23-Video",
-      "output_modalities": [
-        "video",
-        "audio"
-      ],
-      "owner": "vonkaiser",
-      "slug": "vonkaiser-ltx-23-video",
-      "tagline": "Lightricks LTX 2.3 distilled-1.1 FP8 on RTX 6000 Pro \u2014 cinematic T2V, I2V, and keyframe interpolation with 8-step inference, synchronized audio, and GPU prompt enhancement."
-    },
-    {
-      "category": "audio",
-      "chat_llm": false,
-      "chute_id": "947976b4-834d-5522-816e-c4d8cf3fe81b",
-      "in_v1_models_snapshot": false,
-      "input_modalities": [
-        "text",
-        "image"
-      ],
-      "llms_txt": "https://chutes.ai/app/chute/vonkaiser-minimaxh3fl2va/llms.txt",
-      "modalities": "text, image in \u2192 video, audio out",
-      "model_page": "https://chutes.ai/app/chute/vonkaiser-minimaxh3fl2va",
-      "name": "minimaxh3fl2va",
-      "output_modalities": [
-        "video",
-        "audio"
-      ],
-      "owner": "vonkaiser",
-      "slug": "vonkaiser-minimaxh3fl2va",
-      "tagline": "MiniMax H3 FL2VA \u2014 text/image-to-video+audio, GPU-resident NVFP4 transformer + NVFP4 text encoder, FA4 attention, 768p short-side, 4-10s with native 32 kHz stereo audio. Supports text-to-video, first-frame, last-frame, and first+last."
-    },
-    {
-      "category": "chat-llm",
-      "chat_llm": true,
-      "chute_id": "2ead5dca-9b87-54e2-a4ef-4c9fab259d1c",
-      "in_v1_models_snapshot": true,
-      "input_modalities": [
-        "text",
-        "image",
-        "video",
-        "audio"
-      ],
-      "llms_txt": "https://chutes.ai/app/chute/vonkaiser-nemotron-3-nano-omni-30b-tee/llms.txt",
-      "modalities": "text, image, video, audio in \u2192 text out",
-      "model_page": "https://chutes.ai/app/chute/vonkaiser-nemotron-3-nano-omni-30b-tee",
-      "name": "Nemotron-3-Nano-Omni-30B-TEE",
-      "output_modalities": [
-        "text"
-      ],
-      "owner": "vonkaiser",
-      "slug": "vonkaiser-nemotron-3-nano-omni-30b-tee",
-      "tagline": "Multimodal reasoning: video, audio, image, and text \u2192 answers, summaries, and tools"
     },
     {
       "category": "vision-understanding",

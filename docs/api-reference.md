@@ -255,9 +255,11 @@ Verified on a successful direct-model-id completion (2026-06-11): `x-chutes-invo
 ### Prompt Caching
 The completion `usage` block includes `prompt_tokens_details.cached_tokens` (verified 2026-06-11) — prompt caching is active on inference. Cache hits bill at the discounted `pricing.input_cache_read` rate from the models endpoint.
 
-### Harvard Research Endpoint (25% discount)
-Drop-in replacement: `https://research-data-opt-in-proxy.chutes.ai/v1`
-Same API, same auth. Data is recorded for research. Do NOT use for sensitive data.
+### Research Endpoint (25% discount) — DEFUNCT
+The former drop-in proxy `https://research-data-opt-in-proxy.chutes.ai/v1` is gone
+(verified 2026-10-07: HTTP 404 `DEPLOYMENT_NOT_FOUND`; the discount is no longer
+advertised on chutes.ai). Do not configure it. Current advertised discounts are
+subscription-tier only (Plus/Pro).
 
 ---
 

@@ -15,13 +15,13 @@ Intents (see references/alias-packs.md for full definitions):
   agent-coder           tools + long ctx, failover-only
   custom                build your own from --filter / --require-feature / etc.
 
-Catalog notes (live /v1/models, 2026-06-11):
-  - The hosted gateway is TEE-only (13 models, all confidential_compute=true),
+Catalog notes (live /v1/models, 2026-10-07):
+  - The hosted gateway is TEE-only (14 models, all confidential_compute=true),
     so --tee-only and the private-reasoning/tee-chat filters currently match
     the entire catalog. Kept for intent clarity and future-proofing.
   - Some listings carry null input_modalities/supported_features/context_length
     (e.g. unsloth/Mistral-Nemo-Instruct-2407-TEE, the cheapest model, and
-    nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-TEE) and are therefore excluded
+    Nemotron-3-Nano-Omni-30B-TEE) and are therefore excluded
     by modality/feature/context filters. Add them to a pool manually if wanted.
 
 Exit codes:

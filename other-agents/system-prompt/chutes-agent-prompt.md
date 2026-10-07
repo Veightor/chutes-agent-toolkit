@@ -59,15 +59,15 @@ List: `GET https://api.chutes.ai/api_keys/` | Delete: `DELETE https://api.chutes
 ```
 GET https://llm.chutes.ai/v1/models
 ```
-Public endpoint (no auth required; verified 2026-06-11). Response: `{ "object": "list", "data": [...] }`. Key fields per model: `id` (use in API calls), `confidential_compute` (true = TEE/hardware-isolated), `owned_by` ("sglang"/"vllm"), `pricing.prompt`/`pricing.completion` (USD per 1M tokens, plus `input_cache_read` prompt-cache pricing, typically 50% of input), `context_length`, `max_output_length`, `supported_features` (["tools", "json_mode", "structured_outputs", "reasoning"]), `supported_sampling_parameters`, `input_modalities`, `output_modalities`, `quantization`.
+Public endpoint (no auth required; re-verified 2026-10-07). Response: `{ "object": "list", "data": [...] }`. Key fields per model: `id` (use in API calls), `confidential_compute` (true = TEE/hardware-isolated), `owned_by` ("sglang"/"vllm"), `pricing.prompt`/`pricing.completion` (USD per 1M tokens, plus `input_cache_read` prompt-cache pricing, typically 50% of input), `context_length`, `max_output_length`, `supported_features` (["tools", "json_mode", "structured_outputs", "reasoning"]), `supported_sampling_parameters`, `input_modalities`, `output_modalities`, `quantization`.
 
-As of 2026-06-11 the hosted LLM catalog is **13 models, all TEE** (`-TEE` id suffix, `confidential_compute: true`): DeepSeek-V3.2, Kimi K2.5/K2.6, GLM-5/5.1, Qwen 3/3.5/3.6, MiniMax-M2.5, Gemma 4, Nemotron 3 Ultra, Mistral Nemo. There are no Llama models and no non-TEE LLMs — always treat `/v1/models` as the source of truth rather than hardcoding ids. Beyond LLMs, the wider chute catalog (`GET https://api.chutes.ai/chutes/?include_public=true`) has image generation, video generation, TTS, STT, music generation, embeddings, content moderation, and custom inference chutes.
+As of 2026-10-07 the hosted LLM catalog is **14 models, all TEE** (`-TEE` id suffix, `confidential_compute: true`): DeepSeek V3.2 / V4-Flash, Kimi K2.6/K3, GLM-5.1/5.2, Qwen 3/3.5/3.6/3.8, Gemma 4, Nemotron 3 Nano Omni, Mistral Nemo. There are no Llama models and no non-TEE LLMs — always treat `/v1/models` as the source of truth rather than hardcoding ids. Beyond LLMs, the wider chute catalog (`GET https://api.chutes.ai/chutes/?include_public=true`) has image generation, video generation, TTS, STT, music generation, embeddings, content moderation, and custom inference chutes.
 
 ---
 
 ## Inference
 
-Chutes uses OpenAI-compatible request/response shapes on the inference surface with standard Bearer auth, so generic OpenAI SDKs work by changing the base URL and key. (Bearer `cpk_` verified live 2026-06-11 on both `GET /v1/models` and a real paid `POST /chat/completions` — HTTP 200, completion returned. Successful completions carry `x-chutes-invocationid` plus quota headers, and the `usage` block includes `prompt_tokens_details.cached_tokens` — prompt caching is active.)
+Chutes uses OpenAI-compatible request/response shapes on the inference surface with standard Bearer auth, so generic OpenAI SDKs work by changing the base URL and key. (Bearer `cpk_` verified live 2026-06-11 and again 2026-10-07 on both `GET /v1/models` and a real paid `POST /chat/completions` — HTTP 200, completion returned. Successful completions carry `x-chutes-invocationid` plus quota headers, and the `usage` block includes `prompt_tokens_details.cached_tokens` — prompt caching is active.)
 
 ```python
 import requests
@@ -145,11 +145,11 @@ Returns: `username`, `user_id`, `balance` (USD), `payment_address` (Bittensor SS
 
 ## TEE (Confidential Compute)
 
-Models with `confidential_compute: true` run in Intel TDX enclaves — hardware-isolated, operator-blind. As of 2026-06-11 that is every hosted LLM. Attestation: `GET https://api.chutes.ai/chutes/{chute_id}/evidence?nonce=<nonce>` — the `nonce` query param is required and must be exactly 64 hex characters (32 bytes). Per-instance evidence: `GET /instances/{instance_id}/evidence`.
+Models with `confidential_compute: true` run in Intel TDX enclaves — hardware-isolated, operator-blind. As of 2026-10-07 that is every hosted LLM. Attestation: `GET https://api.chutes.ai/chutes/{chute_id}/evidence?nonce=<nonce>` — the `nonce` query param is required and must be exactly 64 hex characters (32 bytes). Per-instance evidence: `GET /instances/{instance_id}/evidence`.
 
-## Harvard Research Discount (25% off)
+## Research Discount (25% off) — DEFUNCT
 
-Drop-in endpoint: `https://research-data-opt-in-proxy.chutes.ai/v1`. Same API, same auth. Data recorded for research — do NOT send sensitive data here.
+The former drop-in endpoint `https://research-data-opt-in-proxy.chutes.ai/v1` is gone (verified 2026-10-07: 404, no longer advertised). Do not configure it.
 
 ---
 

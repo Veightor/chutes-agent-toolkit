@@ -7,7 +7,7 @@ description: "Chutes.ai model routing and pooling. Use this skill when the user 
 
 > **Status: read paths VERIFIED LIVE 2026-06-11** — `build_pool.py` dry-runs (interactive-fast, tee-chat, agent-coder) and `audit_pool.py --alias` exercised against live `/v1/models` + `GET /model_aliases/`. The alias **write** round-trip (`POST /model_aliases/` + `DELETE`) was last verified 2026-04-13 (read-only constraint this run). Originally fleshed out via `docs/chutes-maxi-wave-2.md` Track A.1.
 
-> **Catalog note (2026-06-11):** the hosted LLM gateway is now **TEE-only** — `/v1/models` returns 13 models, every one with `confidential_compute: true` and a `-TEE` id suffix. `--tee-only` and the `private-reasoning` / `tee-chat` filters therefore currently match the entire catalog; they remain useful as future-proofing and as an explicit statement of intent, not as a discriminator. The non-TEE tier (Llama, Qwen2.5, GLM-4.x, etc.) is gone from the gateway.
+> **Catalog note (2026-10-07):** the hosted LLM gateway is now **TEE-only** — `/v1/models` returns 14 models, every one with `confidential_compute: true` and a `-TEE` id suffix. `--tee-only` and the `private-reasoning` / `tee-chat` filters therefore currently match the entire catalog; they remain useful as future-proofing and as an explicit statement of intent, not as a discriminator. The non-TEE tier (Llama, Qwen2.5, GLM-4.x, etc.) is gone from the gateway.
 
 ## What this skill does
 
@@ -43,17 +43,17 @@ Ask the user what they're optimizing for. The intents above are a curated shortl
 python <skill-scripts-dir>/build_pool.py --intent interactive-fast --size 4
 ```
 
-Default output (live run, 2026-06-11):
+Default output (live run, 2026-10-07):
 
 ```
 === interactive-fast (4 models) ===
-  1. Qwen/Qwen3-32B-TEE  TEE  prompt=$ 0.104  completion=$ 0.416  ctx=40960  [json_mode,tools,structured_outputs,reasoning]
-  2. google/gemma-4-31B-turbo-TEE  TEE  prompt=$  0.15  completion=$  0.42  ctx=131072  [json_mode,tools,structured_outputs,reasoning]
-  3. MiniMaxAI/MiniMax-M2.5-TEE  TEE  prompt=$  0.15  completion=$   1.2  ctx=196608  [json_mode,tools,structured_outputs,reasoning]
-  4. Qwen/Qwen3-235B-A22B-Thinking-2507-TEE  TEE  prompt=$0.2989  completion=$1.1957  ctx=262144  [json_mode,structured_outputs,tools,reasoning]
+  1. google/gemma-4-31B-turbo-TEE  TEE  prompt=$  0.12  completion=$  0.37  ctx=131072  [json_mode,tools,structured_outputs,reasoning]
+  2. Qwen/Qwen3-32B-TEE  TEE  prompt=$ 0.104  completion=$ 0.416  ctx=40960  [json_mode,tools,structured_outputs,reasoning]
+  3. Qwen/Qwen3-235B-A22B-Thinking-2507-TEE  TEE  prompt=$0.2989  completion=$1.1957  ctx=262144  [json_mode,structured_outputs,tools,reasoning]
+  4. deepseek-ai/DeepSeek-V4-Flash-0731-TEE  TEE  prompt=$  0.44  completion=$  1.32  ctx=1048576  [json_mode,structured_outputs,tools,reasoning]
 
 Inline routing string:
-  Qwen/Qwen3-32B-TEE,google/gemma-4-31B-turbo-TEE,MiniMaxAI/MiniMax-M2.5-TEE,Qwen/Qwen3-235B-A22B-Thinking-2507-TEE:latency
+  google/gemma-4-31B-turbo-TEE,Qwen/Qwen3-32B-TEE,Qwen/Qwen3-235B-A22B-Thinking-2507-TEE,deepseek-ai/DeepSeek-V4-Flash-0731-TEE:latency
 ```
 
 Flags:

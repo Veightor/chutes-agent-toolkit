@@ -33,7 +33,7 @@ In Cursor, click the **settings (gear) icon → Models**, then expand **API Keys
 
 ### 3. Add a Chutes model
 
-1. Find a model ID on **[chutes.ai](https://chutes.ai/app)** — open the model card and copy its full name, e.g. `moonshotai/Kimi-K2.5-TEE`.
+1. Find a model ID on **[chutes.ai](https://chutes.ai/app)** — open the model card and copy its full name, e.g. `moonshotai/Kimi-K2.6-TEE`.
 2. In the **Add or search model** box, type the full model ID.
 3. Cursor shows "No models available" → click **+ Add Custom Model**. The model appears in the list with its toggle enabled.
 

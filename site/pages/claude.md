@@ -8,7 +8,7 @@
 
 # Claude already knows Chutes.
 
-Claude Code and Claude Cowork get the toolkit's deepest integration: a nine-skill plugin suite, OS-keychain credential storage, and a stdio MCP server. Claude can onboard you to Chutes end to end — including creating the account — and then call frontier open-source models (DeepSeek, Kimi, GLM, Qwen, MiniMax) through the OpenAI API, with the current hosted catalog running under `confidential_compute: true` inside TEEs.
+Claude Code and Claude Cowork get the toolkit's deepest integration: a nine-skill plugin suite, OS-keychain credential storage, and a stdio MCP server. Claude can onboard you to Chutes end to end — including creating the account — and then call frontier open-source models (DeepSeek, Kimi, GLM, Qwen, Gemma) through the OpenAI API, with the current hosted catalog running under `confidential_compute: true` inside TEEs.
 
 Two commands, no config files:
 

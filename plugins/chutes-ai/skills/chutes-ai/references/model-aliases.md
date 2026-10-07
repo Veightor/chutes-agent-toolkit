@@ -26,7 +26,7 @@ Pick one or two packs when onboarding a team. Each alias maps to a category, not
 | Alias | Intent | Example target |
 |---|---|---|
 | `interactive-fast` | Lowest TTFT, cheap | `google/gemma-4-31B-turbo-TEE` or a `default:latency` pool |
-| `interactive-rich` | Balanced quality + speed for chat UIs | `zai-org/GLM-5-TEE` or `moonshotai/Kimi-K2.5-TEE` |
+| `interactive-rich` | Balanced quality + speed for chat UIs | `zai-org/GLM-5.2-TEE` or `moonshotai/Kimi-K2.6-TEE` |
 | `interactive-long` | Long-context interactive (262k) | `Qwen/Qwen3.5-397B-A17B-TEE` |
 
 ### Private / confidential pack
@@ -47,7 +47,7 @@ Note: as of 2026-06-11 every hosted LLM is `confidential_compute: true`, so the 
 ### Agent / tool-use pack
 | Alias | Intent | Example target |
 |---|---|---|
-| `agent-coder` | Tool-calling code model | `moonshotai/Kimi-K2.6-TEE`; budget: `MiniMaxAI/MiniMax-M2.5-TEE` |
+| `agent-coder` | Tool-calling code model | `moonshotai/Kimi-K2.6-TEE`; budget: `Qwen/Qwen3.8-27B-TEE` |
 | `agent-reasoner` | Reasoning + tool use | `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE` |
 
 ## Why aliases beat hardcoded IDs

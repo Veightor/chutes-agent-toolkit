@@ -1,4 +1,10 @@
-"""Video generation on a media chute. [VERIFIED 2026-08-06: ran live against the paid API]
+"""Video generation on a media chute. [VERIFIED 2026-08-06 — but the target chute
+was DELISTED by 2026-10-07: vonkaiser-minimaxh3fl2va now 404s on both its host and
+its model page. The PATTERN below (direct per-chute host, flat JSON POST /generate,
+schema recovered from GET api.chutes.ai/chutes/code/{chute_id}) is still how every
+media chute works — pick a live video chute from docs/model-pages.md (e.g.
+vonkaiser-turbowani2v, image-to-video, live as of 2026-10-07), fetch its schema,
+and adapt CHUTE_HOST + the request body before running.]
 
 Video/image/audio chutes are NOT on the OpenAI-compatible gateway. Each one is
 served on its own host (`https://<slug>.chutes.ai`) and takes a FLAT JSON body

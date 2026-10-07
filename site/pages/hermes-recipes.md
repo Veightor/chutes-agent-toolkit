@@ -8,7 +8,7 @@
 
 # Recipes for running Hermes on Chutes
 
-Use these when you want more than a basic completion: private coding loops, delegated workers, MCP tools, cost-aware routing, research opt-in, and TEE evidence.
+Use these when you want more than a basic completion: private coding loops, delegated workers, MCP tools, cost-aware routing, and TEE evidence.
 
 Each recipe follows the same rule: Chutes is OpenAI-compatible at `https://llm.chutes.ai/v1`, and Hermes should read the key from `CHUTES_API_KEY`.
 
@@ -113,28 +113,9 @@ smart_model_routing:
 
 ---
 
-## Recipe 5: Use research opt-in only for safe workloads
+## Recipe 5: (retired) research opt-in endpoint
 
-**Use when:** You want the lower-cost research endpoint and the workload contains no private, sensitive, or regulated data.
-
-```yaml
-providers:
-  chutes-research:
-    name: Chutes Research Opt-In
-    base_url: https://research-data-opt-in-proxy.chutes.ai/v1
-    key_env: CHUTES_API_KEY
-    transport: chat_completions
-    default_model: default:latency
-    discover_models: true
-    models:
-      "default": {}
-      "default:latency": {}
-      "default:throughput": {}
-```
-
-**Warning copy:** prompts and responses may be recorded for research. Use this for public-data evals, synthetic data, and non-sensitive batch work. Do not make it the silent default.
-
----
+The lower-cost research opt-in endpoint (`research-data-opt-in-proxy.chutes.ai`) was retired — verified 2026-10-07, the host returns 404 and the discount is no longer advertised. If an existing config still has a `chutes-research` provider, delete it; all traffic belongs on `https://llm.chutes.ai/v1`.
 
 ## Recipe 6: Build a privacy-first Hermes workflow
 

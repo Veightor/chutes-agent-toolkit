@@ -83,7 +83,7 @@ The `default:*` aliases below assume a routing pool has been configured once at 
 | Code review | Live model ID with `tools`, `json_mode`, and `reasoning`, or `default:latency` | Use current `/v1/models` metadata when you need explicit capabilities. |
 | Planning and architecture | Long-context live model ID with `reasoning` | Context windows and reasoning support change, so query the catalog before recommending a named model. |
 | Background docs, summaries, and lint triage | Cheapest suitable live model ID, or `default:throughput` for bulk work | Keeps non-interactive work cost-aware without blocking on one static model. |
-| Private or sensitive workflows | Any live model with `confidential_compute: true` | As of 2026-06-11, the hosted LLM catalog is currently all TEE-backed, but the boolean remains the source of truth. |
+| Private or sensitive workflows | Any live model with `confidential_compute: true` | As of 2026-10-07, the hosted LLM catalog is currently all TEE-backed (14 models), but the boolean remains the source of truth. |
 
 Avoid hardcoding dated model claims in Codex prompts. Use:
 
@@ -137,9 +137,9 @@ Rewrite this agent landing-page copy so it explains confidential_compute benefit
 
 ## Verification Status
 
-- Chutes Bearer auth on inference and management hosts: live-verified 2026-06-11.
-- Public `/v1/models` catalog: live-verified 2026-06-11.
-- Paid `POST /v1/chat/completions` with Bearer auth: live-verified 2026-06-11 in the repo refresh notes.
+- Chutes Bearer auth on inference and management hosts: live-verified 2026-06-11, re-verified 2026-10-07.
+- Public `/v1/models` catalog: live-verified 2026-06-11, re-verified 2026-10-07 (14 TEE models).
+- Paid `POST /v1/chat/completions` with Bearer auth: live-verified 2026-06-11 and 2026-10-07 in the repo refresh notes.
 - Codex-specific built-in provider support: not claimed by this repo.
 - This guide performs no live Chutes writes, paid deploy calls, or credential reads.
 

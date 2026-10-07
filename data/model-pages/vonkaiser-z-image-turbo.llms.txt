@@ -28,6 +28,11 @@ This file is intended for AI coding agents wiring an application to this specifi
 - This model is served on its own host (`https://vonkaiser-z-image-turbo.chutes.ai`). Call the endpoint paths listed below directly.
 - For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
 
+## Pricing
+
+- $1.80 per hour
+- Check the model page for current pricing.
+
 ## Playground Notes
 
 - Use short negative prompts for obvious exclusions rather than long lists.
@@ -54,6 +59,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-z-image-turbo.chutes.ai/generate" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -69,6 +76,40 @@ curl -X POST "https://vonkaiser-z-image-turbo.chutes.ai/generate" \
   "num_inference_steps": 9
 }' \
   --output output.png
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-z-image-turbo.chutes.ai/generate"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "seed": 42,
+    "shift": 3,
+    "width": 1024,
+    "height": 1024,
+    "prompt": "a serene mountain lake at sunset",
+    "guidance_scale": 0,
+    "max_sequence_length": 512,
+    "num_inference_steps": 9
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.png", "wb") as f:
+    f.write(response.content)
+print("Saved output.png (" + str(len(response.content)) + " bytes)")
 ```
 
 Playground presets:

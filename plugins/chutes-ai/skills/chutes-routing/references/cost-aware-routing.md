@@ -65,7 +65,7 @@ Live probes (wave-2, re-checked 2026-06-11) show `/users/me/discounts` returns `
 ]
 ```
 
-The `scope` field is important. `"research-endpoint"` means the 25% Harvard research endpoint discount — it applies only when you route through `https://research-data-opt-in-proxy.chutes.ai/v1`, not the main endpoint. `audit_pool.py` surfaces active discounts but does not fold them into the raw price display; apply them yourself with the formula above.
+The `scope` field is important. `"research-endpoint"` meant the former 25% research-endpoint discount — its proxy (`research-data-opt-in-proxy.chutes.ai`) is gone (404, verified 2026-10-07) and the discount is no longer advertised, so treat that scope as historical if it appears. `audit_pool.py` surfaces active discounts but does not fold them into the raw price display; apply them yourself with the formula above.
 
 ## Price overrides
 

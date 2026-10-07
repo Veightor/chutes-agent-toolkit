@@ -184,25 +184,6 @@ def hermes_config(out: Path) -> Path:
             "  model: default:throughput\n"
             "  reasoning_effort: medium\n"
         ),
-        "chutes-dual-endpoints.yaml": (
-            "# ~/.hermes/config.yaml\n"
-            "# Two named Chutes endpoints: normal inference and opt-in research endpoint.\n"
-            "# Use the research endpoint only when the user accepts prompt/response recording.\n\n"
-            "providers:\n"
-            "  chutes:\n"
-            f"{provider_common_latency}\n"
-            "  chutes-research:\n"
-            "    name: Chutes Research Opt-In\n"
-            "    base_url: https://research-data-opt-in-proxy.chutes.ai/v1\n"
-            "    key_env: CHUTES_API_KEY\n"
-            "    transport: chat_completions\n"
-            "    default_model: default:latency\n"
-            "    discover_models: true\n"
-            "    models:\n"
-            "      default: {}\n"
-            "      \"default:latency\": {}\n"
-            "      \"default:throughput\": {}\n"
-        ),
     }
 
     for name, content in examples.items():
@@ -219,9 +200,9 @@ def system_prompt(out: Path) -> Path:
         "# Chutes.ai — System Prompt Block\n\n"
         "Paste this into any system prompt to tell a generic agent how to call Chutes:\n\n"
         "---\n\n"
-        "You have access to Chutes.ai, a decentralized inference network serving open-source models via an OpenAI-compatible inference API. As of 2026-06-11 every hosted LLM runs in a TEE (`confidential_compute: true`, `-TEE` id suffix).\n\n"
+        "You have access to Chutes.ai, a decentralized inference network serving open-source models via an OpenAI-compatible inference API. As of 2026-10-07 every hosted LLM runs in a TEE (`confidential_compute: true`, `-TEE` id suffix).\n\n"
         "Base URL: `https://llm.chutes.ai/v1`\n"
-        "Auth for direct HTTP calls: `Authorization: Bearer cpk_...` (never log or echo the key). Verified live 2026-06-11 on GET /v1/models and on a real POST /chat/completions; Bearer is the platform-recommended header. X-API-Key is silently ignored on the inference surface (confirmed live — the request is treated as anonymous); do not use it.\n"
+        "Auth for direct HTTP calls: `Authorization: Bearer cpk_...` (never log or echo the key). Verified live 2026-10-07 on GET /v1/models and on a real POST /chat/completions; Bearer is the platform-recommended header. X-API-Key is silently ignored on the inference surface (confirmed live — the request is treated as anonymous); do not use it.\n"
         "List models: `GET /models` (public, no auth required; always treat this as source of truth; do not hardcode ids).\n"
         "Chat: `POST /chat/completions` with `{model, messages, max_tokens, temperature}`.\n"
         "Routing: pass `default:latency` or `default:throughput` as the model for smart pools.\n"

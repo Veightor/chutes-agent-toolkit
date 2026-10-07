@@ -28,6 +28,11 @@ This file is intended for AI coding agents wiring an application to this specifi
 - This model is served on its own host (`https://vonkaiser-docuextract.chutes.ai`). Call the endpoint paths listed below directly.
 - For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
 
+## Pricing
+
+- $1.80 per hour
+- Check the model page for current pricing.
+
 ## Playground Notes
 
 - Use image_b64 for screenshots or single-page images; use pdf_b64 for PDFs.
@@ -54,6 +59,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-docuextract.chutes.ai/ocr/lighton/markdown" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -64,6 +71,35 @@ curl -X POST "https://vonkaiser-docuextract.chutes.ai/ocr/lighton/markdown" \
   "temperature": 0.7,
   "enable_thinking": false
 }'
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-docuextract.chutes.ai/ocr/lighton/markdown"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "dpi": 200,
+    "max_pages": 10,
+    "temperature": 0.7,
+    "enable_thinking": False
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
 ```
 
 Playground presets:
@@ -90,6 +126,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-docuextract.chutes.ai/ocr/nuextract/markdown" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -101,6 +139,36 @@ curl -X POST "https://vonkaiser-docuextract.chutes.ai/ocr/nuextract/markdown" \
   "temperature": 0.7,
   "enable_thinking": false
 }'
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-docuextract.chutes.ai/ocr/nuextract/markdown"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "dpi": 200,
+    "mode": "markdown",
+    "max_pages": 10,
+    "temperature": 0.7,
+    "enable_thinking": False
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
 ```
 
 Playground presets:
@@ -129,6 +197,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-docuextract.chutes.ai/ocr/nuextract/extract" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -141,6 +211,37 @@ curl -X POST "https://vonkaiser-docuextract.chutes.ai/ocr/nuextract/extract" \
   "temperature": 0.7,
   "enable_thinking": false
 }'
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-docuextract.chutes.ai/ocr/nuextract/extract"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "dpi": 200,
+    "text": "Your text here",
+    "template": {},
+    "max_pages": 10,
+    "temperature": 0.7,
+    "enable_thinking": False
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
 ```
 
 Playground presets:
@@ -166,6 +267,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-docuextract.chutes.ai/ocr/nuextract/template" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -177,6 +280,101 @@ curl -X POST "https://vonkaiser-docuextract.chutes.ai/ocr/nuextract/template" \
   "temperature": 0.7,
   "enable_thinking": false
 }'
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-docuextract.chutes.ai/ocr/nuextract/template"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "dpi": 200,
+    "max_pages": 1,
+    "description": "example-string",
+    "temperature": 0.7,
+    "enable_thinking": False
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
+```
+
+### 5. POST /ocr/unlimited/markdown
+
+- Base URL: `https://vonkaiser-docuextract.chutes.ai`
+- Output content type: `application/json`
+- Playground note: Use one document input at a time, then tune extraction depth only when the default output misses structure.
+
+Request fields:
+
+- `dpi` (integer, optional) Default: 200.
+- `pdf_b64` (string, optional) Default: null.
+- `image_b64` (string, optional) Default: null.
+- `max_pages` (integer, optional) Default: 10.
+- `temperature` (number, optional) - Sampling temperature; defaults to 0.0 (markdown) or 0.2 (extract) Default: null.
+- `window_size` (integer, optional) - NGram repetition window; defaults 128 (single) / 1024 (multi-page) Default: null.
+- `max_new_tokens` (integer, optional) - Cap generation length; defaults to model maximum safe for input size Default: null.
+- `enable_thinking` (boolean, optional) - NuExtract reasoning mode (slower, higher quality on hard documents) Default: false.
+- `strip_detections` (boolean, optional) - Strip < det layout-detection markers via remove det() Default: true.
+
+Example call:
+
+cURL:
+
+```bash
+curl -X POST "https://vonkaiser-docuextract.chutes.ai/ocr/unlimited/markdown" \
+  -H "Authorization: Bearer $CHUTES_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "dpi": 200,
+  "max_pages": 10,
+  "temperature": 0.7,
+  "enable_thinking": false,
+  "strip_detections": true
+}'
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-docuextract.chutes.ai/ocr/unlimited/markdown"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "dpi": 200,
+    "max_pages": 10,
+    "temperature": 0.7,
+    "enable_thinking": False,
+    "strip_detections": True
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
 ```
 
 ## Model Facts

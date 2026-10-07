@@ -260,13 +260,12 @@ providers:
 
 Use multiple provider entries only when something materially differs, such as:
 
-- normal endpoint vs research opt-in endpoint;
 - different API keys for teams, budgets, or environments;
 - different base URL, auth, transport, or policy.
 
-## 7. Keep research opt-in separate
+## 7. Research opt-in endpoint — defunct
 
-The research endpoint has different privacy tradeoffs. Keep it as a separate named provider so users do not accidentally route private prompts there.
+An earlier opt-in research endpoint (25% discount, prompts/responses recorded) was documented here. It is gone: verified 2026-10-07, `research-data-opt-in-proxy.chutes.ai` returns 404 `DEPLOYMENT_NOT_FOUND` and the offer no longer appears on chutes.ai. If a config still carries a `chutes-research` provider, remove it.
 
 ```yaml
 providers:
@@ -281,21 +280,9 @@ providers:
       default: {}
       "default:latency": {}
       "default:throughput": {}
-
-  chutes-research:
-    name: Chutes Research Opt-In
-    base_url: https://research-data-opt-in-proxy.chutes.ai/v1
-    key_env: CHUTES_API_KEY
-    transport: chat_completions
-    default_model: default:latency
-    discover_models: true
-    models:
-      default: {}
-      "default:latency": {}
-      "default:throughput": {}
 ```
 
-Use `chutes-research` only when the user explicitly accepts prompt/response recording for research. Do not use it for private, sensitive, or regulated data.
+> **Defunct (2026-10-07):** the former `chutes-research` opt-in endpoint (`research-data-opt-in-proxy.chutes.ai`) now returns 404 and the 25% discount is no longer advertised. Do not configure it.
 
 ## 8. Select and test in Hermes
 
@@ -369,9 +356,8 @@ When an agent works on Hermes + Chutes in this repo, it should follow these rule
 2. Treat `https://llm.chutes.ai/v1/models` as the source of truth for model inventory and metadata.
 3. Never commit real `cpk_...`, `cid_...`, or `csc_...` secrets.
 4. Prefer `CHUTES_API_KEY` in `~/.hermes/.env` and `key_env: CHUTES_API_KEY` in YAML.
-5. Keep normal and research endpoints as separate providers.
-6. For privacy-sensitive tasks, require `confidential_compute: true`; do not rely only on a `-TEE` suffix.
-7. For cryptographic TEE claims, use the `chutes-tee` skill and state whether verification was only shape-valid or fully cryptographic.
+5. For privacy-sensitive tasks, require `confidential_compute: true`; do not rely only on a `-TEE` suffix.
+6. For cryptographic TEE claims, use the `chutes-tee` skill and state whether verification was only shape-valid or fully cryptographic.
 8. Do not hardcode stale model recommendations when the live endpoint can be queried.
 9. Verify edited YAML parses and that Hermes can parse the provider entries.
 10. Use `uv run --with pytest --with cryptography pytest ...` if local `pytest` is unavailable.

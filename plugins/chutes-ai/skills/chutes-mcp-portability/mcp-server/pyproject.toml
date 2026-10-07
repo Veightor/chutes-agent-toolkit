@@ -5,7 +5,7 @@ description = "MCP server exposing Chutes.ai management + inference endpoints. B
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "Vincent Bontempo", email = "bontempo.vincent@gmail.com" }]
+authors = [{ name = "Vincent Bontempo" }]
 dependencies = [
     # FastMCP import path (`mcp.server.fastmcp`) is the 1.x location; mcp 2.0.0a1
     # exists on PyPI as of 2026-06-11 and 2.x compatibility is unverified, so cap at <2.

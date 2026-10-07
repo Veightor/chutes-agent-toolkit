@@ -11,7 +11,7 @@
   agents: {
     defaults: {
       model: {
-        primary: "chutes/zai-org/GLM-5-TEE,deepseek-ai/DeepSeek-V3.2-TEE,Qwen/Qwen3.5-397B-A17B-TEE:latency",
+        primary: "chutes/zai-org/GLM-5.2-TEE,deepseek-ai/DeepSeek-V3.2-TEE,Qwen/Qwen3.5-397B-A17B-TEE:latency",
         // Vision-capable fallback for image-bearing messages
         vision: "chutes/google/gemma-4-31B-turbo-TEE",
       },
@@ -27,7 +27,7 @@
         timeoutSeconds: 300,
         models: [
           {
-            id: "zai-org/GLM-5-TEE,deepseek-ai/DeepSeek-V3.2-TEE,Qwen/Qwen3.5-397B-A17B-TEE:latency",
+            id: "zai-org/GLM-5.2-TEE,deepseek-ai/DeepSeek-V3.2-TEE,Qwen/Qwen3.5-397B-A17B-TEE:latency",
             name: "Chutes (latency pool)",
             reasoning: true,
             input: ["text"],

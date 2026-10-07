@@ -25,7 +25,7 @@ python plugins/chutes-ai/skills/chutes-routing/scripts/build_pool.py \
 
 Live probe 2026-06-11: **13 models, all with `confidential_compute=true`** — the whole hosted catalog is TEE-backed (the April 2026 snapshot of 16-of-36 is obsolete; the non-TEE tier was removed). Expect names ending in `-TEE`, but do **not** rely on the suffix — `confidential_compute` on the JSON object is the source of truth (Chutes' own ai-plugin.json says the same).
 
-Current cheapest TEE pool (live `build_pool.py --intent tee-chat` output, 2026-06-11): `Qwen/Qwen3-32B-TEE`, `google/gemma-4-31B-turbo-TEE`, `MiniMaxAI/MiniMax-M2.5-TEE`, `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE`.
+Current cheapest TEE pool (live `build_pool.py --intent tee-chat` output, 2026-10-07): `google/gemma-4-31B-turbo-TEE`, `Qwen/Qwen3-32B-TEE`, `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE`, `deepseek-ai/DeepSeek-V4-Flash-0731-TEE`.
 
 ## Strategy
 

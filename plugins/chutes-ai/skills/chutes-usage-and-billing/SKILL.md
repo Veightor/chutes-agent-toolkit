@@ -49,7 +49,7 @@ All data pulled live — no cached values. If you just deposited and the balance
 
 **Quirk (observed live 2026-06-11):** `monthly.reset_at` can lag — the API returned a reset date in the past (2026-05-02 on 2026-06-11) while `usage`/`remaining` tracked correctly. Trust the dollar figures, not the monthly reset timestamp.
 
-**Plan tiers** (chutes.ai/pricing, 2026-06-11): **Plus $10/mo** (bundled quota + 6% off PAYG beyond it), **Pro $20/mo** (larger quota + 10% off PAYG beyond it), **Enterprise** (custom). The $20 Pro plan maps to the $100/month usage cap and $8.33 rolling 4-hour burst cap shown above (live-verified response shape); exact Plus-tier caps are not published in the static pricing page (unverified as of 2026-06-11). [BETA] A 25% discount is also available by opting into the research data-sharing proxy (`https://research-data-opt-in-proxy.chutes.ai/v1`, per chutes.ai/llms.txt) — enrollment shows up in `/users/me/discounts`; not exercised on this account.
+**Plan tiers** (chutes.ai/pricing, 2026-06-11): **Plus $10/mo** (bundled quota + 6% off PAYG beyond it), **Pro $20/mo** (larger quota + 10% off PAYG beyond it), **Enterprise** (custom). The $20 Pro plan maps to the $100/month usage cap and $8.33 rolling 4-hour burst cap shown above (live-verified response shape); exact Plus-tier caps are not published in the static pricing page (unverified as of 2026-06-11). The former 25% research data-sharing proxy discount is **defunct** (verified 2026-10-07: the proxy returns 404 `DEPLOYMENT_NOT_FOUND` and the offer is gone from chutes.ai/llms.txt and the pricing page); `/users/me/discounts` remains the authoritative per-account discount read.
 
 ### Step 2 — Cost / usage breakdown
 

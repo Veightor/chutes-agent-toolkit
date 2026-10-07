@@ -1,0 +1,34 @@
+{
+  "name": "chutes-agent-toolkit",
+  "owner": {
+    "name": "Vincent Bontempo"
+  },
+  "metadata": {
+    "description": "Chutes.ai agent toolkit marketplace \u2014 decentralized, all-TEE, OpenAI-compatible open-source inference for any agent.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "chutes-ai",
+      "source": "./plugins/chutes-ai",
+      "description": "Access decentralized open-source AI inference via Chutes.ai (all hosted models are TEE confidential-compute). Nine skills: account + API keys + inference hub, Sign in with Chutes (OAuth/OIDC/PKCE), routing + aliases, usage + billing, platform ops, TEE attestation, chute deployment, MCP portability, and agent registration.",
+      "version": "1.3.1",
+      "author": {
+        "name": "Vincent Bontempo"
+      },
+      "license": "MIT",
+      "homepage": "https://chutes.ai",
+      "keywords": [
+        "chutes",
+        "ai",
+        "inference",
+        "open-source",
+        "tee",
+        "confidential-compute",
+        "openai-compatible",
+        "mcp"
+      ],
+      "category": "ai-services"
+    }
+  ]
+}

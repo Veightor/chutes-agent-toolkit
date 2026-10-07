@@ -1,4 +1,4 @@
-"""Tool / function calling round-trip. [VERIFIED 2026-06-11: ran live against the paid API]
+"""Tool / function calling round-trip. [VERIFIED 2026-10-07: ran live against the paid API]
 
 Works on any model whose supported_features includes "tools"
 (check GET https://llm.chutes.ai/v1/models — public).
@@ -10,7 +10,7 @@ import os
 
 from openai import OpenAI
 
-MODEL = os.environ.get("CHUTES_MODEL", "MiniMaxAI/MiniMax-M2.5-TEE")
+MODEL = os.environ.get("CHUTES_MODEL", "google/gemma-4-31B-turbo-TEE")
 
 client = OpenAI(base_url="https://llm.chutes.ai/v1", api_key=os.environ["CHUTES_API_KEY"])
 

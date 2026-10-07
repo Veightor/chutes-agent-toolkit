@@ -18,7 +18,7 @@ Each intent below is defined as **filter + rank + recommended routing strategy**
 - **Strategy suffix:** `:latency` — Chutes re-picks per request based on live TTFT.
 - **Size:** 3-4 members. Smaller pools win on consistency.
 - **Use when:** chat UIs, autocomplete, interactive tools where the user is waiting.
-- **Live pick (2026-06-11, `build_pool.py` output):** `Qwen/Qwen3-32B-TEE` ($0.104/$0.416, 41k ctx), `google/gemma-4-31B-turbo-TEE` ($0.15/$0.42, 131k ctx, vision), `MiniMaxAI/MiniMax-M2.5-TEE` ($0.15/$1.20, 196k ctx), `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE` ($0.2989/$1.1957, 262k ctx). Absolute cheapest on platform: `unsloth/Mistral-Nemo-Instruct-2407-TEE` ($0.0245/$0.0978) — note its `/v1/models` entry has **null** `input_modalities`/`supported_features`/`context_length` (verified 2026-06-11), so modality/feature filters exclude it; add it manually if you want it. Same caveat applies to `nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-TEE`.
+- **Live pick (2026-10-07, `build_pool.py` output):** `google/gemma-4-31B-turbo-TEE` ($0.12/$0.37, 131k ctx, vision), `Qwen/Qwen3-32B-TEE` ($0.104/$0.416, 41k ctx), `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE` ($0.2989/$1.1957, 262k ctx), `deepseek-ai/DeepSeek-V4-Flash-0731-TEE` ($0.44/$1.32, 1M ctx). Absolute cheapest on platform: `unsloth/Mistral-Nemo-Instruct-2407-TEE` ($0.0245/$0.0978) — note its `/v1/models` entry has **null** `input_modalities`/`supported_features`/`context_length` (re-verified 2026-10-07), so modality/feature filters exclude it; add it manually if you want it. Same caveat applies to `Nemotron-3-Nano-Omni-30B-TEE` (the former `nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-TEE` is gone from the catalog).
 
 ### 2. `interactive-rich`
 - **Filter:** `'reasoning' in supported_features` AND `context_length >= 32768`.
@@ -42,8 +42,8 @@ Each intent below is defined as **filter + rank + recommended routing strategy**
 - **Strategy suffix:** `:latency`.
 - **Size:** 3-4 TEE members.
 - **Use when:** sensitive prompts, regulated data, anything where you'd want to explain to an auditor *why* you chose the model.
-- **Catalog note (2026-06-11):** the entire hosted gateway is now TEE (13/13 models `confidential_compute: true`), so these intents currently match everything — keep using them anyway: they document intent and stay correct if a non-TEE tier ever returns.
-- **Live pick (2026-06-11, `build_pool.py --intent tee-chat` output):** `Qwen/Qwen3-32B-TEE`, `google/gemma-4-31B-turbo-TEE`, `MiniMaxAI/MiniMax-M2.5-TEE`, `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE`.
+- **Catalog note (2026-10-07):** the entire hosted gateway is now TEE (14/14 models `confidential_compute: true`), so these intents currently match everything — keep using them anyway: they document intent and stay correct if a non-TEE tier ever returns.
+- **Live pick (2026-10-07, `build_pool.py --intent tee-chat` output):** `google/gemma-4-31B-turbo-TEE`, `Qwen/Qwen3-32B-TEE`, `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE`, `deepseek-ai/DeepSeek-V4-Flash-0731-TEE`.
 - **Note:** the `chutes-tee` skill adds attestation verification on top of TEE flag filtering. Flag alone is not cryptographic proof.
 
 ### 5. `agent-coder`
@@ -52,7 +52,7 @@ Each intent below is defined as **filter + rank + recommended routing strategy**
 - **Strategy suffix:** none (failover-only; latency matters less for long agent loops than reliability).
 - **Size:** 2-3 members.
 - **Use when:** code agents, tool-calling loops, anything where a malformed tool response breaks the run.
-- **Live pick (2026-06-11):** quality-first manual picks: `moonshotai/Kimi-K2.6-TEE` ($0.74/$3.50, 262k ctx) and `zai-org/GLM-5.1-TEE` ($1.20/$4.00, 202k ctx) — the current frontier coding/agentic pair on the platform (relative benchmark standing reported upstream, unverified as of 2026-06-11); budget agentic workhorse: `MiniMaxAI/MiniMax-M2.5-TEE` ($0.15/$1.20, 196k ctx). The script's cost-leaning ranker picks `google/gemma-4-31B-turbo-TEE`, `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE`, `MiniMaxAI/MiniMax-M2.5-TEE` — override toward Kimi/GLM when run quality matters more than spend.
+- **Live pick (2026-10-07):** quality-first manual picks: `moonshotai/Kimi-K3-TEE` ($3.00/$15.00, 1M ctx) and `zai-org/GLM-5.2-TEE` ($1.25/$3.95, 1M ctx) — the current frontier coding/agentic pair on the platform (both bake-off verified live 2026-10-07); mid-tier: `moonshotai/Kimi-K2.6-TEE` ($0.50/$2.85, 262k ctx); budget agentic workhorse: `Qwen/Qwen3.8-27B-TEE` ($0.24/$2.20, 262k ctx, tool-call verified live 2026-10-07). The script's cost-leaning ranker picks `google/gemma-4-31B-turbo-TEE`, `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE`, `deepseek-ai/DeepSeek-V4-Flash-0731-TEE` — override toward Kimi/GLM when run quality matters more than spend.
 
 ## Using a pack
 

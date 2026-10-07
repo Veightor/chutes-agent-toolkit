@@ -28,6 +28,11 @@ This file is intended for AI coding agents wiring an application to this specifi
 - This model is served on its own host (`https://vonkaiser-ace-step-15-music-generator.chutes.ai`). Call the endpoint paths listed below directly.
 - For base64 media fields, send raw base64 strings in API requests. The web playground may use temporary Blob upload references internally for large files before proxying to Chutes.
 
+## Pricing
+
+- $1.80 per hour
+- Check the model page for current pricing.
+
 ## Endpoints
 
 ### 1. POST /generate
@@ -70,6 +75,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-ace-step-15-music-generator.chutes.ai/generate" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -100,6 +107,53 @@ curl -X POST "https://vonkaiser-ace-step-15-music-generator.chutes.ai/generate" 
   --output output.bin
 ```
 
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-ace-step-15-music-generator.chutes.ai/generate"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "args": {
+        "seed": 42,
+        "model": "xl-turbo",
+        "lyrics": "[Instrumental]",
+        "caption": "instrumental lo-fi hip hop, warm vinyl texture, relaxed groove",
+        "duration": 120,
+        "thinking": True,
+        "task_type": "text2music",
+        "batch_size": 1,
+        "use_format": False,
+        "return_json": False,
+        "audio_format": "mp3",
+        "infer_method": "ode",
+        "use_cot_metas": True,
+        "vocal_language": "en",
+        "use_cot_caption": True,
+        "use_random_seed": True,
+        "repainting_start": 0,
+        "use_cot_language": True,
+        "audio_cover_strength": 1
+    }
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+with open("output.bin", "wb") as f:
+    f.write(response.content)
+print("Saved output.bin (" + str(len(response.content)) + " bytes)")
+```
+
 ### 2. GET /models
 
 - Base URL: `https://vonkaiser-ace-step-15-music-generator.chutes.ai`
@@ -110,6 +164,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X GET "https://vonkaiser-ace-step-15-music-generator.chutes.ai/models" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -117,6 +173,32 @@ curl -X GET "https://vonkaiser-ace-step-15-music-generator.chutes.ai/models" \
   -d '{
   "args": {}
 }'
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-ace-step-15-music-generator.chutes.ai/models"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "args": {}
+}
+
+response = requests.request("GET", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
 ```
 
 ### 3. GET /stats
@@ -129,6 +211,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X GET "https://vonkaiser-ace-step-15-music-generator.chutes.ai/stats" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -136,6 +220,32 @@ curl -X GET "https://vonkaiser-ace-step-15-music-generator.chutes.ai/stats" \
   -d '{
   "args": {}
 }'
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-ace-step-15-music-generator.chutes.ai/stats"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "args": {}
+}
+
+response = requests.request("GET", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
 ```
 
 ### 4. GET /health
@@ -148,6 +258,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X GET "https://vonkaiser-ace-step-15-music-generator.chutes.ai/health" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -155,6 +267,32 @@ curl -X GET "https://vonkaiser-ace-step-15-music-generator.chutes.ai/health" \
   -d '{
   "args": {}
 }'
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-ace-step-15-music-generator.chutes.ai/health"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "args": {}
+}
+
+response = requests.request("GET", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
 ```
 
 ### 5. POST /format
@@ -175,6 +313,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-ace-step-15-music-generator.chutes.ai/format" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -189,6 +329,37 @@ curl -X POST "https://vonkaiser-ace-step-15-music-generator.chutes.ai/format" \
 }'
 ```
 
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-ace-step-15-music-generator.chutes.ai/format"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "args": {
+        "lyrics": "",
+        "caption": "",
+        "language": "en",
+        "temperature": 0.85
+    }
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
+```
+
 ### 6. POST /sample
 
 - Base URL: `https://vonkaiser-ace-step-15-music-generator.chutes.ai`
@@ -200,6 +371,8 @@ Request fields:
 
 Example call:
 
+cURL:
+
 ```bash
 curl -X POST "https://vonkaiser-ace-step-15-music-generator.chutes.ai/sample" \
   -H "Authorization: Bearer $CHUTES_API_KEY" \
@@ -209,6 +382,34 @@ curl -X POST "https://vonkaiser-ace-step-15-music-generator.chutes.ai/sample" \
     "sample_type": "simple_mode"
   }
 }'
+```
+
+Python:
+
+```python
+import os
+import requests
+
+api_key = os.environ.get("CHUTES_API_KEY")
+if not api_key:
+    raise ValueError("Missing CHUTES_API_KEY")
+
+url = "https://vonkaiser-ace-step-15-music-generator.chutes.ai/sample"
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+data = {
+    "args": {
+        "sample_type": "simple_mode"
+    }
+}
+
+response = requests.request("POST", url, headers=headers, json=data)
+response.raise_for_status()
+
+result = response.json()
+print(result)
 ```
 
 ## Model Facts

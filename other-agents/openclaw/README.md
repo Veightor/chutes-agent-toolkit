@@ -4,7 +4,9 @@ Wire [Chutes.ai](https://chutes.ai) — decentralized, all-TEE, OpenAI-compatibl
 
 From OpenClaw's point of view, Chutes is just another **OpenAI-compatible provider**. You add one provider block to `openclaw.json`, point your agent at a Chutes model, and your messaging-channel agents now run on open-source TEE models for a fraction of frontier-model cost.
 
-> **[BETA]** This integration is written against OpenClaw's official [model-providers docs](https://docs.openclaw.ai/concepts/model-providers) and the verified Chutes endpoint behavior, but has not yet been exercised end-to-end against a live OpenClaw install. The Chutes side (auth, models, routing) is live-verified; the OpenClaw `models.providers` wiring is doc-derived. Confirm field names against `openclaw --version`'s docs and please open an issue if anything drifts.
+> **Big news (2026-10-07):** OpenClaw now ships an **official bundled Chutes provider** — [`@openclaw/chutes-provider`](https://docs.openclaw.ai/providers/chutes) — with OAuth or API-key onboarding. That is the recommended path (section 1 below); the manual `models.providers` config further down remains the customization/fallback path.
+>
+> **[BETA]** Both paths are written against OpenClaw's official docs (re-checked 2026-10-07 against `openclaw@2026.9.8`) and the live-verified Chutes endpoint behavior, but have not yet been exercised end-to-end against a live OpenClaw install from this repo. Confirm field names against your installed version's docs and please open an issue if anything drifts.
 
 > New to the Chutes API itself? Read the one-page [**Chutes Endpoint Guide**](../../docs/endpoint-guide.md) first — base URLs, auth, routing, and the model list all live there.
 
@@ -22,7 +24,32 @@ From OpenClaw's point of view, Chutes is just another **OpenAI-compatible provid
 
 ---
 
-## 1. Set your API key
+## 1. The official provider plugin (recommended)
+
+OpenClaw bundles an official Chutes provider — install it, restart the gateway, and onboard:
+
+```bash
+openclaw plugins install @openclaw/chutes-provider
+openclaw gateway restart
+
+# Browser OAuth:
+openclaw onboard --auth-choice chutes
+# …or API key:
+openclaw onboard --auth-choice chutes-api-key
+```
+
+What you get (per the [official provider page](https://docs.openclaw.ai/providers/chutes)):
+
+- Provider id `chutes`, base URL `https://llm.chutes.ai/v1`, OpenAI-compatible.
+- Default model after onboarding: `chutes/zai-org/GLM-5.2-TEE`. Registered aliases: `chutes-pro` → `chutes/deepseek-ai/DeepSeek-V3.2-TEE`, `chutes-vision` → `chutes/moonshotai/Kimi-K2.6-TEE`.
+- Env vars: `CHUTES_API_KEY` or `CHUTES_OAUTH_TOKEN` (plus `CHUTES_CLIENT_ID` / `CHUTES_CLIENT_SECRET` / `CHUTES_OAUTH_REDIRECT_URI` / `CHUTES_OAUTH_SCOPES` for custom OAuth apps).
+- Quirks documented upstream: Chutes doesn't report token usage while streaming (`supportsUsageInStreaming: false`); model discovery is cached 5 minutes per credential; `openclaw models list --all --provider chutes` shows the catalog.
+
+If the plugin covers your needs, you're done. The sections below are the **manual custom-provider path** — useful for pinning your own model list, costs, or a routing-pool model id.
+
+---
+
+## 2. Manual path: set your API key
 
 OpenClaw resolves `${ENV_VAR}` references in config from the environment. Export your key (add it to your shell profile or OpenClaw's env file so the daemon sees it):
 
@@ -32,7 +59,7 @@ export CHUTES_API_KEY="cpk_..."
 
 ---
 
-## 2. Add Chutes as a provider in `openclaw.json`
+## 3. Manual path: add Chutes as a provider in `openclaw.json`
 
 Chutes uses the `openai-completions` API shape. Add a `chutes` provider under `models.providers` and point your agent's primary model at it:
 
@@ -92,7 +119,7 @@ That's the whole integration. Your channel agents now run on Chutes.
 
 ---
 
-## 3. (Recommended) Use routing instead of a single model
+## 4. Manual path: use routing instead of a single model
 
 A single model ID is a single point of failure. Chutes accepts a comma-separated **pool** with a strategy suffix right in the model ID — and because OpenClaw passes the `id` straight through, you can use that here too. Define the pool as a model entry:
 
@@ -106,7 +133,7 @@ models: {
       models: [
         {
           // Lowest-latency-first failover pool — great for interactive chat ops
-          id: "zai-org/GLM-5-TEE,deepseek-ai/DeepSeek-V3.2-TEE,Qwen/Qwen3.5-397B-A17B-TEE:latency",
+          id: "zai-org/GLM-5.2-TEE,deepseek-ai/DeepSeek-V3.2-TEE,Qwen/Qwen3.5-397B-A17B-TEE:latency",
           name: "Chutes (latency pool)",
           input: ["text"],
           contextWindow: 131072,
@@ -119,7 +146,7 @@ models: {
 
 agents: {
   defaults: {
-    model: { primary: "chutes/zai-org/GLM-5-TEE,deepseek-ai/DeepSeek-V3.2-TEE,Qwen/Qwen3.5-397B-A17B-TEE:latency" },
+    model: { primary: "chutes/zai-org/GLM-5.2-TEE,deepseek-ai/DeepSeek-V3.2-TEE,Qwen/Qwen3.5-397B-A17B-TEE:latency" },
   },
 },
 ```
@@ -128,21 +155,21 @@ Strategy suffixes: omit for sequential failover, `:latency` for fastest first to
 
 ---
 
-## 4. Picking a model for your channels
+## 5. Picking a model for your channels
 
 | Use case | Suggested model | Why |
 |---|---|---|
-| Interactive chat ops (fast, cheap) | `MiniMaxAI/MiniMax-M2.5-TEE` or `google/gemma-4-31B-turbo-TEE` | Lowest cost, low latency |
+| Interactive chat ops (fast, cheap) | `google/gemma-4-31B-turbo-TEE` or `Qwen/Qwen3.8-27B-TEE` | Lowest cost, low latency (both tool-call verified live 2026-10-07) |
 | General coding agent | `deepseek-ai/DeepSeek-V3.2-TEE` | Strong reasoning, flat $1/$1 pricing |
-| Hard reasoning / planning | `zai-org/GLM-5.1-TEE`, `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE` | Frontier-class reasoning |
+| Hard reasoning / planning | `zai-org/GLM-5.2-TEE`, `Qwen/Qwen3-235B-A22B-Thinking-2507-TEE` | Frontier-class reasoning |
 | Vision (screenshots, images in chat) | `google/gemma-4-31B-turbo-TEE`, `Qwen/Qwen3.6-27B-TEE`, `moonshotai/Kimi-K2.6-TEE` | `input` includes `image` |
-| Huge context (long threads / repos) | `Qwen/Qwen3.5-397B-A17B-TEE`, Kimi-K2 line | 262k context |
+| Huge context (long threads / repos) | `zai-org/GLM-5.2-TEE`, `deepseek-ai/DeepSeek-V4-Flash-0731-TEE`, `moonshotai/Kimi-K3-TEE` | 1M context |
 
 Every hosted model is TEE-backed (`confidential_compute: true`) — a good fit for a gateway that handles real conversations across personal channels. See [privacy](../../docs/endpoint-guide.md#8-privacy-every-model-is-a-tee).
 
 ---
 
-## 5. Optional: vendor-specific request fields
+## 6. Optional: vendor-specific request fields
 
 Need to pass a Chutes/engine-specific field (e.g. a sampling knob not in the standard schema)? OpenClaw merges extra JSON into the request body via per-model `params.extra_body`:
 
@@ -164,14 +191,9 @@ Check each model's `supported_sampling_parameters` (from `/v1/models`) before se
 
 ---
 
-## 6. Privacy-sensitive vs. cost-optimized endpoints
+## 7. Research endpoint — defunct
 
-| Endpoint | `baseUrl` | When to use |
-|---|---|---|
-| **Standard** (default) | `https://llm.chutes.ai/v1` | Everything. Private, hardware-isolated. |
-| **Research opt-in (−25%)** | `https://research-data-opt-in-proxy.chutes.ai/v1` | Cheaper, but prompts/responses are recorded for research. **Never for sensitive channels.** |
-
-To use the discount endpoint, just change `baseUrl` on a second provider block (e.g. `chutes-research`) and confirm the discount is active via `GET https://api.chutes.ai/users/me/discounts`.
+Earlier versions of this guide documented a 25%-cheaper research opt-in endpoint (`research-data-opt-in-proxy.chutes.ai`). It is **gone** — verified 2026-10-07: the host returns 404 `DEPLOYMENT_NOT_FOUND` and the offer is no longer advertised on chutes.ai. Use the standard endpoint (`https://llm.chutes.ai/v1`) for everything; per-account discounts, if any, show up in `GET https://api.chutes.ai/users/me/discounts`.
 
 ---
 
@@ -199,7 +221,7 @@ More: the [Chutes Endpoint Guide → errors & gotchas](../../docs/endpoint-guide
 
 ## Links
 
-- OpenClaw docs: <https://docs.openclaw.ai> · Model providers: <https://docs.openclaw.ai/concepts/model-providers>
+- OpenClaw docs: <https://docs.openclaw.ai> · Chutes provider: <https://docs.openclaw.ai/providers/chutes> · Custom providers: <https://docs.openclaw.ai/concepts/model-providers/custom-providers>
 - Chutes endpoint guide (this repo): [`docs/endpoint-guide.md`](../../docs/endpoint-guide.md)
 - Live model list: <https://llm.chutes.ai/v1/models>
 - Chutes dashboard: <https://chutes.ai/app>
