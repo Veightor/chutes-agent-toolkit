@@ -174,9 +174,10 @@ A per-agent-lane sweep (live catalog + paid completion + full cookbook re-run + 
 - **OpenClaw ships an official `@openclaw/chutes-provider` plugin** (OAuth or API-key onboarding; docs.openclaw.ai/providers/chutes); OpenClaw lane now leads with it. Verified against `openclaw@2026.9.8` docs.
 - **Hermes community catalog plugin landed**: `hermes-chutes-provider` v0.1.5 by TheStreamCode, merged into the hermes-agent plugin catalog 2026-10-04 (PR #126683). Hermes lane now leads with it; local Hermes verified v0.21.3.
 - **LiteLLM prefix is `chutes/`** (was documented as `chutes_ai/`); verified against LiteLLM 1.104.0.
-- **Cookbook 01–07 + chat.mjs re-verified live 2026-10-07**; 08's target video chute (vonkaiser-minimaxh3fl2va) was delisted — header updated with adaptation instructions.
+- **Cookbook 01–07 + chat.mjs re-verified live 2026-10-07**; the former 08 video example was removed after its target chute (vonkaiser-minimaxh3fl2va) was delisted — the media-chute pattern + gotchas live in endpoint-guide §7.
 - **`.claude-plugin/marketplace.json` added** (was missing; `/plugin marketplace add` could not resolve before). `claude plugin validate .` passes. Plugin bumped to v1.3.1.
 - **Vendored model pages refreshed**: all 27 live pages re-fetched 2026-10-07; 9 dead pages (delisted chutes) removed; full-modality catalog rebuilt.
+- **Plugin v1.4.0 follow-ups (same day)**: MCP server declared in `plugin.json` (`mcpServers` → `uvx --from ${CLAUDE_PLUGIN_ROOT}/...`; live stdio `initialize` + `tools/list` verified, 16 tools); fixed a server hang — `_find_manage_credentials()` recursive-globbed up to `/` from installed venvs, now bounded + `CHUTES_MANAGE_CREDENTIALS` override, plus a 30 s credential-subprocess timeout; eval pack migrated to `claude plugin eval` case dirs under `plugins/chutes-ai/evals/` (25 cases, `experimental.evals` declared, suite itself **[BETA]** until first `claude plugin eval` run; legacy `evals/evals.json` kept, marked superseded); non-standard `status: beta` SKILL.md frontmatter dropped (BETA tracking stays in `betaFeatures`).
 
 ### Phase 10: wave 3 brainstorm (not yet scoped)
 

@@ -248,8 +248,6 @@ for chunk in stream:
 - **The published schema may be incomplete.** Some community chutes' llms.txt/openapi document only `prompt` while the deployed code accepts more (image conditioning, duration, seed, …). The authoritative contract is the chute's source: `GET https://api.chutes.ai/chutes/code/{chute_id}` — read the pydantic `*Input` class. (`GET /openapi.json` on the chute host itself just proxies to the management API; it does not describe the chute.)
 - **Billing is per compute-second** at the chute's GPU rate (`x-chutes.pricing.usdPerHour` in its model-page openapi.json), so a video render costs dimes, not the micro-cents of a chat call.
 
-Runnable example: [`cookbook/python/08_video_generation.py`](../cookbook/python/08_video_generation.py).
-
 > Before sending exotic sampling params (`top_k`, `repetition_penalty`, …), check the model's `supported_sampling_parameters`. `sglang` and `vllm` engines accept different knobs.
 
 ---

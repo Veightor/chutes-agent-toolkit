@@ -1,6 +1,5 @@
 ---
 name: chutes-agent-registration
-status: beta
 description: "Chutes.ai agent-native onboarding. Use this skill when an autonomous agent needs to self-register on Chutes without a human signup, bootstrap its own Chutes account, and set up its first API key programmatically via a Bittensor hotkey signature. Triggers on: chutes agent registration, agent signup, agent_registration, agent setup, programmatic chutes signup, hotkey agent register, autonomous chutes onboarding, bittensor agent account."
 ---
 

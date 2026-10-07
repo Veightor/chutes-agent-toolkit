@@ -34,7 +34,7 @@ This repo is both a **Claude plugin marketplace** and a **multi-agent toolkit** 
 
 | Component | Version | Notes |
 |---|---|---|
-| Toolkit / `chutes-ai` plugin | **v1.3.1** | see [`plugin.json`](plugins/chutes-ai/.claude-plugin/plugin.json) |
+| Toolkit / `chutes-ai` plugin | **v1.4.0** | see [`plugin.json`](plugins/chutes-ai/.claude-plugin/plugin.json) |
 | Model snapshot | _auto_ | daily-refreshed → badges above + [`data/chutes-models.json`](data/chutes-models.json) |
 | Chutes SDK (PyPI `chutes`) | 0.6.9 (stable) | for `chutes deploy` / TEE `tee=True` |
 | Hermes (verified against) | v0.21.3 | catalog plugin [`hermes-chutes-provider`](https://github.com/TheStreamCode/hermes-chutes-provider) v0.1.5 by TheStreamCode, or named OpenAI-compatible provider |
@@ -121,6 +121,8 @@ Add this repo as a marketplace, then install the plugin:
 /plugin marketplace add Veightor/chutes-agent-toolkit
 /plugin install chutes-ai@chutes-agent-toolkit
 ```
+
+Since v1.4.0 the plugin also declares the Chutes MCP server (`mcpServers` in `plugin.json`): if [`uv`](https://docs.astral.sh/uv/) is on your PATH, Claude Code auto-starts it from the plugin tree via `uvx` — 16 management/read tools, no separate install step (set `CHUTES_API_KEY` in your environment; verified end-to-end 2026-10-07 with a live stdio `initialize` + `tools/list`). Without `uv`, the server just shows as unavailable and everything else still works.
 
 Claude now has the full four-lane skill suite. Try asking:
 
@@ -413,7 +415,7 @@ chutes-agent-toolkit/
 │   └── llms-txt-review.md
 ├── cookbook/                              # runnable examples, live-verified 2026-06-11
 │   ├── README.md
-│   ├── python/ (01_first_call → 08_video_generation)
+│   ├── python/ (01_first_call → 07_mini_agent)
 │   └── javascript/chat.mjs
 ├── site/                                  # draft chutes.ai pages promoting agent use
 │   ├── README.md                          # page map + widget specs

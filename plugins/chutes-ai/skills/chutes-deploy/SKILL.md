@@ -1,6 +1,5 @@
 ---
 name: chutes-deploy
-status: beta
 description: "[BETA — permanent until verified] Deploy models on the Chutes.ai decentralized GPU network. Use this skill when the user wants to deploy a vLLM chute, diffusion chute, custom CDK chute, build a chute image, deploy a TEE/confidential chute (tee=True), inspect rolling updates, or create a stable model alias after deploy. Triggers on: deploy chute, chutes deploy, vllm chute, diffusion chute, build chute image, POST /chutes/, POST /chutes/vllm, POST /chutes/diffusion, POST /images/, teeify, tee=True, private chute, deployment fee, chutes deploy --accept-fee, revision pinning, rolling update chutes, chute share/unshare/make_public, model alias deploy."
 ---
 

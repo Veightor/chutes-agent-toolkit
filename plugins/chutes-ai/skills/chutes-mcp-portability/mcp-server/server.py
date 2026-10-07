@@ -60,15 +60,23 @@ BETA_PREFIX = "[BETA] "
 
 
 def _find_manage_credentials() -> Optional[Path]:
-    """Locate manage_credentials.py by walking up from this file."""
+    """Locate manage_credentials.py via env override or known relative layouts.
+
+    Never walks the filesystem: an installed copy of this server (uvx/uv tool)
+    lives in a venv, where the old recursive glob climbed to $HOME and / and
+    hung for minutes.
+    """
+    env_path = os.environ.get("CHUTES_MANAGE_CREDENTIALS")
+    if env_path:
+        p = Path(env_path).expanduser()
+        if p.exists():
+            return p
     here = Path(__file__).resolve().parent
-    candidate = here.parent.parent / "chutes-ai" / "scripts" / "manage_credentials.py"
-    if candidate.exists():
-        return candidate
-    for parent in here.parents:
-        found = list(parent.glob("**/manage_credentials.py"))
-        if found:
-            return found[0]
+    rel = Path("chutes-ai") / "scripts" / "manage_credentials.py"
+    for parent in [here, *list(here.parents)[:5]]:
+        for candidate in (parent / rel, parent / "skills" / rel):
+            if candidate.exists():
+                return candidate
     return None
 
 
@@ -82,11 +90,21 @@ def _get_secret(field: str, env_var: str) -> str:
         raise RuntimeError(
             f"{env_var} not set and manage_credentials.py not found on PATH"
         )
-    result = subprocess.run(
-        [sys.executable, str(script), "get", "--field", field],
-        capture_output=True,
-        text=True,
-    )
+    try:
+        # A hard timeout matters here: on macOS a keychain read from a fresh
+        # interpreter (e.g. a uvx-managed venv) can block forever on an
+        # unanswered Keychain authorization dialog.
+        result = subprocess.run(
+            [sys.executable, str(script), "get", "--field", field],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired:
+        raise RuntimeError(
+            f"timed out reading Chutes {field} from credential store "
+            f"(keychain authorization may be pending); set {env_var} instead"
+        )
     if result.returncode != 0:
         raise RuntimeError(f"failed to read Chutes {field} from credential store")
     return result.stdout.strip()

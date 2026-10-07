@@ -1,4 +1,5 @@
 {
+  "superseded_by": "plugins/chutes-ai/evals/ (claude plugin eval case-directory format, migrated 2026-10-07; this file is kept as the legacy source pack)",
   "skill_name": "chutes-ai",
   "evals": [
     {
@@ -92,7 +93,7 @@
       "category": "chute-deploy-vllm",
       "status": "beta",
       "prompt": "Deploy Qwen/Qwen3-8B as a vLLM chute on an H100 and give it a stable alias called 'interactive-fast' so my team can point at the alias instead of hardcoding the model id.",
-      "expected_output": "Should route to the chutes-deploy skill (permanent BETA). Should explicitly acknowledge that deploy consumes real paid compute, confirm before POSTing, POST /chutes/vllm with a templated body (model Qwen/Qwen3-8B, gpu_type h100, gpu_count 1, revision pinned to a full 40-hex HF commit SHA — the API rejects branch names and short SHAs), stream build logs from GET /images/{image_id}/logs, poll GET /chutes/warmup/{chute_id} until ready, then POST /model_aliases/ with {alias: interactive-fast, chute_ids: [<chute_uuid>]} — NOT {alias, model}. Should return the base_url + model_id for inference. Must warn about BETA status and that the easy-deploy lane may be server-side gated (403) on some account classes.",
+      "expected_output": "Should route to the chutes-deploy skill (permanent BETA). Should explicitly acknowledge that deploy consumes real paid compute, confirm before POSTing, POST /chutes/vllm with a templated body (model Qwen/Qwen3-8B, gpu_type h100, gpu_count 1, revision pinned to a full 40-hex HF commit SHA \u2014 the API rejects branch names and short SHAs), stream build logs from GET /images/{image_id}/logs, poll GET /chutes/warmup/{chute_id} until ready, then POST /model_aliases/ with {alias: interactive-fast, chute_ids: [<chute_uuid>]} \u2014 NOT {alias, model}. Should return the base_url + model_id for inference. Must warn about BETA status and that the easy-deploy lane may be server-side gated (403) on some account classes.",
       "files": []
     },
     {
