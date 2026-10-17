@@ -3,7 +3,7 @@
 This file is generated from the public Chutes OpenAI-compatible model endpoint. Do not edit it by hand; run `python3 scripts/update_chutes_models.py` instead.
 
 Source: `GET https://llm.chutes.ai/v1/models` (no auth headers sent)
-Last updated: 2026-10-16 13:58 UTC
+Last updated: 2026-10-17 12:59 UTC
 
 ## Summary
 
@@ -59,7 +59,7 @@ Last updated: 2026-10-16 13:58 UTC
 - `Qwen/Qwen3.8-27B-TEE` ($0.039/$1.25, context 262k, text+image)
 - `deepseek-ai/DeepSeek-V3.2-TEE` ($1/$1, context 131k, text)
 - `Qwen/Qwen3.6-27B-TEE` ($0.25/$2, context 262k, text+image)
-- `moonshotai/Kimi-K2.6-TEE` ($0.45/$1.95, context 262k, text+image+video)
+- `zai-org/GLM-5.1-TEE` ($0.98/$3.08, context 203k, text)
 
 ## Routing aliases
 
