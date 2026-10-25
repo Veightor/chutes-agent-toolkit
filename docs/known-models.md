@@ -3,12 +3,12 @@
 This file is generated from the public Chutes OpenAI-compatible model endpoint. Do not edit it by hand; run `python3 scripts/update_chutes_models.py` instead.
 
 Source: `GET https://llm.chutes.ai/v1/models` (no auth headers sent)
-Last updated: 2026-10-24 13:21 UTC
+Last updated: 2026-10-25 13:43 UTC
 
 ## Summary
 
-- Models returned: **14**
-- TEE/confidential-compute models: **14/14** — the hosted gateway is currently TEE-only.
+- Models returned: **16**
+- TEE/confidential-compute models: **14/16**
 - Models advertising `tools`: **12**
 - Models advertising `json_mode`: **12**
 - Models advertising `structured_outputs`: **12**
@@ -32,6 +32,8 @@ Last updated: 2026-10-24 13:21 UTC
 | `google/gemma-4-31B-turbo-TEE` | 0.12 | 0.37 | 0.012 | 131k | fp4 | sglang | yes | text+image | json_mode, tools, structured_outputs, reasoning |
 | `Nemotron-3-Nano-Omni-30B-TEE` | 0.0245 | 0.0978 | 0.00245 | 131k | — | sglang | yes | text | — |
 | `unsloth/Mistral-Nemo-Instruct-2407-TEE` | 0.0245 | 0.0978 | 0.00245 | 131k | — | sglang | yes | text | — |
+| `Qwen/Qwen3.8-Max-0902` | — | — | — | — | — | chutes | no | text | — |
+| `deepseek-ai/DeepSeek-V4-Pro-0813` | — | — | — | — | — | chutes | no | text | — |
 
 ## Quick picks generated from the live snapshot
 
@@ -57,9 +59,9 @@ Last updated: 2026-10-24 13:21 UTC
 
 - `google/gemma-4-31B-turbo-TEE` ($0.12/$0.37, context 131k, text+image)
 - `Qwen/Qwen3.8-27B-TEE` ($0.039/$1.25, context 262k, text+image)
-- `deepseek-ai/DeepSeek-V3.2-TEE` ($1/$1, context 131k, text)
 - `Qwen/Qwen3.6-27B-TEE` ($0.25/$2, context 262k, text+image)
-- `moonshotai/Kimi-K2.6-TEE` ($0.45/$1.95, context 262k, text+image+video)
+- `deepseek-ai/DeepSeek-V3.2-TEE` ($1/$1, context 131k, text)
+- `zai-org/GLM-5.1-TEE` ($0.98/$3.08, context 203k, text)
 
 ## Routing aliases
 
