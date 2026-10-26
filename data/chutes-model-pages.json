@@ -122,10 +122,10 @@
       "tagline": "moonshotai/Kimi-K3"
     },
     {
-      "category": "chat-llm",
-      "chat_llm": true,
+      "category": "other",
+      "chat_llm": false,
       "chute_id": "761ccdab-2e3d-5268-ab03-55f8ba94a80c",
-      "in_v1_models_snapshot": true,
+      "in_v1_models_snapshot": false,
       "input_modalities": [],
       "llms_txt": "https://chutes.ai/app/chute/chutes-nemotron-3-nano-omni-30b-tee/llms.txt",
       "modalities": null,
@@ -137,10 +137,10 @@
       "tagline": "Multimodal reasoning: video, audio, image, and text \u2192 answers, summaries, and tools"
     },
     {
-      "category": "chat-llm",
-      "chat_llm": true,
+      "category": "other",
+      "chat_llm": false,
       "chute_id": "21d129e5-8426-5c29-a6be-844e0f5f5e30",
-      "in_v1_models_snapshot": true,
+      "in_v1_models_snapshot": false,
       "input_modalities": [
         "text"
       ],
@@ -156,10 +156,10 @@
       "tagline": "Qwen/Qwen3-235B-A22B-Thinking-2507-TEE model on Chutes."
     },
     {
-      "category": "chat-llm",
-      "chat_llm": true,
+      "category": "other",
+      "chat_llm": false,
       "chute_id": "ac059e33-eb27-541c-b9a9-24b214036475",
-      "in_v1_models_snapshot": true,
+      "in_v1_models_snapshot": false,
       "input_modalities": [
         "text"
       ],
@@ -251,10 +251,10 @@
       "tagline": "Qwen/Qwen3-Embedding-8B"
     },
     {
-      "category": "chat-llm",
-      "chat_llm": true,
+      "category": "other",
+      "chat_llm": false,
       "chute_id": "7725a31d-28df-5bb7-9d29-c23b49df5472",
-      "in_v1_models_snapshot": true,
+      "in_v1_models_snapshot": false,
       "input_modalities": [
         "text"
       ],

@@ -7,8 +7,8 @@ Unlike [`known-models.md`](known-models.md) (auto-refreshed from `GET /v1/models
 ## Summary
 
 - Model pages catalogued: **27**
-- Chat LLMs (also in `known-models.md`): **14**
-- Non-chat / full-modality chutes: **13**
+- Chat LLMs (also in `known-models.md`): **10**
+- Non-chat / full-modality chutes: **17**
 
 Every model exposes an agent-facing `llms.txt` at `https://chutes.ai/app/chute/<slug>/llms.txt` and a callable OpenAPI spec at `.../openapi.json`.
 
@@ -21,13 +21,9 @@ Every model exposes an agent-facing `llms.txt` at `https://chutes.ai/app/chute/<
 | [`google/gemma-4-31B-turbo-TEE`](https://chutes.ai/app/chute/chutes-google-gemma-4-31b-turbo-tee) | chutes | text, image in → text out | Gemma-4-31B-IT NVFP4 with DFlash speculative decoding |
 | [`moonshotai/Kimi-K2.6-TEE`](https://chutes.ai/app/chute/chutes-moonshotai-kimi-k2-6-tee) | chutes | text, image, video in → text out | moonshotai/Kimi-K2.6 |
 | [`moonshotai/Kimi-K3-TEE`](https://chutes.ai/app/chute/chutes-moonshotai-kimi-k3-tee) | chutes | — | moonshotai/Kimi-K3 |
-| [`Nemotron-3-Nano-Omni-30B-TEE`](https://chutes.ai/app/chute/chutes-nemotron-3-nano-omni-30b-tee) | chutes | — | Multimodal reasoning: video, audio, image, and text → answers, summaries, and tools |
-| [`Qwen/Qwen3-235B-A22B-Thinking-2507-TEE`](https://chutes.ai/app/chute/chutes-qwen-qwen3-235b-a22b-thinking-2507-tee) | chutes | text in → text out | Qwen/Qwen3-235B-A22B-Thinking-2507-TEE model on Chutes. |
-| [`Qwen/Qwen3-32B-TEE`](https://chutes.ai/app/chute/chutes-qwen-qwen3-32b-tee) | chutes | text in → text out | Qwen/Qwen3-32B, FP8 precision with DFLASH speculative decoding |
 | [`Qwen/Qwen3.5-397B-A17B-TEE`](https://chutes.ai/app/chute/chutes-qwen-qwen3-5-397b-a17b-tee) | chutes | text, image, video in → text out | Qwen/Qwen3.5-397B-A17B-FP8 |
 | [`Qwen/Qwen3.6-27B-TEE`](https://chutes.ai/app/chute/chutes-qwen-qwen3-6-27b-tee) | chutes | text, image, video in → text out | Qwen/Qwen3.6-27B-FP8 with DFlash speculative decoding |
 | [`Qwen/Qwen3.8-27B-TEE`](https://chutes.ai/app/chute/chutes-qwen-qwen3-8-27b-tee) | chutes | — | Qwen/Qwen3.8-27B-FP8 |
-| [`unsloth/Mistral-Nemo-Instruct-2407-TEE`](https://chutes.ai/app/chute/chutes-unsloth-mistral-nemo-instruct-2407-tee) | chutes | text in → text out | unsloth/Mistral-Nemo-Instruct-2407 |
 | [`zai-org/GLM-5.1-TEE`](https://chutes.ai/app/chute/chutes-zai-org-glm-5-1-tee) | chutes | text in → text out | zai-org/GLM-5.1-FP8 |
 | [`zai-org/GLM-5.2-TEE`](https://chutes.ai/app/chute/chutes-zai-org-glm-5-2-tee) | chutes | text in → text out | nvidia/GLM-5.2-NVFP4 |
 
@@ -72,7 +68,11 @@ Every model exposes an agent-facing `llms.txt` at `https://chutes.ai/app/chute/<
 |---|---|---|---|
 | [`halo-guard`](https://chutes.ai/app/chute/astroboi-halo-guard) | astroboi | — | Structured guard classifier for Halo0.8B-guard-v1 |
 | [`halo4b-guard-alpha`](https://chutes.ai/app/chute/astroboi-halo4b-guard-alpha) | astroboi | — | Halo Guard Alpha 4B |
+| [`Nemotron-3-Nano-Omni-30B-TEE`](https://chutes.ai/app/chute/chutes-nemotron-3-nano-omni-30b-tee) | chutes | — | Multimodal reasoning: video, audio, image, and text → answers, summaries, and tools |
+| [`Qwen/Qwen3-235B-A22B-Thinking-2507-TEE`](https://chutes.ai/app/chute/chutes-qwen-qwen3-235b-a22b-thinking-2507-tee) | chutes | text in → text out | Qwen/Qwen3-235B-A22B-Thinking-2507-TEE model on Chutes. |
+| [`Qwen/Qwen3-32B-TEE`](https://chutes.ai/app/chute/chutes-qwen-qwen3-32b-tee) | chutes | text in → text out | Qwen/Qwen3-32B, FP8 precision with DFLASH speculative decoding |
 | [`sam3`](https://chutes.ai/app/chute/score-test-sam3) | score_test | — | Segment Anything Model (SAM3) |
+| [`unsloth/Mistral-Nemo-Instruct-2407-TEE`](https://chutes.ai/app/chute/chutes-unsloth-mistral-nemo-instruct-2407-tee) | chutes | text in → text out | unsloth/Mistral-Nemo-Instruct-2407 |
 
 ## Notes
 
