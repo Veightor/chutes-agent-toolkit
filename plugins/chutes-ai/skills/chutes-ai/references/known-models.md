@@ -3,15 +3,15 @@
 This file is generated from the public Chutes OpenAI-compatible model endpoint. Do not edit it by hand; run `python3 scripts/update_chutes_models.py` instead.
 
 Source: `GET https://llm.chutes.ai/v1/models` (no auth headers sent)
-Last updated: 2026-11-08 15:59 UTC
+Last updated: 2026-11-09 19:50 UTC
 
 ## Summary
 
-- Models returned: **18**
-- TEE/confidential-compute models: **10/18**
-- Models advertising `tools`: **10**
-- Models advertising `json_mode`: **10**
-- Models advertising `structured_outputs`: **10**
+- Models returned: **19**
+- TEE/confidential-compute models: **11/19**
+- Models advertising `tools`: **11**
+- Models advertising `json_mode`: **11**
+- Models advertising `structured_outputs`: **11**
 - The models endpoint carries pricing and capability metadata, but not TTFT/TPS latency stats. For live latency/throughput data, use `GET https://api.chutes.ai/invocations/stats/llm` or the `default:latency` / `default:throughput` routing aliases.
 
 ## Live model table (USD per 1M tokens)
@@ -24,8 +24,9 @@ Last updated: 2026-11-08 15:59 UTC
 | `zai-org/GLM-5.1-TEE` | 0.9 | 2.9 | 0.09 | 203k | fp8 | sglang | yes | text | json_mode, structured_outputs, tools, reasoning |
 | `Qwen/Qwen3.6-27B-TEE` | 0.25 | 2 | 0.025 | 262k | fp8 | sglang | yes | text+image | json_mode, tools, structured_outputs, reasoning |
 | `moonshotai/Kimi-K2.6-TEE` | 0.39 | 1.8 | 0.039 | 262k | int4 | vllm | yes | text+image+video | json_mode, structured_outputs, tools, reasoning |
+| `Qwen/Qwen3.5-27B-TEE` | 0.2 | 1.75 | 0.02 | 262k | fp8 | sglang | yes | text+image | json_mode, structured_outputs, tools, reasoning |
 | `deepseek-ai/DeepSeek-V4-Flash-0731-TEE` | 0.44 | 1.32 | 0.044 | 1049k | fp8 | sglang | yes | text | json_mode, structured_outputs, tools, reasoning |
-| `Qwen/Qwen3.8-27B-TEE` | 0.039 | 1.25 | 0.0039 | 262k | fp8 | vllm | yes | text+image | json_mode, tools, structured_outputs, reasoning |
+| `Qwen/Qwen3.8-27B-TEE` | 0.039 | 1.25 | 0.0039 | 262k | fp8 | sglang | yes | text+image | json_mode, tools, structured_outputs, reasoning |
 | `deepseek-ai/DeepSeek-V3.2-TEE` | 1 | 1 | 0.1 | 131k | fp8 | sglang | yes | text | json_mode, tools, reasoning, structured_outputs |
 | `google/gemma-4-31B-turbo-TEE` | 0.12 | 0.37 | 0.012 | 131k | fp4 | sglang | yes | text+image | json_mode, tools, structured_outputs, reasoning |
 | `Qwen/Qwen3.8-2.4T-A95B` | — | — | — | — | — | chutes | no | text | — |
@@ -43,13 +44,13 @@ Last updated: 2026-11-08 15:59 UTC
 
 - `Qwen/Qwen3.8-27B-TEE` ($0.039/$1.25, context 262k, text+image)
 - `google/gemma-4-31B-turbo-TEE` ($0.12/$0.37, context 131k, text+image)
-- `Qwen/Qwen3.6-27B-TEE` ($0.25/$2, context 262k, text+image)
+- `Qwen/Qwen3.5-27B-TEE` ($0.2/$1.75, context 262k, text+image)
 
 ### Cheapest image-capable models
 
 - `Qwen/Qwen3.8-27B-TEE` ($0.039/$1.25, context 262k, text+image)
 - `google/gemma-4-31B-turbo-TEE` ($0.12/$0.37, context 131k, text+image)
-- `Qwen/Qwen3.6-27B-TEE` ($0.25/$2, context 262k, text+image)
+- `Qwen/Qwen3.5-27B-TEE` ($0.2/$1.75, context 262k, text+image)
 
 ### Largest context windows
 
