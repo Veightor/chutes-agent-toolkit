@@ -3,12 +3,12 @@
 This file is generated from the public Chutes OpenAI-compatible model endpoint. Do not edit it by hand; run `python3 scripts/update_chutes_models.py` instead.
 
 Source: `GET https://llm.chutes.ai/v1/models` (no auth headers sent)
-Last updated: 2026-11-20 17:50 UTC
+Last updated: 2026-11-21 16:48 UTC
 
 ## Summary
 
-- Models returned: **19**
-- TEE/confidential-compute models: **11/19**
+- Models returned: **20**
+- TEE/confidential-compute models: **11/20**
 - Models advertising `tools`: **19**
 - Models advertising `json_mode`: **19**
 - Models advertising `structured_outputs`: **19**
@@ -22,6 +22,7 @@ Last updated: 2026-11-20 17:50 UTC
 | `zai-org/GLM-5.2-Fast` | 2.45 | 7.7 | 0.49 | 1049k | — | chutes | no | text | json_mode, structured_outputs, tools, reasoning |
 | `Qwen/Qwen3.8-2.4T-A95B` | 2 | 6 | 0.25 | 1000k | — | chutes | no | text | json_mode, structured_outputs, tools, reasoning |
 | `Qwen/Qwen3.8-Max-0902` | 2 | 6 | 0.25 | 1000k | — | chutes | no | text+image+video | json_mode, structured_outputs, tools, reasoning |
+| `Qwen/Qwen4-Max` | 1.5 | 4.5 | 0.075 | — | — | chutes | no | text | — |
 | `zai-org/GLM-5.2-TEE` | 1.25 | 3.95 | 0.125 | 1049k | fp4 | sglang | yes | text | json_mode, structured_outputs, tools, reasoning |
 | `moonshotai/Kimi-K2.7-Code` | 0.832 | 3.5 | 0.167 | 262k | — | chutes | no | text+image+video | json_mode, structured_outputs, tools, reasoning |
 | `Qwen/Qwen3.5-397B-A17B-TEE` | 0.45 | 3 | 0.045 | 262k | fp8 | sglang | yes | text+image | json_mode, tools, structured_outputs, reasoning |
@@ -62,9 +63,9 @@ Last updated: 2026-11-20 17:50 UTC
 
 - `Qwen/Qwen3.8-27B-TEE` ($0.039/$1.25, context 262k, text+image)
 - `google/gemma-4-31B-turbo-TEE` ($0.12/$0.37, context 131k, text+image)
+- `deepseek-ai/DeepSeek-V3.2-TEE` ($1/$1, context 131k, text)
 - `moonshotai/Kimi-K2.6-TEE` ($0.39/$1.8, context 262k, text+image+video)
 - `zai-org/GLM-5.1-TEE` ($0.9/$2.9, context 203k, text)
-- `deepseek-ai/DeepSeek-V3.2-TEE` ($1/$1, context 131k, text)
 
 ## Routing aliases
 
